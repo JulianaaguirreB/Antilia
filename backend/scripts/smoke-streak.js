@@ -3,6 +3,18 @@ const { Pool } = require("pg");
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
+if (!process.env.DATABASE_URL) {
+  console.error("FAIL: DATABASE_URL is not defined");
+  process.exit(1);
+}
+
+const dbUrl = new URL(process.env.DATABASE_URL);
+const force = process.argv.includes("--force");
+if (!force && dbUrl.hostname !== "localhost" && dbUrl.hostname !== "127.0.0.1") {
+  console.error("FAIL: DATABASE_URL no es localhost ni 127.0.0.1. Usa --force para correr en otro host.");
+  process.exit(1);
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.DATABASE_SSL === 'true' ? (process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'false' ? { rejectUnauthorized: false } : true) : false,

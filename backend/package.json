@@ -8,7 +8,8 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "migrate": "node src/migrate.js",
-    "smoke": "node scripts/smoke.js"
+    "smoke": "node scripts/smoke.js",
+    "smoke:streak": "node scripts/smoke-streak.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
