@@ -37,16 +37,23 @@ app.get(/^(?!\/api)/, (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error(err);
-  if (err.status >= 400 && err.status < 500) {
-    return res.status(err.status).json({ error: err.message || "Solicitud inválida." });
-  }
-  if (err.statusCode >= 400 && err.statusCode < 500) {
-    return res.status(err.statusCode).json({ error: err.message || "Solicitud inválida." });
-  }
-  if (err.type === 'entity.parse.failed') {
+  if (err.type === "entity.parse.failed") {
     return res.status(400).json({ error: "JSON inválido." });
   }
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({ error: "La solicitud es demasiado grande." });
+  }
+
+  const status = err.status || err.statusCode || 500;
+
+  if (status >= 400 && status < 500) {
+    if (err.isValidation) {
+      return res.status(status).json({ error: err.message });
+    }
+    return res.status(status).json({ error: "Solicitud inválida." });
+  }
+
+  console.error(err);
   res.status(500).json({ error: "Error interno." });
 });
 
