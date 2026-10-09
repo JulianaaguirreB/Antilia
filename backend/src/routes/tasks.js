@@ -5,17 +5,41 @@ const { validateString, validateType } = require("../validate");
 
 const router = express.Router();
 router.use(requireAuth);
-router.get("/", async (req, res) => {
-  const status = req.query.status === "completada" ? "completada" : "pendiente";
+
+router.get("/", async (req, res, next) => {
   try {
-    const result = await pool.query(
-      "SELECT id, title, type, status, created_at, completed_at FROM tasks WHERE user_id = $1 AND status = $2 ORDER BY created_at ASC",
-      [req.userId, status]
-    );
+    let status = req.query.status;
+    if (status !== "completada" && status !== "all") {
+      status = "pendiente";
+    }
+
+    let type = req.query.type;
+    if (type !== undefined) {
+      if (type !== "fisica" && type !== "digital") {
+        return res.status(400).json({ error: "type debe ser 'fisica' o 'digital'." });
+      }
+    }
+
+    let query = "SELECT id, title, type, status, created_at, completed_at FROM tasks WHERE user_id = $1";
+    const params = [req.userId];
+    let paramIndex = 2;
+
+    if (status !== "all") {
+      query += \` AND status = $\${paramIndex++}\`;
+      params.push(status);
+    }
+    
+    if (type) {
+      query += \` AND type = $\${paramIndex++}\`;
+      params.push(type);
+    }
+
+    query += " ORDER BY created_at ASC";
+
+    const result = await pool.query(query, params);
     res.json({ tasks: result.rows });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "No se pudieron consultar las tareas." });
+    next(err);
   }
 });
 
@@ -31,10 +55,10 @@ router.post("/", async (req, res, next) => {
     res.status(201).json({ task: result.rows[0] });
   } catch (err) {
     next(err);
- {
-    console.error(err);
-    
-router.patch("/:id/complete", async (req, res) => {
+  }
+});
+
+router.patch("/:id/complete", async (req, res, next) => {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.id)) {
     return res.status(404).json({ error: "Tarea no encontrada." });
   }
@@ -60,12 +84,12 @@ router.patch("/:id/complete", async (req, res) => {
     res.json({ task: taskResult.rows[0], streak });
   } catch (err) {
     if (client) await client.query("ROLLBACK").catch(() => {});
-    console.error(err);
-    res.status(500).json({ error: "No se pudo completar la tarea." });
+    next(err);
   } finally {
     if (client) client.release();
   }
 });
+
 async function updateStreakOnCompletion(client, userId) {
   const current = await client.query(
     "SELECT current_streak, best_streak, (now() AT TIME ZONE 'America/Bogota')::date - last_active_date AS diff FROM streaks WHERE user_id = $1 FOR UPDATE",
