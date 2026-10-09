@@ -42,9 +42,15 @@ router.post("/register", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
   try {
     const email = validateEmail(req.body.email);
-    const password = validateString(req.body.password, "password", 1, 72);
+    const password = req.body.password;
+    if (typeof password !== "string") {
+      throw { status: 400, message: "password debe ser texto.", isValidation: true };
+    }
+    if (password.length < 1) {
+      throw { status: 400, message: "password debe tener al menos 1 carácter.", isValidation: true };
+    }
     if (Buffer.byteLength(password, "utf8") > 72) {
-      throw { status: 400, message: "máximo 72 bytes; evita demasiados acentos o emojis" };
+      throw { status: 400, message: "La contraseña es demasiado larga (máximo 72 bytes).", isValidation: true };
     }
 
     const result = await pool.query(
