@@ -43,6 +43,9 @@ router.post("/login", async (req, res, next) => {
   try {
     const email = validateEmail(req.body.email);
     const password = validateString(req.body.password, "password", 1, 72);
+    if (Buffer.byteLength(password, "utf8") > 72) {
+      throw { status: 400, message: "máximo 72 bytes; evita demasiados acentos o emojis" };
+    }
 
     const result = await pool.query(
       "SELECT id, name, email, password_hash FROM users WHERE email = $1",
