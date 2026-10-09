@@ -1,6 +1,7 @@
 const express = require("express");
 const { pool } = require("../db");
 const { requireAuth } = require("../middleware/auth");
+const { validateString, validateType } = require("../validate");
 
 const router = express.Router();
 router.use(requireAuth);
@@ -17,24 +18,22 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "No se pudieron consultar las tareas." });
   }
 });
-router.post("/", async (req, res) => {
-  const { title, type } = req.body;
 
-  if (!title || !["fisica", "digital"].includes(type)) {
-    return res.status(400).json({ error: "title es obligatorio y type debe ser 'fisica' o 'digital'." });
-  }
-
+router.post("/", async (req, res, next) => {
   try {
+    const title = validateString(req.body.title, "title", 1, 120);
+    const type = validateType(req.body.type);
+
     const result = await pool.query(
       "INSERT INTO tasks (user_id, title, type) VALUES ($1, $2, $3) RETURNING id, title, type, status, created_at",
       [req.userId, title, type]
     );
     res.status(201).json({ task: result.rows[0] });
   } catch (err) {
+    next(err);
+ {
     console.error(err);
-    res.status(500).json({ error: "No se pudo crear la tarea." });
-  }
-});
+    
 router.patch("/:id/complete", async (req, res) => {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.id)) {
     return res.status(404).json({ error: "Tarea no encontrada." });

@@ -2,63 +2,51 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { pool } = require("../db");
+const { validateString, validateEmail, validatePassword } = require("../validate");
 const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
-function isValidPassword(password) {
-  return /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password || "");
-}
-
 function signToken(userId) {
   return jwt.sign({ sub: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 }
-router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
 
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: "name, email y password son obligatorios." });
-  }
-  if (!isValidPassword(password)) {
-    return res.status(400).json({ error: "La contraseña debe tener mínimo 8 caracteres, con al menos una letra y un número." });
-  }
-
+router.post("/register", async (req, res, next) => {
   try {
-    const existing = await pool.query("SELECT id FROM users WHERE email = $1", [email.toLowerCase()]);
-    if (existing.rows.length > 0) {
-      return res.status(409).json({ error: "Ya existe una cuenta con ese correo." });
-    }
+    const name = validateString(req.body.name, "name", 1, 80);
+    const email = validateEmail(req.body.email);
+    const password = validatePassword(req.body.password);
 
     const passwordHash = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, created_at",
-      [name, email.toLowerCase(), passwordHash]
+      `WITH new_user AS (
+        INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, created_at
+      ), new_streak AS (
+        INSERT INTO streaks (user_id, current_streak, best_streak, last_active_date) SELECT id, 0, 0, NULL FROM new_user
+      )
+      SELECT id, name, email, created_at FROM new_user`,
+      [name, email, passwordHash]
     );
     const user = result.rows[0];
-
-    await pool.query(
-      "INSERT INTO streaks (user_id, current_streak, best_streak, last_active_date) VALUES ($1, 0, 0, NULL)",
-      [user.id]
-    );
 
     const token = signToken(user.id);
     res.status(201).json({ token, user });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "No se pudo crear la cuenta." });
+    if (err.code === '23505') {
+      return res.status(409).json({ error: "Ya existe una cuenta con ese correo." });
+    }
+    next(err);
   }
 });
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: "email y password son obligatorios." });
-  }
-
+router.post("/login", async (req, res, next) => {
   try {
+    const email = validateEmail(req.body.email);
+    const password = validateString(req.body.password, "password", 1, 72);
+
     const result = await pool.query(
       "SELECT id, name, email, password_hash FROM users WHERE email = $1",
-      [email.toLowerCase()]
+      [email]
     );
     const user = result.rows[0];
 
@@ -77,11 +65,11 @@ router.post("/login", async (req, res) => {
       user: { id: user.id, name: user.name, email: user.email },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "No se pudo iniciar sesión." });
+    next(err);
   }
 });
-router.get("/me", requireAuth, async (req, res) => {
+
+router.get("/me", requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
       "SELECT id, name, email, created_at FROM users WHERE id = $1",
@@ -92,8 +80,7 @@ router.get("/me", requireAuth, async (req, res) => {
     }
     res.json({ user: result.rows[0] });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "No se pudo consultar el usuario." });
+    next(err);
   }
 });
 
