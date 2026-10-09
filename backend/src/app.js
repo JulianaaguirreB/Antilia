@@ -28,7 +28,10 @@ app.use("/api", (req, res) => {
 const frontendDist = path.join(__dirname, "..", "..", "frontend", "dist");
 app.use(express.static(frontendDist));
 
-app.get(/^(?!\/api)/, (req, res) => {
+app.get(/^(?!\/api)/, (req, res, next) => {
+  if (req.path.match(/\.[a-z0-9]+$/i)) {
+    return res.status(404).json({ error: "Ruta no encontrada." });
+  }
   res.sendFile(path.join(frontendDist, "index.html"), (err) => {
     if (err) {
       res.status(404).json({ error: "Ruta no encontrada." });
