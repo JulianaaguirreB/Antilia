@@ -1,5 +1,5 @@
 {
-  "name": "logtech-backend",
+  "name": "antilia-backend",
   "version": "0.1.0",
   "description": "Logtech backend — Release 1 (job principal: registro/login, tareas, racha)",
   "main": "src/server.js",

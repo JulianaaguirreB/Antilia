@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", service: "logtech-backend", release: "v0.1" });
+  res.json({ status: "ok", service: "antilia-backend", release: "v0.1" });
 });
 
 app.use("/api/auth", authRoutes);
