@@ -9,5 +9,5 @@ if (!secret || secret.length < 32 || secret.startsWith("cambia-esto")) {
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
-  console.log(`Logtech backend corriendo en http://localhost:${port}`);
+  console.log(`Antilia backend corriendo en http://localhost:${port}`);
 });
