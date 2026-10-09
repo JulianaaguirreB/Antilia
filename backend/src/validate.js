@@ -20,7 +20,7 @@ function validateEmail(val) {
 function validatePassword(val) {
   if (typeof val !== 'string') throw { status: 400, message: "password debe ser texto.", isValidation: true };
   if (Buffer.byteLength(val, "utf8") > 72) {
-    throw { status: 400, message: "máximo 72 bytes; evita demasiados acentos o emojis", isValidation: true };
+    throw { status: 400, message: "La contraseña es demasiado larga (máximo 72 bytes).", isValidation: true };
   }
   if (val.length < 8 || val.length > 72 || !/^(?=.*[A-Za-z])(?=.*\d)/.test(val)) {
     throw { status: 400, message: "La contraseña debe tener entre 8 y 72 caracteres, con al menos una letra y un número.", isValidation: true };
