@@ -138,7 +138,12 @@ async function run() {
     json = await res.json();
     assertEqual(json.tasks.length, 2, "List all tasks 2");
 
-    // complete
+    res = await fetch(`${BASE_URL}/api/tasks?status=completada`, { headers: { "Authorization": `Bearer ${token}` }});
+    json = await res.json();
+    assertEqual(json.tasks.length, 0, "List completada 0 before complete");
+
+    res = await fetch(`${BASE_URL}/api/tasks?type=invalido`, { headers: { "Authorization": `Bearer ${token}` }});
+    assertEqual(res.status, 400, "List invalido type 400");
     res = await fetch(`${BASE_URL}/api/tasks/${taskFisicaId}/complete`, {
       method: "PATCH",
       headers: { "Authorization": `Bearer ${token}` }
@@ -146,6 +151,10 @@ async function run() {
     assertEqual(res.status, 200, "Complete task 200");
     json = await res.json();
     assertEqual(json.streak.current_streak, 1, "Streak current_streak = 1");
+
+    res = await fetch(`${BASE_URL}/api/tasks?status=all`, { headers: { "Authorization": `Bearer ${token}` }});
+    json = await res.json();
+    assertEqual(json.tasks.length, 2, "List all tasks 2 after complete");
 
     res = await fetch(`${BASE_URL}/api/tasks/${taskFisicaId}/complete`, {
       method: "PATCH",
@@ -166,6 +175,8 @@ async function run() {
       body: "{"
     });
     assertEqual(res.status, 400, "Malformed JSON 400");
+    json = await res.json();
+    assertEqual(json.error, "JSON inválido.", "Malformed JSON message");
 
     // /api/inexistente
     res = await fetch(`${BASE_URL}/api/inexistente`);
