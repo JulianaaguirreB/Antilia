@@ -1,7 +1,8 @@
 const app = require("./app");
 
-if (!process.env.JWT_SECRET) {
-  console.error("JWT_SECRET es obligatorio");
+const secret = process.env.JWT_SECRET || "";
+if (!secret || secret.length < 32 || secret.startsWith("cambia-esto")) {
+  console.error("Error: JWT_SECRET debe tener al menos 32 caracteres y no empezar con 'cambia-esto'.");
   process.exit(1);
 }
 
