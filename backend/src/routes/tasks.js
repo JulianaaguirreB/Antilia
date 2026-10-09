@@ -36,8 +36,13 @@ router.post("/", async (req, res) => {
   }
 });
 router.patch("/:id/complete", async (req, res) => {
-  const client = await pool.connect();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.id)) {
+    return res.status(404).json({ error: "Tarea no encontrada." });
+  }
+
+  let client;
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
 
     const taskResult = await client.query(
@@ -46,7 +51,7 @@ router.patch("/:id/complete", async (req, res) => {
     );
 
     if (taskResult.rows.length === 0) {
-      await client.query("ROLLBACK");
+      await client.query("ROLLBACK").catch(() => {});
       return res.status(404).json({ error: "Tarea no encontrada o ya estaba completada." });
     }
 
@@ -55,33 +60,26 @@ router.patch("/:id/complete", async (req, res) => {
     await client.query("COMMIT");
     res.json({ task: taskResult.rows[0], streak });
   } catch (err) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK").catch(() => {});
     console.error(err);
     res.status(500).json({ error: "No se pudo completar la tarea." });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 });
 async function updateStreakOnCompletion(client, userId) {
   const current = await client.query(
-    "SELECT current_streak, best_streak, last_active_date FROM streaks WHERE user_id = $1 FOR UPDATE",
+    "SELECT current_streak, best_streak, (now() AT TIME ZONE 'America/Bogota')::date - last_active_date AS diff FROM streaks WHERE user_id = $1 FOR UPDATE",
     [userId]
   );
-  const row = current.rows[0] || { current_streak: 0, best_streak: 0, last_active_date: null };
-
-  const todayResult = await client.query("SELECT CURRENT_DATE AS today");
-  const today = todayResult.rows[0].today;
+  const row = current.rows[0] || { current_streak: 0, best_streak: 0, diff: null };
 
   let newStreak = row.current_streak;
 
-  if (!row.last_active_date) {
+  if (row.diff === null) {
     newStreak = 1;
   } else {
-    const diffDays = await client.query(
-      "SELECT ($1::date - $2::date) AS diff",
-      [today, row.last_active_date]
-    );
-    const diff = diffDays.rows[0].diff;
+    const diff = row.diff;
 
     if (diff === 0) {
       newStreak = row.current_streak;
@@ -96,11 +94,11 @@ async function updateStreakOnCompletion(client, userId) {
 
   const updated = await client.query(
     `INSERT INTO streaks (user_id, current_streak, best_streak, last_active_date)
-     VALUES ($1, $2, $3, $4)
+     VALUES ($1, $2, $3, (now() AT TIME ZONE 'America/Bogota')::date)
      ON CONFLICT (user_id)
-     DO UPDATE SET current_streak = $2, best_streak = $3, last_active_date = $4
+     DO UPDATE SET current_streak = $2, best_streak = $3, last_active_date = (now() AT TIME ZONE 'America/Bogota')::date
      RETURNING current_streak, best_streak, last_active_date`,
-    [userId, newStreak, newBest, today]
+    [userId, newStreak, newBest]
   );
 
   return updated.rows[0];

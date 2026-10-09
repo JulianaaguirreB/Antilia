@@ -1,11 +1,12 @@
 require("dotenv").config();
-const { Pool } = require("pg");
+const pg = require("pg");
+const { Pool } = pg;
 
-const isLocal = (process.env.DATABASE_URL || "").includes("localhost");
+pg.types.setTypeParser(1082, v => v);
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: isLocal ? false : { rejectUnauthorized: false },
+  ssl: process.env.DATABASE_SSL === 'true' ? (process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'false' ? { rejectUnauthorized: false } : true) : false,
 });
 
 module.exports = { pool };
