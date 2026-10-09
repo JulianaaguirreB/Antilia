@@ -10,3 +10,6 @@ const pool = new Pool({
 });
 
 module.exports = { pool };
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client', err);
+});
