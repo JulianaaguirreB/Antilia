@@ -70,6 +70,34 @@ async function run() {
     });
     assertEqual(res.status, 401, "Login invalid 401");
 
+    // (a) registro con contraseña " Prueba1234 " y login con esa misma clave → 200
+    const emailUntrimmedPwd = `test_untrimmed_${Date.now()}@example.com`;
+    const pwdUntrimmed = " Prueba1234 ";
+    res = await fetch(`${BASE_URL}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "Test User 2", email: emailUntrimmedPwd, password: pwdUntrimmed })
+    });
+    assertEqual(res.status, 201, "Register with untrimmed password 201");
+
+    res = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: emailUntrimmedPwd, password: pwdUntrimmed })
+    });
+    assertEqual(res.status, 200, "Login with untrimmed password 200");
+
+    // (b) login con 80 bytes → 400 con el mensaje del punto 2
+    const longBytesPwd = "a".repeat(80);
+    res = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: emailUntrimmedPwd, password: longBytesPwd })
+    });
+    assertEqual(res.status, 400, "Login with 80 bytes password 400");
+    let jsonErr = await res.json();
+    assertEqual(jsonErr.message || jsonErr.error, "La contraseña es demasiado larga (máximo 72 bytes).", "Login with 80 bytes password message");
+
     // 5. /me y protegido sin token
     res = await fetch(`${BASE_URL}/api/auth/me`, {
       headers: { "Authorization": `Bearer ${token}` }
