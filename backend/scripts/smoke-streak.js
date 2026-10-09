@@ -12,11 +12,11 @@ let failures = 0;
 
 function assertEqual(actual, expected, msg) {
   if (actual !== expected) {
-    console.error(\`FAIL: \${msg} (Expected: \${expected}, Actual: \${actual})\`);
+    console.error(`FAIL: ${msg} (Expected: ${expected}, Actual: ${actual})`);
     failures++;
     return false;
   }
-  console.log(\`PASS: \${msg}\`);
+  console.log(`PASS: ${msg}`);
   return true;
 }
 
@@ -26,8 +26,8 @@ async function run() {
     client = await pool.connect();
 
     // 1. registro
-    const email = \`streak\${Date.now()}@test.com\`;
-    let res = await fetch(\`\${BASE_URL}/api/auth/register\`, {
+    const email = `streak${Date.now()}@test.com`;
+    let res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Streak Test", email, password: "Password123" })
@@ -39,17 +39,17 @@ async function run() {
     // Fija last_active_date en ayer
     await client.query("UPDATE streaks SET current_streak = 5, best_streak = 5, last_active_date = (now() AT TIME ZONE 'America/Bogota')::date - 1 WHERE user_id = $1", [userId]);
 
-    res = await fetch(\`\${BASE_URL}/api/tasks\`, {
+    res = await fetch(`${BASE_URL}/api/tasks`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": \`Bearer \${token}\` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ title: "T1", type: "fisica" })
     });
     json = await res.json();
     let t1 = json.task.id;
 
-    res = await fetch(\`\${BASE_URL}/api/tasks/\${t1}/complete\`, {
+    res = await fetch(`${BASE_URL}/api/tasks/${t1}/complete`, {
       method: "PATCH",
-      headers: { "Authorization": \`Bearer \${token}\` }
+      headers: { "Authorization": `Bearer ${token}` }
     });
     json = await res.json();
     assertEqual(json.streak.current_streak, 6, "Subió racha desde ayer (5 -> 6)");
@@ -58,21 +58,21 @@ async function run() {
     // Fija last_active_date en hace 3 días
     await client.query("UPDATE streaks SET current_streak = 6, best_streak = 6, last_active_date = (now() AT TIME ZONE 'America/Bogota')::date - 3 WHERE user_id = $1", [userId]);
 
-    res = await fetch(\`\${BASE_URL}/api/streak\`, { headers: { "Authorization": \`Bearer \${token}\` }});
+    res = await fetch(`${BASE_URL}/api/streak`, { headers: { "Authorization": `Bearer ${token}` }});
     json = await res.json();
     assertEqual(json.streak.current_streak, 0, "GET /streak con racha caducada da 0");
 
-    res = await fetch(\`\${BASE_URL}/api/tasks\`, {
+    res = await fetch(`${BASE_URL}/api/tasks`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": \`Bearer \${token}\` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ title: "T2", type: "fisica" })
     });
     json = await res.json();
     let t2 = json.task.id;
 
-    res = await fetch(\`\${BASE_URL}/api/tasks/\${t2}/complete\`, {
+    res = await fetch(`${BASE_URL}/api/tasks/${t2}/complete`, {
       method: "PATCH",
-      headers: { "Authorization": \`Bearer \${token}\` }
+      headers: { "Authorization": `Bearer ${token}` }
     });
     json = await res.json();
     assertEqual(json.streak.current_streak, 1, "Racha vuelve a 1 tras 3 días");

@@ -25,12 +25,12 @@ router.get("/", async (req, res, next) => {
     let paramIndex = 2;
 
     if (status !== "all") {
-      query += \` AND status = $\${paramIndex++}\`;
+      query += ` AND status = $${paramIndex++}`;
       params.push(status);
     }
     
     if (type) {
-      query += \` AND type = $\${paramIndex++}\`;
+      query += ` AND type = $${paramIndex++}`;
       params.push(type);
     }
 

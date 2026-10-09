@@ -3,36 +3,36 @@ let failures = 0;
 
 function assertEqual(actual, expected, msg) {
   if (actual !== expected) {
-    console.error(\`FAIL: \${msg} (Expected: \${expected}, Actual: \${actual})\`);
+    console.error(`FAIL: ${msg} (Expected: ${expected}, Actual: ${actual})`);
     failures++;
     return false;
   }
-  console.log(\`PASS: \${msg}\`);
+  console.log(`PASS: ${msg}`);
   return true;
 }
 
 function assertMatch(actual, regex, msg) {
   if (!regex.test(actual)) {
-    console.error(\`FAIL: \${msg} (Actual: \${actual} no encaja en \${regex})\`);
+    console.error(`FAIL: ${msg} (Actual: ${actual} no encaja en ${regex})`);
     failures++;
     return false;
   }
-  console.log(\`PASS: \${msg}\`);
+  console.log(`PASS: ${msg}`);
   return true;
 }
 
 async function run() {
   try {
     // 1. health
-    let res = await fetch(\`\${BASE_URL}/api/health\`);
+    let res = await fetch(`${BASE_URL}/api/health`);
     assertEqual(res.status, 200, "Health check status 200");
     let json = await res.json();
     assertEqual(json.service, "antilia-backend", "Health check service name");
 
     // 2. registro
-    const email = \`test\${Date.now()}@example.com\`;
+    const email = `test${Date.now()}@example.com`;
     const pwd = "Password123";
-    res = await fetch(\`\${BASE_URL}/api/auth/register\`, {
+    res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Test User", email, password: pwd })
@@ -48,7 +48,7 @@ async function run() {
     const token = json.token;
 
     // 3. correo duplicado
-    res = await fetch(\`\${BASE_URL}/api/auth/register\`, {
+    res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Test User", email, password: pwd })
@@ -56,14 +56,14 @@ async function run() {
     assertEqual(res.status, 409, "Register duplicate email 409");
 
     // 4. login
-    res = await fetch(\`\${BASE_URL}/api/auth/login\`, {
+    res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password: pwd })
     });
     assertEqual(res.status, 200, "Login valid 200");
     
-    res = await fetch(\`\${BASE_URL}/api/auth/login\`, {
+    res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password: "WrongPassword1" })
@@ -71,54 +71,54 @@ async function run() {
     assertEqual(res.status, 401, "Login invalid 401");
 
     // 5. /me y protegido sin token
-    res = await fetch(\`\${BASE_URL}/api/auth/me\`, {
-      headers: { "Authorization": \`Bearer \${token}\` }
+    res = await fetch(`${BASE_URL}/api/auth/me`, {
+      headers: { "Authorization": `Bearer ${token}` }
     });
     assertEqual(res.status, 200, "Get /me valid token 200");
     
-    res = await fetch(\`\${BASE_URL}/api/auth/me\`);
+    res = await fetch(`${BASE_URL}/api/auth/me`);
     assertEqual(res.status, 401, "Get /me no token 401");
 
     // 6. crear tarea
-    res = await fetch(\`\${BASE_URL}/api/tasks\`, {
+    res = await fetch(`${BASE_URL}/api/tasks`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": \`Bearer \${token}\` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ title: "Fisica 1", type: "fisica" })
     });
     assertEqual(res.status, 201, "Create task fisica 201");
     let taskFisica = await res.json();
     let taskFisicaId = taskFisica.task.id;
 
-    res = await fetch(\`\${BASE_URL}/api/tasks\`, {
+    res = await fetch(`${BASE_URL}/api/tasks`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": \`Bearer \${token}\` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ title: "Digital 1", type: "digital" })
     });
     assertEqual(res.status, 201, "Create task digital 201");
 
     // invalid type, title no-string, title >120, email no-string
-    res = await fetch(\`\${BASE_URL}/api/tasks\`, {
+    res = await fetch(`${BASE_URL}/api/tasks`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": \`Bearer \${token}\` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ title: "Inv", type: "invalido" })
     });
     assertEqual(res.status, 400, "Create task invalido type 400");
     
-    res = await fetch(\`\${BASE_URL}/api/tasks\`, {
+    res = await fetch(`${BASE_URL}/api/tasks`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": \`Bearer \${token}\` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ title: 123, type: "fisica" })
     });
     assertEqual(res.status, 400, "Create task invalido title type 400");
     
-    res = await fetch(\`\${BASE_URL}/api/tasks\`, {
+    res = await fetch(`${BASE_URL}/api/tasks`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": \`Bearer \${token}\` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ title: "a".repeat(121), type: "fisica" })
     });
     assertEqual(res.status, 400, "Create task invalido title length 400");
     
-    res = await fetch(\`\${BASE_URL}/api/auth/register\`, {
+    res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "1", email: 123, password: pwd })
@@ -126,41 +126,41 @@ async function run() {
     assertEqual(res.status, 400, "Register email invalid type 400");
 
     // listados
-    res = await fetch(\`\${BASE_URL}/api/tasks?status=pendiente\`, { headers: { "Authorization": \`Bearer \${token}\` }});
+    res = await fetch(`${BASE_URL}/api/tasks?status=pendiente`, { headers: { "Authorization": `Bearer ${token}` }});
     json = await res.json();
     assertEqual(json.tasks.length, 2, "List pending tasks 2");
 
-    res = await fetch(\`\${BASE_URL}/api/tasks?type=fisica\`, { headers: { "Authorization": \`Bearer \${token}\` }});
+    res = await fetch(`${BASE_URL}/api/tasks?type=fisica`, { headers: { "Authorization": `Bearer ${token}` }});
     json = await res.json();
     assertEqual(json.tasks.length, 1, "List pending fisica 1");
 
-    res = await fetch(\`\${BASE_URL}/api/tasks?status=all\`, { headers: { "Authorization": \`Bearer \${token}\` }});
+    res = await fetch(`${BASE_URL}/api/tasks?status=all`, { headers: { "Authorization": `Bearer ${token}` }});
     json = await res.json();
     assertEqual(json.tasks.length, 2, "List all tasks 2");
 
     // complete
-    res = await fetch(\`\${BASE_URL}/api/tasks/\${taskFisicaId}/complete\`, {
+    res = await fetch(`${BASE_URL}/api/tasks/${taskFisicaId}/complete`, {
       method: "PATCH",
-      headers: { "Authorization": \`Bearer \${token}\` }
+      headers: { "Authorization": `Bearer ${token}` }
     });
     assertEqual(res.status, 200, "Complete task 200");
     json = await res.json();
     assertEqual(json.streak.current_streak, 1, "Streak current_streak = 1");
 
-    res = await fetch(\`\${BASE_URL}/api/tasks/\${taskFisicaId}/complete\`, {
+    res = await fetch(`${BASE_URL}/api/tasks/${taskFisicaId}/complete`, {
       method: "PATCH",
-      headers: { "Authorization": \`Bearer \${token}\` }
+      headers: { "Authorization": `Bearer ${token}` }
     });
     assertEqual(res.status, 404, "Complete task again 404");
     
-    res = await fetch(\`\${BASE_URL}/api/tasks/not-uuid/complete\`, {
+    res = await fetch(`${BASE_URL}/api/tasks/not-uuid/complete`, {
       method: "PATCH",
-      headers: { "Authorization": \`Bearer \${token}\` }
+      headers: { "Authorization": `Bearer ${token}` }
     });
     assertEqual(res.status, 404, "Complete invalid UUID 404");
 
     // json malformado
-    res = await fetch(\`\${BASE_URL}/api/auth/login\`, {
+    res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: "{"
@@ -168,7 +168,7 @@ async function run() {
     assertEqual(res.status, 400, "Malformed JSON 400");
 
     // /api/inexistente
-    res = await fetch(\`\${BASE_URL}/api/inexistente\`);
+    res = await fetch(`${BASE_URL}/api/inexistente`);
     assertEqual(res.status, 404, "API not found 404");
     json = await res.json();
     assertEqual(json.error, "Ruta no encontrada.", "API not found JSON");
