@@ -48,7 +48,7 @@ export function Account({ navigate }: AccountProps) {
           </div>
           <h2 className="text-xl font-bold text-text-main mb-1">{user.name}</h2>
           <p className="text-text-secondary text-sm mb-4">{user.email}</p>
-          <p className="text-xs text-text-secondary capitalize">
+          <p className="text-xs text-text-secondary">
             Miembro desde {formatMemberSince(user.created_at)}
           </p>
         </div>
