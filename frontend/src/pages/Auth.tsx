@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { api, ApiError } from '../api';
 import { useAuth } from '../auth';
 import { Input, Button } from '../components/ui';
@@ -60,15 +60,16 @@ export function Auth({ isRegister, navigate }: AuthProps) {
           body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
         });
         login(res.token, res.user);
-        navigate('#/inicio');
       } else {
         const res = await api('/auth/login', {
           method: 'POST',
           body: JSON.stringify({ email: email.trim(), password }),
         });
         login(res.token, res.user);
-        navigate('#/inicio');
       }
+      const meRes = await api<{ user: any }>('/auth/me');
+      login(localStorage.getItem('antilia_token') || '', meRes.user);
+      navigate('#/inicio');
     } catch (err) {
       if (err instanceof ApiError) {
         setGlobalError(err.message);
@@ -80,8 +81,17 @@ export function Auth({ isRegister, navigate }: AuthProps) {
     }
   };
 
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem('session_expired')) {
+        setGlobalError('Tu sesión venció. Inicia sesión de nuevo.');
+        sessionStorage.removeItem('session_expired');
+      }
+    } catch(e) {}
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-dvh max-w-[480px] mx-auto bg-bg-main p-6 pb-[env(safe-area-inset-bottom)]">
+    <div key={isRegister ? 'register' : 'login'} className="flex flex-col min-h-dvh max-w-[480px] mx-auto bg-bg-main p-6 pb-[env(safe-area-inset-bottom)]">
       <div className="flex-1 flex flex-col justify-center">
         <h1 className="text-[28px] font-bold text-text-main mb-2">
           {isRegister ? 'Crea tu cuenta' : 'Empezar'}
@@ -98,7 +108,7 @@ export function Auth({ isRegister, navigate }: AuthProps) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
           {isRegister && (
             <Input
               id="name"

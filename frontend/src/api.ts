@@ -13,7 +13,11 @@ export async function api<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = localStorage.getItem('antilia_token');
+  let token = null;
+  try {
+    token = localStorage.getItem('antilia_token');
+  } catch (e) {}
+  
   const headers = new Headers(options.headers || {});
   
   if (token) {
@@ -40,6 +44,17 @@ export async function api<T = any>(
     const data = isJson ? await res.json() : null;
 
     if (!res.ok) {
+      if (res.status === 401) {
+        try {
+          localStorage.removeItem('antilia_token');
+        } catch (e) {}
+        if (window.location.hash !== '#/acceso' && window.location.hash !== '#/registro') {
+          try {
+            sessionStorage.setItem('session_expired', 'true');
+          } catch(e) {}
+          window.location.hash = '#/acceso';
+        }
+      }
       throw new ApiError(res.status, data?.error || 'Error desconocido del servidor');
     }
 
