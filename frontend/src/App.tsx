@@ -33,9 +33,9 @@ export function AppContent() {
 
   switch (hash) {
     case '#/acceso':
-      return <Auth isRegister={false} navigate={navigate} />;
+      return <Auth key="login" isRegister={false} navigate={navigate} />;
     case '#/registro':
-      return <Auth isRegister={true} navigate={navigate} />;
+      return <Auth key="register" isRegister={true} navigate={navigate} />;
     case '#/inicio':
       return <Home navigate={navigate} />;
     case '#/progreso':
