@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Inter:Bold";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Inter:Extra Bold";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 800;
+}
+
+@font-face {
+  font-family: "Inter:Medium";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Inter:Regular";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Inter:Semi Bold";
+  src: url("https://static.figma.com/font/Inter_1") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+}
+
+:root {
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: "Inter:Regular", Inter, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100dvh;
+  background: #f8fafc;
+}
+
+button,
+[data-name="Button"],
+[data-name="Botón principal"],
+[data-name="Google"],
+[data-name="Apple"],
+[data-name^="Toggle-"],
+[data-name="Card"],
+[data-name="Menu-Item"],
+[data-name="Forgot"] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.antilia-app > [data-name] {
+  display: none;
+}
+
+.antilia-app[data-screen="Acceso con Apple"] > [data-name="Acceso con Apple"],
+.antilia-app[data-screen="Acceso con Google"] > [data-name="Acceso con Google"],
+.antilia-app[data-screen="Registro de nuevo usuario"] > [data-name="Registro de nuevo usuario"],
+.antilia-app[data-screen="antilia-ui-01-inicio"] > [data-name="antilia-ui-01-inicio"],
+.antilia-app[data-screen="antilia-ui-02-acceso"] > [data-name="antilia-ui-02-acceso"],
+.antilia-app[data-screen="antilia-ui-03-principal"] > [data-name="antilia-ui-03-principal"],
+.antilia-app[data-screen="antilia-ui-04-organizacion-fisica"] > [data-name="antilia-ui-04-organizacion-fisica"],
+.antilia-app[data-screen="antilia-ui-05-organizacion-digital"] > [data-name="antilia-ui-05-organizacion-digital"],
+.antilia-app[data-screen="antilia-ui-06-racha"] > [data-name="antilia-ui-06-racha"],
+.antilia-app[data-screen="antilia-ui-07-correos"] > [data-name="antilia-ui-07-correos"],
+.antilia-app[data-screen="antilia-ui-08-ranking"] > [data-name="antilia-ui-08-ranking"],
+.antilia-app[data-screen="antilia-ui-09-orden-escritorio"] > [data-name="antilia-ui-09-orden-escritorio"],
+.antilia-app[data-screen="antilia-ui-10-cuenta"] > [data-name="antilia-ui-10-cuenta"],
+.antilia-app[data-screen="antilia-ui-11-datos"] > [data-name="antilia-ui-11-datos"],
+.antilia-app[data-screen="antilia-ui-12-medir-espacio"] > [data-name="antilia-ui-12-medir-espacio"],
+.antilia-app[data-screen="antilia-ui-13-archivos"] > [data-name="antilia-ui-13-archivos"],
+.antilia-app[data-screen="antilia-ui-14-recordatorios"] > [data-name="antilia-ui-14-recordatorios"],
+.antilia-app[data-screen="antilia-ui-15-cerrar-sesion"] > [data-name="antilia-ui-15-cerrar-sesion"],
+.antilia-app[data-screen="antilia-ui-16-estado"] > [data-name="antilia-ui-16-estado"],
+.antilia-app[data-screen="antilia-ui-17-recuperar-contrasena"] > [data-name="antilia-ui-17-recuperar-contrasena"] {
+  position: relative;
+  inset: auto;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  height: auto;
+  border-radius: 0;
+  animation: screen-in 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-name="Status-Bar"],
+[data-name="Barra de estado"],
+[data-name="Indicador de inicio"],
+[data-name="Footer-Accent"],
+[data-name="Bottom"] > [data-name="Indicator"] {
+  display: none !important;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (min-width: 760px) {
+  .antilia-app > [data-name] > [data-name="Top"],
+  .antilia-app > [data-name] > [data-name="Contenido superior"],
+  .antilia-app > [data-name] > [data-name="Bottom"],
+  .antilia-app > [data-name] > [data-name="Pie"] {
+    width: min(100%, 760px);
+    margin-inline: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .antilia-app > [data-name] {
+    animation: none !important;
+  }
+}
