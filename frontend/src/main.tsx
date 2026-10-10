@@ -1,13 +1,14 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AuthProvider } from './auth';
-import { AppContent } from './App';
+import { App } from './App';
 import './index.css';
+import '@fontsource-variable/inter';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
-      <AppContent />
+      <App />
     </AuthProvider>
   </StrictMode>
 );
