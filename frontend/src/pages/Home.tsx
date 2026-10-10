@@ -41,11 +41,11 @@ export function Home({ navigate }: HomeProps) {
   const [newTaskType, setNewTaskType] = useState<'fisica' | 'digital'>('fisica');
   const [newTaskError, setNewTaskError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-
+  const [isSlow, setIsSlow] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
 
   const fetchData = () => {
-    Promise.all([
+    return Promise.all([
       api<{ tasks: Task[] }>('/tasks?status=all'),
       api<{ streak: Streak }>('/streak')
     ])
@@ -60,8 +60,11 @@ export function Home({ navigate }: HomeProps) {
   };
 
   useEffect(() => {
-    fetchData();
-    setLoading(false);
+    const timer = setTimeout(() => setIsSlow(true), 4000);
+    fetchData().finally(() => {
+      clearTimeout(timer);
+      setLoading(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -165,8 +168,30 @@ export function Home({ navigate }: HomeProps) {
 
   if (loading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-bg-main text-text-secondary">
-        Cargando…
+      <div className="flex min-h-dvh items-center justify-center bg-bg-main text-text-secondary px-4 text-center">
+        {isSlow ? 'Conectando con el servidor… la primera vez puede tardar unos segundos.' : 'Cargando…'}
+      </div>
+    );
+  }
+
+  if (error && !streak) {
+    return (
+      <div className="flex flex-col min-h-dvh items-center justify-center bg-bg-main px-4">
+        <div className="bg-error/10 text-error p-4 rounded-[16px] mb-4 text-center">
+          {error}
+        </div>
+        <Button onClick={() => {
+          setLoading(true);
+          setError(null);
+          setIsSlow(false);
+          const timer = setTimeout(() => setIsSlow(true), 4000);
+          fetchData().finally(() => {
+            clearTimeout(timer);
+            setLoading(false);
+          });
+        }}>
+          Reintentar
+        </Button>
       </div>
     );
   }
