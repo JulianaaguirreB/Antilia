@@ -9,6 +9,12 @@ export class ApiError extends Error {
 
 const BASE_URL = '/api';
 
+let unauthorizedHandler: (() => void) | null = null;
+
+export function setUnauthorizedHandler(handler: () => void) {
+  unauthorizedHandler = handler;
+}
+
 export async function api<T = any>(
   endpoint: string,
   options: RequestInit = {}
@@ -44,15 +50,9 @@ export async function api<T = any>(
     const data = isJson ? await res.json() : null;
 
     if (!res.ok) {
-      if (res.status === 401) {
-        try {
-          localStorage.removeItem('antilia_token');
-        } catch (e) {}
-        if (window.location.hash !== '#/acceso' && window.location.hash !== '#/registro') {
-          try {
-            sessionStorage.setItem('session_expired', 'true');
-          } catch(e) {}
-          window.location.hash = '#/acceso';
+      if (res.status === 401 && token) {
+        if (unauthorizedHandler) {
+          unauthorizedHandler();
         }
       }
       throw new ApiError(res.status, data?.error || 'Error desconocido del servidor');

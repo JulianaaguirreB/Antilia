@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { api } from './api';
+import { api, setUnauthorizedHandler } from './api';
 
 export interface User {
   id: string;
@@ -22,6 +22,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setUnauthorizedHandler(() => {
+      try {
+        localStorage.removeItem('antilia_token');
+        sessionStorage.setItem('session_expired', 'true');
+      } catch (e) {}
+      setUser(null);
+      if (window.location.hash !== '#/acceso' && window.location.hash !== '#/registro') {
+        window.location.hash = '#/acceso';
+      }
+    });
+
     let token = null;
     try {
       token = localStorage.getItem('antilia_token');
@@ -36,13 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(data.user);
       })
       .catch((error) => {
-        if (error.status === 401) {
-          try {
-            localStorage.removeItem('antilia_token');
-            sessionStorage.setItem('session_expired', 'true');
-          } catch (e) {}
-          window.location.hash = '#/acceso';
-        }
+        // El handler se encarga del 401 ahora si había token
       })
       .finally(() => {
         setLoading(false);
