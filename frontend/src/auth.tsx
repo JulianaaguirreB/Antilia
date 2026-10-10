@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { api } from './api';
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   created_at: string;
@@ -22,7 +22,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('antilia_token');
+    let token = null;
+    try {
+      token = localStorage.getItem('antilia_token');
+    } catch (e) {}
     if (!token) {
       setLoading(false);
       return;
@@ -34,7 +37,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch((error) => {
         if (error.status === 401) {
-          localStorage.removeItem('antilia_token');
+          try {
+            localStorage.removeItem('antilia_token');
+            sessionStorage.setItem('session_expired', 'true');
+          } catch (e) {}
+          window.location.hash = '#/acceso';
         }
       })
       .finally(() => {
@@ -43,12 +50,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (token: string, newUser: User) => {
-    localStorage.setItem('antilia_token', token);
+    try {
+      localStorage.setItem('antilia_token', token);
+    } catch (e) {}
     setUser(newUser);
   };
 
   const logout = () => {
-    localStorage.removeItem('antilia_token');
+    try {
+      localStorage.removeItem('antilia_token');
+    } catch (e) {}
     setUser(null);
   };
 

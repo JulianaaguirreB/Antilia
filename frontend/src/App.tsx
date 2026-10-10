@@ -1,3 +1,4 @@
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { useAuth } from './auth';
 import { useHashRoute } from './route';
 import { Auth } from './pages/Auth';
@@ -49,4 +50,41 @@ export function AppContent() {
       }
       return null;
   }
+}
+
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error(error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col min-h-dvh items-center justify-center bg-bg-main p-6 text-center">
+          <p className="text-text-main mb-4">Algo salió mal. Recarga la página.</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-primary text-white px-4 py-2 rounded-lg font-medium"
+          >
+            Recargar
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
 }

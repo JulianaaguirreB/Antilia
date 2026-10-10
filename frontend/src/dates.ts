@@ -14,6 +14,7 @@ export function isCompletedToday(completedAt: string | null | undefined): boolea
 
 export function formatMemberSince(createdAt: string): string {
   const date = new Date(createdAt);
+  if (isNaN(date.getTime())) return '';
   const options: Intl.DateTimeFormatOptions = { timeZone: 'America/Bogota', month: 'long', year: 'numeric' };
   return new Intl.DateTimeFormat('es-CO', options).format(date);
 }
