@@ -8,7 +8,7 @@ import { Button, Input } from '../components/ui';
 import { validateTitle } from '../validation';
 
 export interface Task {
-  id: number;
+  id: string;
   title: string;
   type: 'fisica' | 'digital';
   status: 'pendiente' | 'completada';
@@ -33,6 +33,7 @@ export function Home({ navigate }: HomeProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [completingIds, setCompletingIds] = useState<Set<string>>(new Set());
 
   const [tab, setTab] = useState<'todas' | 'fisica' | 'digital'>('todas');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -43,7 +44,7 @@ export function Home({ navigate }: HomeProps) {
 
   const titleRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  const fetchData = () => {
     Promise.all([
       api<{ tasks: Task[] }>('/tasks?status=all'),
       api<{ streak: Streak }>('/streak')
@@ -55,9 +56,23 @@ export function Home({ navigate }: HomeProps) {
       .catch(err => {
         if (err instanceof ApiError) setError(err.message);
         else setError('Error al cargar datos');
-      })
-      .finally(() => setLoading(false));
+      });
+  };
+
+  useEffect(() => {
+    fetchData();
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isSheetOpen) {
+        setIsSheetOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSheetOpen]);
 
   const todayTasks = useMemo(() => {
     return tasks.filter(t => t.status === 'pendiente' || isCompletedToday(t.completed_at));
@@ -82,7 +97,10 @@ export function Home({ navigate }: HomeProps) {
 
   const firstName = user?.name.split(' ')[0] || '';
 
-  const handleComplete = async (taskId: number) => {
+  const handleComplete = async (taskId: string) => {
+    if (completingIds.has(taskId)) return;
+    setCompletingIds(prev => new Set(prev).add(taskId));
+    setError(null);
     try {
       const prevStreak = streak?.current_streak || 0;
       const res = await api<{ task: Task; streak: Streak }>(`/tasks/${taskId}/complete`, { method: 'PATCH' });
@@ -91,11 +109,23 @@ export function Home({ navigate }: HomeProps) {
       setStreak(res.streak);
 
       if (res.streak.current_streak > prevStreak) {
-        setToast(`¡Racha de ${res.streak.current_streak} días!`);
+        setToast(`¡Racha de ${res.streak.current_streak} día${res.streak.current_streak === 1 ? '' : 's'}!`);
         setTimeout(() => setToast(null), 3000);
       }
     } catch (err) {
-      if (err instanceof ApiError) alert(err.message);
+      if (err instanceof ApiError) {
+        if (err.status === 404) {
+          fetchData();
+        } else {
+          setError(err.message);
+        }
+      }
+    } finally {
+      setCompletingIds(prev => {
+        const next = new Set(prev);
+        next.delete(taskId);
+        return next;
+      });
     }
   };
 
@@ -119,7 +149,15 @@ export function Home({ navigate }: HomeProps) {
       setNewTaskTitle('');
       setNewTaskType('fisica');
     } catch (err) {
-      if (err instanceof ApiError) setNewTaskError(err.message);
+      if (err instanceof ApiError) {
+        if (err.status === 500) {
+          setNewTaskError('No se pudo guardar la tarea. Inténtalo de nuevo.');
+        } else {
+          setNewTaskError(err.message);
+        }
+      } else {
+        setNewTaskError('Error desconocido al crear la tarea');
+      }
     } finally {
       setCreating(false);
     }
@@ -134,7 +172,7 @@ export function Home({ navigate }: HomeProps) {
   }
 
   return (
-    <div className="min-h-dvh bg-bg-main pb-24">
+    <div className="min-h-dvh bg-bg-main pb-[calc(140px+env(safe-area-inset-bottom))]">
       <div className="max-w-[480px] mx-auto px-4 pt-6">
         <header className="mb-6 flex justify-between items-start">
           <div>
@@ -143,7 +181,7 @@ export function Home({ navigate }: HomeProps) {
           </div>
           <button 
             onClick={() => navigate('#/progreso')}
-            className="flex items-center gap-1.5 bg-primary-soft text-primary px-3 py-1.5 rounded-full text-sm font-medium"
+            className="flex items-center gap-1.5 bg-primary-soft text-primary px-3 min-h-[44px] rounded-full text-sm font-medium"
           >
             <Icons.TrendingUp className="w-4 h-4" />
             Racha: {streak?.current_streak || 0}
@@ -178,7 +216,7 @@ export function Home({ navigate }: HomeProps) {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors capitalize ${
+              className={`px-4 min-h-[44px] rounded-full text-sm font-medium transition-colors capitalize ${
                 tab === t ? 'bg-text-main text-white' : 'bg-white text-text-secondary border border-border-main'
               }`}
             >
@@ -205,14 +243,17 @@ export function Home({ navigate }: HomeProps) {
                 >
                   <button
                     onClick={() => task.status === 'pendiente' && handleComplete(task.id)}
-                    disabled={task.status === 'completada'}
-                    className={`shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center mt-0.5 ${
+                    disabled={task.status === 'completada' || completingIds.has(task.id)}
+                    aria-label={`Completar tarea: ${task.title}`}
+                    className="relative shrink-0 w-11 h-11 flex items-center justify-center -ml-2 -mt-2"
+                  >
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                       task.status === 'completada' 
                         ? 'bg-success border-success text-white' 
                         : 'border-border-main hover:border-primary'
-                    }`}
-                  >
-                    {task.status === 'completada' && <Icons.Check className="w-4 h-4" />}
+                    }`}>
+                      {task.status === 'completada' && <Icons.Check className="w-4 h-4" />}
+                    </div>
                   </button>
                   <div className="flex-1 min-w-0">
                     <p className={`text-text-main font-medium ${
@@ -303,7 +344,7 @@ export function Home({ navigate }: HomeProps) {
       )}
 
       {toast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-text-main text-white px-4 py-2 rounded-full shadow-lg text-sm font-medium animate-bounce" aria-live="polite">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-text-main text-white px-4 py-2 rounded-full shadow-lg text-sm font-medium animate-bounce" aria-live="polite">
           {toast}
         </div>
       )}
