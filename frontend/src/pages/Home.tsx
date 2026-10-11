@@ -90,7 +90,6 @@ export function Home({ navigate }: HomeProps) {
     if (tab !== 'todas') {
       filtered = filtered.filter(t => t.type === tab);
     }
-    // Pendientes primero, completadas al final (se ordena una copia para no modificar todayTasks)
     return [...filtered].sort((a, b) => {
       if (a.status === 'pendiente' && b.status === 'completada') return -1;
       if (a.status === 'completada' && b.status === 'pendiente') return 1;

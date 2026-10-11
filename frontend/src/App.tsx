@@ -17,8 +17,6 @@ export function AppContent() {
       </div>
     );
   }
-
-  // Routing Logic
   const isAuthRoute = hash === '#/acceso' || hash === '#/registro';
   
   if (!user && !isAuthRoute) {

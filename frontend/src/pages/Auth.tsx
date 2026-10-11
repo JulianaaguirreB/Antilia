@@ -48,7 +48,6 @@ export function Auth({ isRegister, navigate }: AuthProps) {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      // Focus first error
       if (newErrors.name && nameRef.current) nameRef.current.focus();
       else if (newErrors.email && emailRef.current) emailRef.current.focus();
       else if (newErrors.password && passwordRef.current) passwordRef.current.focus();

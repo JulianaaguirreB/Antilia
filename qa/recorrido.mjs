@@ -1,15 +1,3 @@
-// Prueba E2E del job principal de Antilia (Release 1) en vista de celular.
-// Recorre: registro -> crear tarea física y digital -> completar -> racha ->
-// progreso -> perfil -> recargar (sesión persiste) -> cerrar sesión.
-//
-// Uso:
-//   npm run recorrido                                  (contra http://localhost:3000)
-//   BASE_URL=https://tu-app.vercel.app npm run recorrido   (macOS/Linux)
-//   $env:BASE_URL="https://tu-app.vercel.app"; npm run recorrido   (PowerShell)
-//
-// Guarda capturas en qa/evidencias/<fecha>/ para el reporte.
-// Crea una cuenta nueva en cada ejecución: úsenlo con una base de pruebas o
-// borren esas cuentas después.
 import { chromium, devices } from 'playwright';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -41,7 +29,7 @@ const context = await browser.newContext({ ...devices['Pixel 7'] });
 const page = await context.newPage();
 const erroresConsola = [];
 page.on('console', (m) => { if (m.type() === 'error') erroresConsola.push(m.text()); });
-page.setDefaultTimeout(30000); // la primera carga en la nube puede tardar
+page.setDefaultTimeout(30000);
 
 try {
   console.log(`Probando ${BASE_URL}`);
@@ -50,8 +38,6 @@ try {
   await page.waitForSelector('text=Iniciar Sesión');
   comprobar(true, `La pantalla de acceso carga (${Date.now() - inicio} ms)`);
   await captura(page, 'acceso');
-
-  // Registro: primero vacío para ver los mensajes de error, luego válido.
   await page.click('text=Regístrate aquí');
   await page.click('text=Crear Cuenta');
   comprobar(await page.isVisible('text=El nombre es obligatorio'), 'El registro vacío muestra cómo corregir');
@@ -64,8 +50,6 @@ try {
   await page.waitForSelector('text=Hola, Usuario');
   comprobar(true, 'Después del registro se abre el panel principal');
   await captura(page, 'panel-vacio');
-
-  // Crear una tarea de cada tipo.
   for (const [titulo, tipo] of [['Ordenar escritorio', 'Física'], ['Limpiar Descargas', 'Digital']]) {
     await page.click('text=Nueva tarea');
     await page.fill('#new-task-title', titulo);
@@ -76,16 +60,12 @@ try {
   }
   comprobar(await page.isVisible('text=0 de 2 tareas'), 'El progreso del día muestra 0 de 2');
   await captura(page, 'panel-con-tareas');
-
-  // Completar con un toque y ver la racha.
   await page.click('button[aria-label="Completar tarea: Ordenar escritorio"]');
   await page.waitForSelector('text=¡Racha de 1 día!');
   comprobar(true, 'Al completar aparece el aviso de racha');
   comprobar(await page.isVisible('text=1 de 2 tareas'), 'El progreso sube a 1 de 2');
   comprobar(await page.isVisible('text=Racha: 1'), 'La racha se ve en la pantalla principal');
   await captura(page, 'tarea-completada');
-
-  // Filtro por tipo.
   await page.click('button:has-text("Digitales")');
   comprobar(!(await page.isVisible('text=Ordenar escritorio')), 'El filtro Digitales oculta las tareas físicas');
   await page.click('button:has-text("Todas")');

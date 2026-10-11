@@ -1,7 +1,3 @@
-// Punto de entrada de la API cuando la app corre en Vercel.
-// Vercel publica el frontend compilado (frontend/dist) como archivos estáticos
-// y envía todas las peticiones /api/* a esta función, que reutiliza la misma
-// app de Express del backend. En local se sigue usando backend/src/server.js.
 const app = require("../backend/src/app");
 
 function configError() {

@@ -47,7 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(data.user);
       })
       .catch(() => {
-        // El handler se encarga del 401 ahora si había token
       })
       .finally(() => {
         setLoading(false);
