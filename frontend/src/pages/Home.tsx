@@ -5,6 +5,7 @@ import { isCompletedToday } from '../dates';
 import { Navigation } from '../components/Navigation';
 import { Icons } from '../components/Icons';
 import { Button, Input } from '../components/ui';
+import { TaskSheet } from '../components/TaskSheet';
 import { validateTitle } from '../validation';
 
 export interface Task {
@@ -71,13 +72,13 @@ export function Home({ navigate }: HomeProps) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isSheetOpen) {
+      if (e.key === 'Escape' && isSheetOpen && !creating) {
         setIsSheetOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSheetOpen]);
+  }, [isSheetOpen, creating]);
 
   const todayTasks = useMemo(() => {
     return tasks.filter(t => t.status === 'pendiente' || isCompletedToday(t.completed_at));
@@ -321,60 +322,7 @@ export function Home({ navigate }: HomeProps) {
 
       <Navigation currentPath="#/inicio" navigate={navigate} />
 
-      {isSheetOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm" onClick={() => setIsSheetOpen(false)}>
-          <div 
-            className="w-full max-w-[480px] bg-white rounded-t-[24px] p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
-            onClick={e => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-bold text-text-main mb-4">Nueva Tarea</h3>
-            <form onSubmit={handleCreateTask} className="flex flex-col gap-4">
-              <Input
-                id="new-task-title"
-                ref={titleRef}
-                label="Título de la tarea"
-                placeholder="Ej. Ordenar el escritorio"
-                value={newTaskTitle}
-                onChange={e => setNewTaskTitle(e.target.value)}
-                maxLength={120}
-                error={newTaskError}
-              />
-              <div>
-                <label className="text-sm font-medium text-text-main mb-2 block">Tipo de tarea</label>
-                <div className="flex gap-3">
-                  <label className="flex-1">
-                    <input 
-                      type="radio" 
-                      name="type" 
-                      value="fisica" 
-                      className="peer sr-only" 
-                      checked={newTaskType === 'fisica'}
-                      onChange={() => setNewTaskType('fisica')}
-                    />
-                    <div className="text-center py-2.5 rounded-[12px] border border-border-main text-text-secondary peer-checked:border-primary peer-checked:bg-primary-soft peer-checked:text-primary peer-checked:font-medium transition-colors cursor-pointer">
-                      Física
-                    </div>
-                  </label>
-                  <label className="flex-1">
-                    <input 
-                      type="radio" 
-                      name="type" 
-                      value="digital" 
-                      className="peer sr-only" 
-                      checked={newTaskType === 'digital'}
-                      onChange={() => setNewTaskType('digital')}
-                    />
-                    <div className="text-center py-2.5 rounded-[12px] border border-border-main text-text-secondary peer-checked:border-primary peer-checked:bg-primary-soft peer-checked:text-primary peer-checked:font-medium transition-colors cursor-pointer">
-                      Digital
-                    </div>
-                  </label>
-                </div>
-              </div>
-              <Button type="submit" loading={creating} className="mt-2">Guardar Tarea</Button>
-            </form>
-          </div>
-        </div>
-      )}
+      {isSheetOpen && <TaskSheet title={newTaskTitle} type={newTaskType} error={newTaskError} creating={creating} titleRef={titleRef} onTitle={setNewTaskTitle} onType={setNewTaskType} onClose={() => { if (!creating) setIsSheetOpen(false); }} onSubmit={handleCreateTask} />}
 
       {toast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-text-main text-white px-4 py-2 rounded-full shadow-lg text-sm font-medium animate-bounce" aria-live="polite">
