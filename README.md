@@ -1,66 +1,135 @@
 # Antilia
 
-Aplicación móvil para ayudar a asistentes administrativos a organizar su espacio físico y digital de trabajo. Repositorio compartido del equipo para PIETI 2026-2.
+Aplicación web para celular que ayuda a asistentes administrativos de empresas medianas de Bogotá a mantener ordenado su espacio de trabajo físico y digital en pocos minutos al día. Proyecto del equipo Antilia para PIETI 2026-2.
 
-## Código disponible
+**App publicada:** _pendiente de despliegue_
 
-`backend/` contiene la API en Node.js, Express y PostgreSQL. Incluye registro, inicio de sesión, consulta de usuario, creación y consulta de tareas, completar tareas y rachas. La autenticación de esta versión usa JWT y contraseñas protegidas con bcrypt.
+## Qué hace la versión v0.1 (Release 1)
 
-El frontend todavía no está incluido. El backend devuelve datos JSON y no tiene una página de inicio en `/`. El recorrido de registro, login, crear tarea, consultar tareas, completar y ver racha se probó localmente. Todavía no se ha comprobado una entrega pública integrada.
+El job principal es: **crear una cuenta → ver las tareas de orden del día → completar una → ver la racha actualizada.**
 
-## Ejecutar en Windows
+| # | Función | Dónde se ve |
+|---|---|---|
+| 1 | Registro e inicio de sesión con correo y contraseña. La sesión dura 7 días. | Pantallas Acceso y Registro |
+| 2 | Crear una tarea física o digital con solo título y tipo | Botón "Nueva tarea" |
+| 3 | Completar una tarea con un toque, con la barra "Progreso del día" | Inicio |
+| 4 | Racha de días seguidos y racha más alta, con aviso al subir | Inicio y Progreso |
+| 5 | Filtros Físicas/Digitales, errores que dicen cómo corregir y diseño para celular | Todas las pantallas |
 
-Necesitas Node.js, npm y Docker Desktop con el motor funcionando. Después de clonar el repositorio, entra a `backend`, donde está `package.json`.
+Todavía no incluye: inicio de sesión con Google, recordatorio por correo, bloqueo después de intentos fallidos ni la gráfica de los últimos 7 días.
+
+## Cómo está organizado
+
+```
+Antilia/
+├── backend/     API REST en Node.js + Express + PostgreSQL (JWT y bcrypt)
+├── frontend/    Interfaz en React + TypeScript + Tailwind (Vite)
+├── api/         Entrada de la API cuando se despliega en Vercel
+├── qa/          Prueba automática del recorrido completo en vista de celular
+└── vercel.json  Configuración del despliegue
+```
+
+En local, el backend sirve la API en `/api` y también la interfaz ya compilada (`frontend/dist`), así que todo queda en `http://localhost:3000`. En Vercel, la interfaz se publica como archivos estáticos y `/api/*` llega a la misma app de Express.
+
+## Ejecutar en local
+
+### Requisitos
+
+- [Node.js 22 LTS](https://nodejs.org/) (incluye npm)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) abierto y con el motor funcionando, para la base de datos. Si ya tienes PostgreSQL, puedes omitir Docker y poner tu cadena en `DATABASE_URL`.
+- Git
+
+### Windows (PowerShell)
 
 ```powershell
 git clone https://github.com/JulianaaguirreB/Antilia.git
-Set-Location .\Antilia\backend
+Set-Location .\Antilia
+
+# 1. Backend: dependencias y configuración
+Set-Location .\backend
 npm.cmd ci
-if (!(Test-Path .env)) { Copy-Item .env.example .env }
-```
+node -e "const fs=require('fs');const c=require('crypto');let s=fs.readFileSync('.env.example','utf8');s=s.replace(/^JWT_SECRET=.*$/m,'JWT_SECRET='+c.randomBytes(32).toString('hex'));fs.writeFileSync('.env',s)"
 
-Genera una clave local de acceso. Este comando reemplaza solo la clave de ejemplo y conserva el resto de `.env`:
-
-```powershell
-node -e "const fs=require('fs');const crypto=require('crypto');const p='.env';let s=fs.readFileSync(p,'utf8');s=s.replace(/^JWT_SECRET=cambia-esto-por-un-secreto-largo-y-aleatorio\r?$/m,'JWT_SECRET='+crypto.randomBytes(32).toString('hex'));fs.writeFileSync(p,s)"
-```
-
-Ejecuta estos comandos uno por uno. La primera descarga de PostgreSQL depende de tu conexión. Si un paso falla, corrígelo antes de continuar.
-
-```powershell
+# 2. Base de datos (la primera vez descarga PostgreSQL)
 docker compose up -d
 npm.cmd run migrate
-npm.cmd run dev
+
+# 3. Frontend: compilar la interfaz
+Set-Location ..\frontend
+npm.cmd ci
+npm.cmd run build
+
+# 4. Arrancar
+Set-Location ..\backend
+npm.cmd start
 ```
 
-Mantén esa terminal abierta. Desde otra terminal:
+### macOS / Linux
 
-```powershell
-Invoke-RestMethod http://localhost:3000/api/health
+```bash
+git clone https://github.com/JulianaaguirreB/Antilia.git
+cd Antilia/backend
+npm ci
+node -e "const fs=require('fs');const c=require('crypto');let s=fs.readFileSync('.env.example','utf8');s=s.replace(/^JWT_SECRET=.*$/m,'JWT_SECRET='+c.randomBytes(32).toString('hex'));fs.writeFileSync('.env',s)"
+docker compose up -d
+npm run migrate
+cd ../frontend && npm ci && npm run build
+cd ../backend && npm start
 ```
 
-La respuesta debe incluir `status: ok`. Este resultado comprueba el servidor; las rutas de usuarios y tareas también necesitan PostgreSQL. Para usar una base ya existente, configura `DATABASE_URL` en `.env` y omite el comando de Docker. Las credenciales del archivo Compose son solo para desarrollo local.
+Abre **http://localhost:3000**. Para probar con el celular en la misma red Wi-Fi, usa la IP del computador, por ejemplo `http://192.168.1.20:3000`.
 
-## Probar el recorrido del backend
+El comando `node -e ...` crea `backend/.env` a partir de `.env.example` con una clave `JWT_SECRET` aleatoria. El servidor no arranca si la clave es la de ejemplo.
 
-Usa una base de desarrollo. La siguiente prueba crea una cuenta y una tarea:
+### Modo desarrollo (para editar la interfaz)
 
-```powershell
-$base = 'http://localhost:3000/api'
-$email = 'prueba-' + [guid]::NewGuid().ToString('N') + '@example.com'
-$body = @{name='Prueba local';email=$email;password='PruebaLocal1234'} | ConvertTo-Json
-$registro = Invoke-RestMethod -Uri "$base/auth/register" -Method Post -ContentType 'application/json' -Body $body
-$loginBody = @{email=$email;password='PruebaLocal1234'} | ConvertTo-Json
-$login = Invoke-RestMethod -Uri "$base/auth/login" -Method Post -ContentType 'application/json' -Body $loginBody
-$headers = @{Authorization='Bearer ' + $login.token}
-$taskBody = @{title='Ordenar Descargas';type='digital'} | ConvertTo-Json
-$creada = Invoke-RestMethod -Uri "$base/tasks" -Method Post -ContentType 'application/json' -Headers $headers -Body $taskBody
-Invoke-RestMethod -Uri "$base/tasks" -Headers $headers
-Invoke-RestMethod -Uri "$base/tasks/$($creada.task.id)/complete" -Method Patch -Headers $headers
-Invoke-RestMethod -Uri "$base/streak" -Headers $headers
+Usa dos terminales: `npm run dev` en `backend/` y `npm run dev` en `frontend/`. Luego abre `http://localhost:5173`. Vite recarga los cambios al instante y envía `/api` al backend del puerto 3000.
+
+### Problemas comunes
+
+| Síntoma | Causa probable |
+|---|---|
+| `JWT_SECRET debe tener al menos 32 caracteres` | Falta el paso del comando `node -e` o se borró `.env` |
+| `ECONNREFUSED ... 5432` | Docker Desktop no está abierto o `docker compose up -d` no terminó |
+| `{"error":"Ruta no encontrada."}` en `localhost:3000` | No se compiló la interfaz (`npm run build` en `frontend/`) |
+| En PowerShell, `npm` dice que la ejecución de scripts está deshabilitada | Usa `npm.cmd` en lugar de `npm` |
+
+## Pruebas
+
+Con el servidor corriendo, desde `backend/`:
+
+```bash
+npm run smoke          # 33 comprobaciones de la API
+npm run smoke:streak   # reglas de la racha (solo con base local)
 ```
 
-## Rutas disponibles
+Recorrido completo en un navegador con pantalla de celular (registro, tareas, racha, progreso, perfil). Desde `qa/`:
+
+```bash
+npm ci
+npx playwright install chromium
+npm run recorrido
+```
+
+Para probar la versión publicada: `$env:BASE_URL="https://..."; npm.cmd run recorrido` en PowerShell, o `BASE_URL=https://... npm run recorrido` en macOS/Linux. Las capturas quedan en `qa/evidencias/`. Cada ejecución crea una cuenta de prueba nueva.
+
+## Despliegue en Vercel
+
+1. Crear una base PostgreSQL gratuita (por ejemplo, Neon desde *Vercel → Storage*) y copiar su cadena de conexión.
+2. Crear las tablas una sola vez desde tu computador, en `backend/`:
+   ```powershell
+   $env:DATABASE_URL="postgresql://...?sslmode=require"; $env:DATABASE_SSL="true"; npm.cmd run migrate
+   ```
+3. En Vercel, importar el repositorio con **Root Directory vacío (la raíz del repo)** y Framework Preset **Other**. `vercel.json` ya define la instalación, la compilación y las rutas.
+4. En *Settings → Environment Variables*, agregar:
+   - `DATABASE_URL`: la cadena de la base
+   - `DATABASE_SSL`: `true`
+   - `JWT_SECRET`: un texto aleatorio de 64 caracteres. Puedes generarlo con `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+5. Desplegar y comprobar `https://<tu-app>.vercel.app/api/health`. Debe responder `"status":"ok"`.
+
+Si falta una variable, la API responde con un error que dice cuál es.
+
+## Rutas de la API
 
 | Método | Ruta | Función |
 |---|---|---|
@@ -68,20 +137,23 @@ Invoke-RestMethod -Uri "$base/streak" -Headers $headers
 | POST | `/api/auth/register` | Crear cuenta |
 | POST | `/api/auth/login` | Iniciar sesión |
 | GET | `/api/auth/me` | Consultar el usuario |
-| GET | `/api/tasks` | Consultar tareas pendientes |
-| GET | `/api/tasks?status=completada` | Consultar tareas completadas |
-| POST | `/api/tasks` | Crear tarea física o digital |
-| PATCH | `/api/tasks/:id/complete` | Completar tarea y actualizar racha |
-| GET | `/api/streak` | Consultar racha y récord |
+| GET | `/api/tasks` | Tareas pendientes (`?status=completada` o `?status=all`; `?type=fisica` o `?type=digital`) |
+| POST | `/api/tasks` | Crear tarea `{ title, type: "fisica" \| "digital" }` |
+| PATCH | `/api/tasks/:id/complete` | Completar tarea y actualizar la racha |
+| GET | `/api/streak` | Racha actual y récord |
 
 Las rutas de usuario, tareas y racha requieren `Authorization: Bearer <token>`. Registro y login devuelven ese token.
 
-## Estado de Release 1
+**Regla de la racha** (hora de Bogotá): al completar la primera tarea del día, la racha sube en 1 si la última actividad fue ayer y vuelve a 1 si fue antes. Si pasa un día completo sin completar tareas, la racha mostrada es 0. Siempre se conserva el récord.
 
-Este repositorio contiene el backend actual. Los cinco cambios propuestos son acceso, consulta de tareas, creación de tareas, completar tareas y racha. Para contarlos como updates de la entrega, deben poder usarse desde la aplicación publicada.
+## Equipo
 
-Quedan pendientes la integración con frontend, URL pública, video, reporte con costos reales, plan de validación y tag de la entrega. También deben revisarse validación de entradas, errores de conexión, registro en una transacción, fecha de Bogotá para rachas y verificación TLS para bases remotas.
+| Integrante | Rol |
+|---|---|
+| Alejandro Macías | Diseño UX |
+| Juan Fernando Herrera | Frontend |
+| Juliana Aguirre Ballesteros | Backend |
+| Samuel Montealegre | QA |
+| Nicolás Silva García | Tech Lead |
 
-## Trabajo en equipo
-
-Agreguen el frontend y los documentos del proyecto en sus propias carpetas. No suban `.env`, claves reales ni `node_modules`. El archivo `.env.example` sirve como plantilla de configuración.
+No suban `.env`, claves reales ni `node_modules`. `.env.example` es la plantilla de configuración.
