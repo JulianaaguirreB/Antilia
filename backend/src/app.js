@@ -40,7 +40,7 @@ app.get(/^(?!\/api)/, (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.type === "entity.parse.failed") {
+  if (err.type === "entity.parse.failed" || (err instanceof SyntaxError && (err.status === 400 || err.statusCode === 400))) {
     return res.status(400).json({ error: "JSON inválido." });
   }
   if (err.type === "entity.too.large") {
