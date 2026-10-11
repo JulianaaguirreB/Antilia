@@ -36,6 +36,8 @@ export function Home({ navigate }: HomeProps) {
   const [completingIds, setCompletingIds] = useState<Set<string>>(new Set());
 
   const [tab, setTab] = useState<'todas' | 'fisica' | 'digital'>('todas');
+  const [search, setSearch] = useState('');
+  const [view, setView] = useState<'hoy' | 'historial'>('hoy');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskType, setNewTaskType] = useState<'fisica' | 'digital'>('fisica');
@@ -82,7 +84,8 @@ export function Home({ navigate }: HomeProps) {
   }, [tasks]);
 
   const filteredTasks = useMemo(() => {
-    let filtered = todayTasks;
+    let filtered = view === 'historial' ? tasks.filter(t => t.status === 'completada') : todayTasks;
+    if (search.trim()) filtered = filtered.filter(t => t.title.toLocaleLowerCase('es').includes(search.trim().toLocaleLowerCase('es')));
     if (tab !== 'todas') {
       filtered = filtered.filter(t => t.type === tab);
     }
@@ -92,7 +95,7 @@ export function Home({ navigate }: HomeProps) {
       if (a.status === 'completada' && b.status === 'pendiente') return 1;
       return 0;
     });
-  }, [todayTasks, tab]);
+  }, [todayTasks, tasks, tab, search, view]);
 
   const completedTodayCount = todayTasks.filter(t => t.status === 'completada').length;
   const totalTodayCount = todayTasks.length;
@@ -238,11 +241,14 @@ export function Home({ navigate }: HomeProps) {
           <p className="text-sm text-white/80">{completedTodayCount} de {totalTodayCount} tareas</p><p className="mt-4 text-xs text-white/65">{totalTodayCount === 0 ? 'Tu primer paso empieza con una tarea.' : pct === 100 ? 'Todo listo por hoy. Disfruta tu espacio.' : 'Cada tarea completada cuenta. Sigue a tu ritmo.'}</p>
         </div>
 
+        <div className="flex gap-2 mb-4 rounded-2xl bg-white p-1 border border-border-main/60"><button onClick={() => setView('hoy')} aria-pressed={view === 'hoy'} className={`flex-1 rounded-xl py-3 text-sm font-semibold ${view === 'hoy' ? 'bg-primary-soft text-primary' : 'text-text-secondary'}`}>Hoy</button><button onClick={() => setView('historial')} aria-pressed={view === 'historial'} className={`flex-1 rounded-xl py-3 text-sm font-semibold ${view === 'historial' ? 'bg-primary-soft text-primary' : 'text-text-secondary'}`}>Historial</button></div>
+        <div className="mb-4"><Input id="task-search" label="Buscar tus tareas" placeholder="Escribe una palabra del título" value={search} onChange={e => setSearch(e.target.value)} type="search" /></div>
         <div className="flex gap-2 mb-6">
           {(['todas', 'fisica', 'digital'] as const).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
+              aria-pressed={tab === t}
               className={`px-4 min-h-[44px] rounded-full text-sm font-medium transition-colors capitalize ${
                 tab === t ? 'bg-text-main text-white' : 'bg-white text-text-secondary border border-border-main'
               }`}
@@ -253,11 +259,11 @@ export function Home({ navigate }: HomeProps) {
         </div>
 
         <div>
-          <h3 className="font-semibold text-text-main mb-4">Tareas de Hoy</h3>
+          <h3 className="font-semibold text-text-main mb-4">{view === 'historial' ? 'Tareas completadas' : 'Tareas de Hoy'}</h3>
           
           {filteredTasks.length === 0 ? (
             <div className="text-center py-10 bg-white rounded-[16px] border border-border-main border-dashed">
-              <p className="text-text-secondary">No tienes tareas pendientes.<br/>Agrega una para empezar.</p>
+              <span className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-primary-soft text-primary"><Icons.Check /></span><p className="font-semibold mb-2">{search ? 'No encontramos esa tarea' : view === 'historial' ? 'Tu historia empieza aquí' : 'Un espacio para empezar'}</p><p className="text-text-secondary text-sm px-6">{search ? 'Prueba otra palabra o cambia el filtro.' : view === 'historial' ? 'Cuando completes tareas aparecerán en esta lista.' : 'Agrega una tarea física o digital y da tu primer paso.'}</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
