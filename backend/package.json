@@ -1,13 +1,15 @@
 {
-  "name": "logtech-backend",
+  "name": "antilia-backend",
   "version": "0.1.0",
-  "description": "Logtech backend — Release 1 (job principal: registro/login, tareas, racha)",
+  "description": "Antilia backend — Release 1 (job principal: registro/login, tareas, racha)",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "migrate": "node src/migrate.js"
+    "migrate": "node src/migrate.js",
+    "smoke": "node scripts/smoke.js",
+    "smoke:streak": "node scripts/smoke-streak.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
