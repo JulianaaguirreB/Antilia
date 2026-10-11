@@ -172,9 +172,7 @@ export function Home({ navigate }: HomeProps) {
 
   if (loading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-bg-main text-text-secondary px-4 text-center">
-        {isSlow ? 'Conectando con el servidor… la primera vez puede tardar unos segundos.' : 'Cargando…'}
-      </div>
+      <div className="page-content" role="status"><p className="eyebrow mb-5">Antilia</p><div className="skeleton h-10 w-2/3 mb-6"/><div className="skeleton h-44 mb-6"/><div className="skeleton h-20 mb-3"/><div className="skeleton h-20 mb-4"/><p className="text-sm text-text-secondary">{isSlow ? 'Conectando con el servidor… la primera vez puede tardar unos segundos.' : 'Cargando…'}</p></div>
     );
   }
 
@@ -279,6 +277,7 @@ export function Home({ navigate }: HomeProps) {
                     onClick={() => task.status === 'pendiente' && handleComplete(task.id)}
                     disabled={task.status === 'completada' || completingIds.has(task.id)}
                     aria-label={`Completar tarea: ${task.title}`}
+                    aria-busy={completingIds.has(task.id)}
                     className="relative shrink-0 w-11 h-11 flex items-center justify-center -ml-2 -mt-2"
                   >
                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
@@ -286,7 +285,7 @@ export function Home({ navigate }: HomeProps) {
                         ? 'bg-success border-success text-white' 
                         : 'border-border-main hover:border-primary'
                     }`}>
-                      {task.status === 'completada' && <Icons.Check className="w-4 h-4" />}
+                      {completingIds.has(task.id) ? <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent" /> : task.status === 'completada' && <Icons.Check className="w-4 h-4" />}
                     </div>
                   </button>
                   <div className="flex-1 min-w-0">
@@ -310,7 +309,7 @@ export function Home({ navigate }: HomeProps) {
         </div>
       </div>
 
-      <div className="fixed bottom-20 left-0 right-0 px-4 max-w-[480px] mx-auto z-40">
+      <div className="fixed bottom-[calc(88px+env(safe-area-inset-bottom))] left-0 right-0 px-4 max-w-[480px] mx-auto z-30">
         <Button 
           className="w-full shadow-lg shadow-primary/20"
           onClick={() => { setIsSheetOpen(true); setTimeout(() => titleRef.current?.focus(), 100); }}
@@ -325,7 +324,7 @@ export function Home({ navigate }: HomeProps) {
       {isSheetOpen && <TaskSheet title={newTaskTitle} type={newTaskType} error={newTaskError} creating={creating} titleRef={titleRef} onTitle={setNewTaskTitle} onType={setNewTaskType} onClose={() => { if (!creating) setIsSheetOpen(false); }} onSubmit={handleCreateTask} />}
 
       {toast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-text-main text-white px-4 py-2 rounded-full shadow-lg text-sm font-medium animate-bounce" aria-live="polite">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-text-main text-white px-4 py-2 rounded-full shadow-lg text-sm font-medium" aria-live="polite">
           {toast}
         </div>
       )}
