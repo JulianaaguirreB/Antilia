@@ -7,3 +7,4 @@ _referencia_figma/
 dist/
 .vercel/
 qa/evidencias/
+*.tsbuildinfo
