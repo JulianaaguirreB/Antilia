@@ -12,12 +12,14 @@ interface AccountProps {
 export function Account({ navigate }: AccountProps) {
   const { user, logout } = useAuth();
   const [completedTasks, setCompletedTasks] = useState<number | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
 
   useEffect(() => {
     api<{ tasks: any[] }>('/tasks?status=completada')
       .then(res => setCompletedTasks(res.tasks.length))
       .catch(err => {
-        if (err instanceof ApiError) console.error(err);
+        if (err instanceof ApiError) setLoadError(true);
       });
   }, []);
 
@@ -39,7 +41,7 @@ export function Account({ navigate }: AccountProps) {
     <div className="min-h-dvh bg-bg-main pb-24">
       <div className="max-w-[480px] mx-auto px-4 pt-6">
         <header className="mb-8">
-          <h1 className="text-2xl font-bold text-text-main">Mi Cuenta</h1>
+          <p className="eyebrow mb-2">Tu espacio personal</p><h1 className="text-2xl font-bold text-text-main">Mi Cuenta</h1><p className="text-text-secondary text-sm mt-2">Tu información y lo que has logrado.</p>
         </header>
 
         <div className="bg-white p-6 rounded-[24px] shadow-sm border border-border-main flex flex-col items-center text-center mb-6">
@@ -56,19 +58,21 @@ export function Account({ navigate }: AccountProps) {
         <div className="bg-white p-5 rounded-[16px] shadow-sm border border-border-main flex justify-between items-center mb-8">
           <span className="font-medium text-text-main">Tareas hechas</span>
           <span className="text-xl font-bold text-primary">
-            {completedTasks !== null ? completedTasks : '…'}
+            {loadError ? 'No disponible' : completedTasks !== null ? completedTasks : '…'}
           </span>
         </div>
 
+        <section className="surface p-5 mb-6"><p className="eyebrow mb-3">Cómo funciona tu racha</p><p className="text-sm text-text-secondary leading-relaxed">Completa una tarea cada día para mantenerla. Varias tareas en el mismo día cuentan como un solo día. Tu récord se conserva.</p><p className="mt-4 text-xs text-text-secondary">Tus tareas se guardan en tu cuenta y solo tú puedes consultarlas.</p></section>
         <Button 
           variant="secondary" 
-          onClick={handleLogout} 
+          onClick={() => setConfirmLogout(true)} 
           className="w-full text-error bg-error/10 hover:bg-error/20 active:bg-error/30"
         >
           Cerrar Sesión
         </Button>
       </div>
 
+      {confirmLogout && <div className="fixed inset-0 z-50 bg-[#17132c]/40 backdrop-blur-sm grid place-items-center p-5"><div role="alertdialog" aria-modal="true" aria-labelledby="logout-title" className="surface p-6 max-w-sm w-full"><h2 id="logout-title" className="text-xl font-bold mb-2">¿Cerrar tu sesión?</h2><p className="text-sm text-text-secondary mb-5">Tus tareas seguirán guardadas. Puedes volver cuando quieras.</p><div className="flex gap-3"><Button autoFocus variant="secondary" onClick={() => setConfirmLogout(false)}>Cancelar</Button><Button onClick={handleLogout}>Salir</Button></div></div></div>}
       <Navigation currentPath="#/perfil" navigate={navigate} />
     </div>
   );
