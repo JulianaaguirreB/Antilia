@@ -35,6 +35,7 @@ try {
   console.log(`Probando ${BASE_URL}`);
   const inicio = Date.now();
   await page.goto(`${BASE_URL}/`);
+  comprobar(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'La pantalla no desborda el ancho del celular');
   await page.waitForSelector('text=Iniciar Sesión');
   comprobar(true, `La pantalla de acceso carga (${Date.now() - inicio} ms)`);
   await captura(page, 'acceso');
@@ -43,9 +44,13 @@ try {
   comprobar(await page.isVisible('text=El nombre es obligatorio'), 'El registro vacío muestra cómo corregir');
   await captura(page, 'registro-errores');
 
+  await page.fill('#email', 'nombre..prueba@gmail.com');
+  await page.locator('#email').blur();
+  comprobar(await page.isVisible('text=Escribe un correo válido'), 'El correo con puntos repetidos se rechaza');
   await page.fill('#name', 'Usuario Prueba QA');
   await page.fill('#email', `qa-${Date.now()}@example.com`);
   await page.fill('#password', 'Orden2026');
+  await page.fill('#confirmation', 'Orden2026');
   await page.click('text=Crear Cuenta');
   await page.waitForSelector('text=Hola, Usuario');
   comprobar(true, 'Después del registro se abre el panel principal');
@@ -69,9 +74,17 @@ try {
   await page.click('button:has-text("Digitales")');
   comprobar(!(await page.isVisible('text=Ordenar escritorio')), 'El filtro Digitales oculta las tareas físicas');
   await page.click('button:has-text("Todas")');
+  await page.fill('#task-search', 'Limpiar');
+  comprobar(!(await page.isVisible('text=Ordenar escritorio')), 'La búsqueda filtra las tareas');
+  await page.fill('#task-search', '');
+  await page.getByRole('button', { name: 'Historial', exact: true }).click();
+  comprobar(await page.isVisible('text=Ordenar escritorio'), 'El historial muestra tareas completadas');
+  comprobar(!(await page.isVisible('text=Limpiar Descargas')), 'El historial no mezcla tareas pendientes');
+  await page.getByRole('button', { name: 'Hoy', exact: true }).click();
 
   await page.click('nav >> text=Progreso');
   await page.waitForSelector('text=Racha más alta: 1 día');
+  comprobar(await page.isVisible('text=Últimos 7 días'), 'La actividad semanal aparece');
   comprobar(true, 'Progreso muestra la racha y el récord');
   await captura(page, 'progreso');
 
@@ -85,6 +98,7 @@ try {
   comprobar(true, 'La sesión se mantiene al recargar');
 
   await page.click('text=Cerrar Sesión');
+  await page.getByRole('button', { name: 'Salir', exact: true }).click();
   await page.waitForSelector('text=Iniciar Sesión');
   comprobar(true, 'Cerrar sesión vuelve a la pantalla de acceso');
 
