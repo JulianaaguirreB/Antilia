@@ -11,8 +11,8 @@ function validateString(val, name, min, max) {
 function validateEmail(val) {
   if (typeof val !== 'string') throw { status: 400, message: "email debe ser texto.", isValidation: true };
   const trimmed = val.trim().toLowerCase();
-  if (trimmed.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-    throw { status: 400, message: "email inválido.", isValidation: true };
+  if (trimmed.split("@")[0].length > 64 || trimmed.length > 254 || !/^(?!.*\.\.)([A-Za-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+\/=?^_`{|}~-]+)*)@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$/.test(trimmed)) {
+    throw { status: 400, message: "Escribe un correo válido, por ejemplo nombre@gmail.com.", isValidation: true };
   }
   return trimmed;
 }
