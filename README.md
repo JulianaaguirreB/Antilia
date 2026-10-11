@@ -4,6 +4,8 @@ Aplicación web para celular que ayuda a asistentes administrativos de empresas 
 
 **App publicada:** https://antilia-delta.vercel.app
 
+Publicación comprobada el 11 de octubre de 2026: Vercel con PostgreSQL de Neon en plan Free. Pasaron las 14 comprobaciones del recorrido automático en vista de celular: acceso, validación del formulario, registro, tareas físicas y digitales, completar, progreso, racha, filtros, perfil, sesión al recargar y cierre de sesión. También se probaron registro, login, persistencia y racha por la API pública con datos ficticios. La prueba automática no sustituye la comprobación desde un celular ajeno al equipo.
+
 ## Qué hace la versión v0.1 (Release 1)
 
 El job principal es: **crear una cuenta → ver las tareas de orden del día → completar una → ver la racha actualizada.**
