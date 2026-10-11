@@ -199,10 +199,11 @@ export function Home({ navigate }: HomeProps) {
   return (
     <div className="min-h-dvh bg-bg-main pb-[calc(140px+env(safe-area-inset-bottom))]">
       <div className="max-w-[480px] mx-auto px-4 pt-6">
-        <header className="mb-6 flex justify-between items-start">
+        <div className="flex items-center justify-between mb-6"><div className="flex items-center gap-2"><span className="brand-mark !w-8 !h-8 !text-lg !rounded-xl">a</span><span className="font-bold text-lg">antilia.</span></div><span className="eyebrow">Tu espacio, en orden</span></div>
+        <header className="mb-6 flex justify-between items-start gap-3">
           <div>
             <h1 className="text-2xl font-bold text-text-main">Hola, {firstName}</h1>
-            <p className="text-text-secondary text-sm mt-1">Tu mente se ordena con tu entorno</p>
+            <p className="text-text-secondary text-sm mt-1">Pequeños pasos, un día más ligero</p>
           </div>
           <button 
             onClick={() => navigate('#/progreso')}
@@ -219,21 +220,22 @@ export function Home({ navigate }: HomeProps) {
           </div>
         )}
 
-        <div className="bg-white p-5 rounded-[16px] shadow-sm border border-border-main mb-6">
+        <div className="hero-card mb-6">
+          <p className="eyebrow mb-3">Tu enfoque de hoy</p>
           <div className="flex justify-between items-end mb-3">
-            <h2 className="font-semibold text-text-main">Progreso del Día</h2>
+            <h2 className="font-semibold text-white">Progreso del Día</h2>
             <div className="text-right">
-              <span className="text-2xl font-bold text-primary">{pct}%</span>
-              <span className="text-text-secondary text-sm ml-1">Completado</span>
+              <span className="text-3xl font-bold text-white">{pct}%</span>
+              <span className="text-white/70 text-xs ml-1">Completado</span>
             </div>
           </div>
-          <div className="h-2 bg-bg-main rounded-full overflow-hidden mb-2">
+          <div role="progressbar" aria-label="Progreso de tareas de hoy" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} className="h-2 bg-white/15 rounded-full overflow-hidden mb-3">
             <div 
-              className="h-full bg-primary transition-all duration-500 ease-out"
+              className="h-full bg-[#b8aeff] transition-all duration-500 ease-out"
               style={{ width: `${pct}%` }}
             />
           </div>
-          <p className="text-sm text-text-secondary">{completedTodayCount} de {totalTodayCount} tareas</p>
+          <p className="text-sm text-white/80">{completedTodayCount} de {totalTodayCount} tareas</p><p className="mt-4 text-xs text-white/65">{totalTodayCount === 0 ? 'Tu primer paso empieza con una tarea.' : pct === 100 ? 'Todo listo por hoy. Disfruta tu espacio.' : 'Cada tarea completada cuenta. Sigue a tu ritmo.'}</p>
         </div>
 
         <div className="flex gap-2 mb-6">
@@ -262,7 +264,7 @@ export function Home({ navigate }: HomeProps) {
               {filteredTasks.map(task => (
                 <div 
                   key={task.id} 
-                  className={`flex items-start gap-3 p-4 bg-white rounded-[16px] border ${
+                  className={`task-card flex items-start gap-3 p-4 bg-white rounded-[16px] border ${
                     task.status === 'completada' ? 'border-border-main/50 opacity-60' : 'border-border-main'
                   } transition-all`}
                 >
