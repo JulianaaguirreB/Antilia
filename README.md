@@ -2,7 +2,7 @@
 
 Aplicación web para celular que ayuda a asistentes administrativos de empresas medianas de Bogotá a mantener ordenado su espacio de trabajo físico y digital en pocos minutos al día. Proyecto del equipo Antilia para PIETI 2026-2.
 
-**App publicada:** _pendiente de despliegue_
+**App publicada:** https://antilia-delta.vercel.app
 
 ## Qué hace la versión v0.1 (Release 1)
 
