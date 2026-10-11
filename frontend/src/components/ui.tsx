@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, ReactNode, forwardRef } from 'react';
+import { InputHTMLAttributes, ReactNode, forwardRef, useId } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -8,24 +8,28 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, rightIcon, id, className = '', ...props }, ref) => {
+    const generatedId = useId();
+    const fieldId = id || generatedId;
     return (
-      <div className="flex flex-col gap-1 w-full">
-        <label htmlFor={id} className="text-sm font-medium text-text-main">
+      <div className="flex flex-col gap-1.5 w-full">
+        <label htmlFor={fieldId} className="text-sm font-medium text-text-main">
           {label}
         </label>
         <div className="relative flex items-center">
           <input
-            id={id}
+            id={fieldId}
             ref={ref}
-            className={`w-full h-11 px-3 py-2 text-base rounded-[12px] border ${
+            aria-invalid={!!error}
+            aria-describedby={error ? `${fieldId}-error` : props['aria-describedby']}
+            className={`w-full h-13 px-4 py-3 text-base rounded-[12px] border ${
               error ? 'border-error' : 'border-border-main focus:border-primary'
-            } outline-none transition-colors bg-white text-text-main ${className}`}
+            } outline-none transition-colors bg-white text-text-main ${rightIcon ? 'pr-14' : ''} ${className}`}
             {...props}
           />
           {rightIcon && <div className="absolute right-3">{rightIcon}</div>}
         </div>
         {error && (
-          <p className="text-sm text-error mt-1" id={`${id}-error`} aria-live="polite">
+          <p className="text-sm text-error mt-1" id={`${fieldId}-error`} aria-live="polite">
             {error}
           </p>
         )}
@@ -42,7 +46,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, variant = 'primary', loading, className = '', disabled, ...props }, ref) => {
-    const baseStyles = 'h-11 px-4 py-2 font-medium text-base rounded-[16px] transition-colors flex items-center justify-center select-none';
+    const baseStyles = 'min-h-13 px-5 py-3 font-semibold text-base rounded-[16px] transition-colors flex items-center justify-center select-none';
     const variants = {
       primary: 'bg-primary text-white hover:bg-primary-hover active:bg-primary-hover disabled:bg-primary/50 disabled:cursor-not-allowed',
       secondary: 'bg-primary-soft text-primary hover:bg-primary/20 active:bg-primary/30 disabled:opacity-50 disabled:cursor-not-allowed',
@@ -53,6 +57,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={disabled || loading}
+        aria-busy={!!loading}
         className={`${baseStyles} ${variants[variant]} ${className}`}
         {...props}
       >

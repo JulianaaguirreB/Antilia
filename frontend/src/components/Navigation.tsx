@@ -13,8 +13,8 @@ export function Navigation({ currentPath, navigate }: NavigationProps) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border-main pb-[env(safe-area-inset-bottom)] z-50">
-      <div className="max-w-[480px] mx-auto flex justify-around items-center h-16 px-2">
+    <nav aria-label="Navegación principal" className="fixed bottom-0 left-0 right-0 mx-auto max-w-[520px] bg-white/95 backdrop-blur-xl border-t border-border-main/60 pb-[env(safe-area-inset-bottom)] z-40">
+      <div className="max-w-[480px] mx-auto flex justify-around items-center h-20 px-4 gap-3 py-3">
         {items.map((item) => {
           const isActive = currentPath === item.id;
           const Icon = item.icon;
@@ -22,8 +22,9 @@ export function Navigation({ currentPath, navigate }: NavigationProps) {
             <button
               key={item.id}
               onClick={() => navigate(item.id)}
+              aria-current={isActive ? 'page' : undefined}
               className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
-                isActive ? 'text-primary' : 'text-text-secondary hover:text-text-main'
+                isActive ? 'text-primary bg-primary-soft/60 rounded-2xl' : 'text-text-secondary hover:text-text-main'
               }`}
             >
               <Icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />

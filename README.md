@@ -4,7 +4,7 @@ Aplicación web para celular que ayuda a asistentes administrativos de empresas 
 
 **App publicada:** https://antilia-delta.vercel.app
 
-Publicación comprobada el 11 de octubre de 2026: Vercel con PostgreSQL de Neon en plan Free. Pasaron las 14 comprobaciones del recorrido automático en vista de celular: acceso, validación del formulario, registro, tareas físicas y digitales, completar, progreso, racha, filtros, perfil, sesión al recargar y cierre de sesión. También se probaron registro, login, persistencia y racha por la API pública con datos ficticios. La prueba automática no sustituye la comprobación desde un celular ajeno al equipo.
+Publicación inicial comprobada el 11 de octubre de 2026: Vercel con PostgreSQL de Neon en plan Free. Esta rama incorpora 20 comprobaciones del recorrido móvil y conserva las 33 pruebas de API; ambas suites y la compilación de producción pasaron localmente. La publicación de las mejoras debe volver a comprobarse tras integrar la rama. La prueba automática no sustituye la comprobación desde un celular ajeno al equipo.
 
 ## Qué hace la versión v0.1 (Release 1)
 
@@ -18,7 +18,13 @@ El job principal es: **crear una cuenta → ver las tareas de orden del día →
 | 4 | Racha de días seguidos y racha más alta, con aviso al subir | Inicio y Progreso |
 | 5 | Filtros Físicas/Digitales, errores que dicen cómo corregir y diseño para celular | Todas las pantallas |
 
-Todavía no incluye: inicio de sesión con Google, recordatorio por correo, bloqueo después de intentos fallidos ni la gráfica de los últimos 7 días.
+Incluye búsqueda, historial, actividad real de los últimos 7 días, confirmación de contraseña y validación de correo en pantalla y servidor. La validación comprueba formato; no confirma propiedad del buzón.
+
+Todavía no incluye inicio de sesión con Google, recordatorio por correo ni bloqueo después de intentos fallidos.
+
+## Mejoras de Release 1
+
+Interfaz diseñada para celular con formularios accesibles, botones táctiles, navegación clara y estados de carga. El historial y los filtros usan las tareas reales del usuario. La gráfica semanal calcula las fechas en Bogotá. La cuenta de uso personal se administra fuera del repositorio; no se publican contraseñas.
 
 ## Cómo está organizado
 
