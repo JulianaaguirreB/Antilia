@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api, ApiError } from '../api';
 import { Navigation } from '../components/Navigation';
 import { Task, Streak } from './Home';
+import { weekActivity } from '../dates';
 
 interface ProgressProps {
   navigate: (path: string) => void;
@@ -37,6 +38,8 @@ export function Progress({ navigate }: ProgressProps) {
     );
   }
 
+  if (error) return <div className="page-content"><h1 className="text-2xl font-bold mb-4">Mi Racha</h1><p role="alert" className="surface p-5 text-error">{error}</p><button className="mt-4 text-primary" onClick={() => window.location.reload()}>Reintentar</button><Navigation currentPath="#/progreso" navigate={navigate} /></div>;
+  const week = weekActivity(tasks);
   const current = streak?.current_streak || 0;
   const best = streak?.best_streak || 0;
   
@@ -48,7 +51,7 @@ export function Progress({ navigate }: ProgressProps) {
       <div className="max-w-[480px] mx-auto px-4 pt-6">
         <header className="mb-8">
           <h1 className="text-2xl font-bold text-text-main">Mi Racha</h1>
-          <p className="text-text-secondary text-sm mt-1">Tu constancia rinde frutos</p>
+          <p className="text-text-secondary text-sm mt-1">Tu constancia, vista con claridad</p>
         </header>
 
         {error && (
@@ -57,7 +60,7 @@ export function Progress({ navigate }: ProgressProps) {
           </div>
         )}
 
-        <div className="bg-white p-8 rounded-[24px] shadow-sm border border-border-main text-center mb-6 flex flex-col items-center">
+        <div className="surface p-8 text-center mb-6 flex flex-col items-center">
           <div className="w-32 h-32 rounded-full border-[8px] border-primary-soft flex items-center justify-center mb-6">
             <div className="text-center">
               <span className="block text-4xl font-bold text-primary leading-none mb-1">
@@ -82,6 +85,7 @@ export function Progress({ navigate }: ProgressProps) {
           </p>
         </div>
 
+        <section className="surface p-5 mb-6" aria-label="Actividad de los últimos siete días"><p className="eyebrow mb-2">Tu semana</p><h2 className="font-semibold mb-5">Últimos 7 días</h2><div className="grid grid-cols-7 gap-2">{week.map(day => <div key={day.key} className="text-center"><div className="h-24 flex items-end justify-center pb-2"><div className={`w-full max-w-8 rounded-lg ${day.count ? 'bg-primary' : 'bg-primary-soft'}`} style={{ height: `${day.count ? Math.max(12, day.count / Math.max(1,...week.map(d => d.count)) * 80) : 6}px` }} aria-label={`${day.date}: ${day.count} tareas`} /></div><span className="block text-xs text-text-secondary">{day.label}</span><strong className="text-xs">{day.count}</strong></div>)}</div><p className="text-xs text-text-secondary mt-4">Tareas completadas por día, hora de Bogotá.</p></section>
         <h3 className="font-semibold text-text-main mb-4">Total Completadas</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white p-4 rounded-[16px] border border-border-main flex flex-col items-center justify-center text-center">
