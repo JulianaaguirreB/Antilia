@@ -9,7 +9,10 @@
     "start": "node src/server.js",
     "migrate": "node src/migrate.js",
     "smoke": "node scripts/smoke.js",
-    "smoke:streak": "node scripts/smoke-streak.js"
+    "smoke:streak": "node scripts/smoke-streak.js",
+    "test:release2": "node --test --test-concurrency=1 test/release2.test.js",
+    "reminders:dispatch": "node scripts/dispatch-reminders.js",
+    "preview:release2": "node scripts/preview-local.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
