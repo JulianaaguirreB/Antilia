@@ -2,6 +2,8 @@ const express = require("express");
 const { pool } = require("../db");
 const { requireAuth } = require("../middleware/auth");
 const { validateString, validateType } = require("../validate");
+const { body, uuid, instant, queryText, digitalKind, referenceUrl } = require('../release2-validation');
+const { problem, route, transaction } = require('../http');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -9,7 +11,8 @@ router.use(requireAuth);
 router.get("/", async (req, res, next) => {
   try {
     let status = req.query.status;
-    if (status !== "completada" && status !== "all") {
+    if (status !== undefined && !['pendiente', 'en_progreso', 'completada', 'archivada', 'all'].includes(status)) throw problem(400, 'status no válido.');
+    if (status === undefined) {
       status = "pendiente";
     }
 
@@ -20,13 +23,15 @@ router.get("/", async (req, res, next) => {
       }
     }
 
-    let query = "SELECT id, title, type, status, created_at, completed_at FROM tasks WHERE user_id = $1";
+    let query = "SELECT id, title, type, status, space_id, due_at, digital_kind, reference_url, updated_at, created_at, completed_at FROM tasks WHERE user_id = $1";
     const params = [req.userId];
     let paramIndex = 2;
 
     if (status !== "all") {
       query += ` AND status = $${paramIndex++}`;
       params.push(status);
+    } else {
+      query += " AND status <> 'archivada'";
     }
     
     if (type) {
@@ -34,7 +39,16 @@ router.get("/", async (req, res, next) => {
       params.push(type);
     }
 
-    query += " ORDER BY created_at ASC";
+    if (req.query.space_id !== undefined) {
+      params.push(uuid(req.query.space_id, 'Espacio'));
+      query += ` AND space_id = $${paramIndex++}`;
+    }
+    const search = queryText(req.query.search, 'search');
+    if (search) {
+      params.push(search);
+      query += ` AND strpos(lower(title), lower($${paramIndex++})) > 0`;
+    }
+    query += " ORDER BY created_at ASC, id ASC";
 
     const result = await pool.query(query, params);
     res.json({ tasks: result.rows });
@@ -45,18 +59,60 @@ router.get("/", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const title = validateString(req.body.title, "title", 1, 120);
-    const type = validateType(req.body.type);
-
-    const result = await pool.query(
-      "INSERT INTO tasks (user_id, title, type) VALUES ($1, $2, $3) RETURNING id, title, type, status, created_at",
-      [req.userId, title, type]
-    );
-    res.status(201).json({ task: result.rows[0] });
+    const input = body(req.body, ['title', 'type', 'space_id', 'due_at', 'digital_kind', 'reference_url']);
+    const title = validateString(input.title, "title", 1, 120);
+    const type = validateType(input.type);
+    const spaceId = input.space_id == null ? null : uuid(input.space_id, 'Espacio');
+    const dueAt = input.due_at == null ? null : instant(input.due_at, 'due_at');
+    const kind = digitalKind(input.digital_kind ?? 'general');
+    if (type === 'fisica' && kind !== 'general') throw problem(400, 'Los correos y archivos deben ser digitales.');
+    const reference = input.reference_url === undefined ? null : referenceUrl(input.reference_url);
+    const task = await transaction(async client => {
+      await validateSpace(client, spaceId, req.userId, type);
+      const result = await client.query('INSERT INTO tasks (user_id, title, type, space_id, due_at, digital_kind, reference_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [req.userId, title, type, spaceId, dueAt, kind, reference]);
+      return result.rows[0];
+    });
+    res.status(201).json({ task });
   } catch (err) {
     next(err);
   }
 });
+
+async function validateSpace(client, spaceId, userId, type) {
+  if (!spaceId) return;
+  const space = await client.query('SELECT type, archived_at FROM spaces WHERE id = $1 AND user_id = $2 FOR UPDATE', [spaceId, userId]);
+  if (!space.rows.length || space.rows[0].archived_at) throw problem(404, 'Espacio activo no encontrado.');
+  if (space.rows[0].type !== type) throw problem(400, 'El tipo de tarea debe coincidir con el espacio.');
+}
+
+router.patch('/:id', route(async (req, res) => {
+  const id = uuid(req.params.id, 'Tarea');
+  const input = body(req.body, ['title', 'type', 'space_id', 'due_at', 'digital_kind', 'reference_url', 'status']);
+  const task = await transaction(async client => {
+    const found = await client.query("SELECT * FROM tasks WHERE id = $1 AND user_id = $2 AND status IN ('pendiente','en_progreso') FOR UPDATE", [id, req.userId]);
+    if (!found.rows.length) throw problem(404, 'Tarea pendiente no encontrada.');
+    const previous = found.rows[0];
+    const title = input.title === undefined ? previous.title : validateString(input.title, 'title', 1, 120);
+    const type = input.type === undefined ? previous.type : validateType(input.type);
+    const spaceId = input.space_id === undefined ? previous.space_id : input.space_id === null ? null : uuid(input.space_id, 'Espacio');
+    const dueAt = input.due_at === undefined ? previous.due_at : input.due_at === null ? null : instant(input.due_at, 'due_at');
+    const kind = input.digital_kind === undefined ? previous.digital_kind : digitalKind(input.digital_kind);
+    const reference = input.reference_url === undefined ? previous.reference_url : referenceUrl(input.reference_url);
+    const status = input.status === undefined ? previous.status : input.status;
+    if (!['pendiente', 'en_progreso'].includes(status)) throw problem(400, 'Usa la acción completar o archivar para cerrar una tarea.');
+    if (type === 'fisica' && kind !== 'general') throw problem(400, 'Los correos y archivos deben ser digitales.');
+    await validateSpace(client, spaceId, req.userId, type);
+    const result = await client.query('UPDATE tasks SET title = $1, type = $2, space_id = $3, due_at = $4, digital_kind = $5, reference_url = $6, status = $7, updated_at = now() WHERE id = $8 AND user_id = $9 RETURNING *', [title, type, spaceId, dueAt, kind, reference, status, id, req.userId]);
+    return result.rows[0];
+  });
+  res.json({ task });
+}));
+
+router.post('/:id/archive', route(async (req, res) => {
+  const result = await pool.query("UPDATE tasks SET status = 'archivada', updated_at = now() WHERE id = $1 AND user_id = $2 AND completed_at IS NULL RETURNING *", [uuid(req.params.id, 'Tarea'), req.userId]);
+  if (!result.rows.length) throw problem(404, 'Tarea no encontrada o ya está completada.');
+  res.json({ task: result.rows[0] });
+}));
 
 router.patch("/:id/complete", async (req, res, next) => {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.id)) {
@@ -69,7 +125,7 @@ router.patch("/:id/complete", async (req, res, next) => {
     await client.query("BEGIN");
 
     const taskResult = await client.query(
-      "UPDATE tasks SET status = 'completada', completed_at = now() WHERE id = $1 AND user_id = $2 AND status = 'pendiente' RETURNING id, title, type, status, completed_at",
+      "UPDATE tasks SET status = 'completada', completed_at = now(), updated_at = now() WHERE id = $1 AND user_id = $2 AND status IN ('pendiente','en_progreso') RETURNING *",
       [req.params.id, req.userId]
     );
 
