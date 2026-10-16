@@ -3,17 +3,25 @@ import { useAuth } from '../auth';
 import { api, ApiError } from '../api';
 import { formatMemberSince } from '../dates';
 import { Navigation } from '../components/Navigation';
-import { Button } from '../components/ui';
+import { Button, Input } from '../components/ui';
+import { Modal, Notice } from '../components/ReleaseLayout';
+import { validateEmail, validateName } from '../validation';
 
 interface AccountProps {
   navigate: (path: string) => void;
 }
 
 export function Account({ navigate }: AccountProps) {
-  const { user, logout } = useAuth();
+  const { user, logout, login } = useAuth();
   const [completedTasks, setCompletedTasks] = useState<number | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [password, setPassword] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     api<{ tasks: any[] }>('/tasks?status=completada')
@@ -55,6 +63,8 @@ export function Account({ navigate }: AccountProps) {
           </p>
         </div>
 
+        <Button variant="secondary" className="w-full mb-4" onClick={() => { setName(user.name); setEmail(user.email); setPassword(''); setError(''); setEditing(true); }}>Editar mis datos</Button>
+        <button className="surface p-4 text-left w-full mb-6 text-sm text-primary" onClick={() => navigate('#/verificar-correo')}>{user.email_verified_at ? 'Correo verificado ✓' : 'Verificar correo para recordatorios →'}</button>
         <div className="bg-white p-5 rounded-[16px] shadow-sm border border-border-main flex justify-between items-center mb-8">
           <span className="font-medium text-text-main">Tareas hechas</span>
           <span className="text-xl font-bold text-primary">
@@ -73,6 +83,7 @@ export function Account({ navigate }: AccountProps) {
       </div>
 
       {confirmLogout && <div className="fixed inset-0 z-50 bg-[#17132c]/40 backdrop-blur-sm grid place-items-center p-5"><div role="alertdialog" aria-modal="true" aria-labelledby="logout-title" className="surface p-6 max-w-sm w-full"><h2 id="logout-title" className="text-xl font-bold mb-2">¿Cerrar tu sesión?</h2><p className="text-sm text-text-secondary mb-5">Tus tareas seguirán guardadas. Puedes volver cuando quieras.</p><div className="flex gap-3"><Button autoFocus variant="secondary" onClick={() => setConfirmLogout(false)}>Cancelar</Button><Button onClick={handleLogout}>Salir</Button></div></div></div>}
+      {editing && <Modal title="Editar mis datos" busy={saving} onClose={() => setEditing(false)}><form className="grid gap-4" onSubmit={async e => { e.preventDefault(); const validation = validateName(name) || validateEmail(email); setError(validation || ''); if (validation) return; setSaving(true); try { const result = await api<{ user: typeof user }>('/auth/me', { method: 'PATCH', body: JSON.stringify({ name, email, ...(email.trim().toLowerCase() !== user.email ? { current_password: password } : {}) }) }); login(localStorage.getItem('antilia_token') || '', result.user); setEditing(false); } catch (err) { setError((err as Error).message); } finally { setSaving(false); } }}><Input label="Nombre completo" value={name} maxLength={80} required onChange={e => setName(e.target.value)}/><Input label="Correo Electrónico" value={email} type="email" required onChange={e => setEmail(e.target.value)}/>{email.trim().toLowerCase() !== user.email && <><Input label="Contraseña actual" type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)}/><Notice>Al cambiar el correo, los recordatorios se pausarán hasta que verifiques el nuevo.</Notice></>}{error && <Notice error>{error}</Notice>}<Button loading={saving}>Guardar datos</Button></form></Modal>}
       <Navigation currentPath="#/perfil" navigate={navigate} />
     </div>
   );

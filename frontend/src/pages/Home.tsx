@@ -12,7 +12,7 @@ export interface Task {
   id: string;
   title: string;
   type: 'fisica' | 'digital';
-  status: 'pendiente' | 'completada';
+  status: 'pendiente' | 'en_progreso' | 'completada' | 'archivada';
   created_at: string;
   completed_at: string | null;
 }
@@ -81,7 +81,7 @@ export function Home({ navigate }: HomeProps) {
   }, [isSheetOpen, creating]);
 
   const todayTasks = useMemo(() => {
-    return tasks.filter(t => t.status === 'pendiente' || isCompletedToday(t.completed_at));
+    return tasks.filter(t => ['pendiente', 'en_progreso'].includes(t.status) || isCompletedToday(t.completed_at));
   }, [tasks]);
 
   const filteredTasks = useMemo(() => {
@@ -91,8 +91,8 @@ export function Home({ navigate }: HomeProps) {
       filtered = filtered.filter(t => t.type === tab);
     }
     return [...filtered].sort((a, b) => {
-      if (a.status === 'pendiente' && b.status === 'completada') return -1;
-      if (a.status === 'completada' && b.status === 'pendiente') return 1;
+      if (a.status !== 'completada' && b.status === 'completada') return -1;
+      if (a.status === 'completada' && b.status !== 'completada') return 1;
       return 0;
     });
   }, [todayTasks, tasks, tab, search, view]);
@@ -221,6 +221,7 @@ export function Home({ navigate }: HomeProps) {
           </div>
         )}
 
+        <section aria-label="Accesos de organización" className="grid grid-cols-2 gap-3 mb-6">{[['#/espacios','Tus espacios','Físicos y digitales'],['#/escritorio','Tu escritorio','Un paso a la vez'],['#/turnos','Tu agenda','Reserva tu tiempo'],['#/recordatorios','Recordatorios','Tus horarios']].map(([path,title,text]) => <button key={path} className="surface p-4 text-left" onClick={() => navigate(path)}><span className="font-semibold block text-sm">{title} →</span><span className="text-xs text-text-secondary">{text}</span></button>)}</section>
         <div className="hero-card mb-6">
           <p className="eyebrow mb-3">Tu enfoque de hoy</p>
           <div className="flex justify-between items-end mb-3">
@@ -273,7 +274,7 @@ export function Home({ navigate }: HomeProps) {
                   } transition-all`}
                 >
                   <button
-                    onClick={() => task.status === 'pendiente' && handleComplete(task.id)}
+                    onClick={() => ['pendiente','en_progreso'].includes(task.status) && handleComplete(task.id)}
                     disabled={task.status === 'completada' || completingIds.has(task.id)}
                     aria-label={`Completar tarea: ${task.title}`}
                     aria-busy={completingIds.has(task.id)}
