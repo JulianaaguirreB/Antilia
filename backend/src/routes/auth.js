@@ -4,15 +4,18 @@ const jwt = require("jsonwebtoken");
 const { pool } = require("../db");
 const { validateString, validateEmail, validatePassword } = require("../validate");
 const { requireAuth } = require("../middleware/auth");
+const { route, problem, transaction } = require('../http');
+const { body } = require('../release2-validation');
 
 const router = express.Router();
 
-function signToken(userId) {
-  return jwt.sign({ sub: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+function signToken(userId, version = 0) {
+  return jwt.sign({ sub: userId, version }, process.env.JWT_SECRET, { expiresIn: "7d" });
 }
 
 router.post("/register", async (req, res, next) => {
   try {
+    body(req.body, ['name', 'email', 'password']);
     const name = validateString(req.body.name, "name", 1, 80);
     const email = validateEmail(req.body.email);
     const password = validatePassword(req.body.password);
@@ -41,6 +44,7 @@ router.post("/register", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
+    body(req.body, ['email', 'password']);
     const email = validateEmail(req.body.email);
     const password = req.body.password;
     if (typeof password !== "string") {
@@ -54,7 +58,7 @@ router.post("/login", async (req, res, next) => {
     }
 
     const result = await pool.query(
-      "SELECT id, name, email, password_hash FROM users WHERE email = $1",
+      "SELECT id, name, email, password_hash, token_version FROM users WHERE email = $1",
       [email]
     );
     const user = result.rows[0];
@@ -68,7 +72,7 @@ router.post("/login", async (req, res, next) => {
       return res.status(401).json({ error: "Correo o contraseña incorrectos." });
     }
 
-    const token = signToken(user.id);
+    const token = signToken(user.id, user.token_version);
     res.json({
       token,
       user: { id: user.id, name: user.name, email: user.email },
@@ -81,7 +85,7 @@ router.post("/login", async (req, res, next) => {
 router.get("/me", requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
-      "SELECT id, name, email, created_at FROM users WHERE id = $1",
+      "SELECT id, name, email, email_verified_at, updated_at, created_at FROM users WHERE id = $1",
       [req.userId]
     );
     if (result.rows.length === 0) {
@@ -92,5 +96,31 @@ router.get("/me", requireAuth, async (req, res, next) => {
     next(err);
   }
 });
+
+router.patch('/me', requireAuth, route(async (req, res) => {
+  const input = body(req.body, ['name', 'email', 'current_password']);
+  if (input.name === undefined && input.email === undefined) throw problem(400, 'Incluye name o email.');
+  try {
+    const user = await transaction(async client => {
+      const found = await client.query('SELECT * FROM users WHERE id = $1 FOR UPDATE', [req.userId]);
+      if (!found.rows.length) throw problem(404, 'Usuario no encontrado.');
+      const previous = found.rows[0];
+      const name = input.name === undefined ? previous.name : validateString(input.name, 'name', 1, 80);
+      const email = input.email === undefined ? previous.email : validateEmail(input.email);
+      const changedEmail = email !== previous.email;
+      if (changedEmail) {
+        if (typeof input.current_password !== 'string' || Buffer.byteLength(input.current_password, 'utf8') > 72 || !await bcrypt.compare(input.current_password, previous.password_hash)) throw problem(401, 'Confirma tu contraseña actual para cambiar el correo.');
+        await client.query('DELETE FROM email_verifications WHERE user_id = $1', [req.userId]);
+        await client.query('UPDATE reminders SET enabled = false, updated_at = now() WHERE user_id = $1', [req.userId]);
+      }
+      const result = await client.query('UPDATE users SET name = $1, email = $2, email_verified_at = CASE WHEN $3 THEN NULL ELSE email_verified_at END, updated_at = now() WHERE id = $4 RETURNING id, name, email, email_verified_at, created_at, updated_at', [name, email, changedEmail, req.userId]);
+      return result.rows[0];
+    });
+    res.json({ user });
+  } catch (error) {
+    if (error.code === '23505') throw problem(409, 'Ya existe una cuenta con ese correo.');
+    throw error;
+  }
+}));
 
 module.exports = router;
