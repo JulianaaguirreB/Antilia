@@ -4,6 +4,12 @@ Aplicación web para celular que ayuda a asistentes administrativos de empresas 
 
 **App publicada:** https://antilia-delta.vercel.app
 
+## Avance de Release 2 en developer
+
+Esta rama añade espacios, tablero, agenda, perfil editable, recuperación de acceso y configuración de recordatorios. La versión nueva se prueba por separado en http://localhost:3102; requiere el computador encendido. La URL pública anterior corresponde a Release 1 hasta integrar y publicar los cambios.
+
+Consulta [cómo abrir y configurar las mejoras](backend/README_RELEASE2.md) y [el avance y los pendientes de entrega](backend/ESTADO_RELEASE2.md). El correo real y el programador requieren configuración; no se simulan envíos en la app. La validación con usuarios, los hallazgos, la landing, el video, el reporte y el tag v0.2 siguen pendientes.
+
 Publicación inicial comprobada el 11 de octubre de 2026: Vercel con PostgreSQL de Neon en plan Free. Esta rama incorpora 20 comprobaciones del recorrido móvil y conserva las 33 pruebas de API; ambas suites y la compilación de producción pasaron localmente. La publicación de las mejoras debe volver a comprobarse tras integrar la rama. La prueba automática no sustituye la comprobación desde un celular ajeno al equipo.
 
 ## Qué hace la versión v0.1 (Release 1)
