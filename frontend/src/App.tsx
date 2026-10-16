@@ -5,6 +5,11 @@ import { Auth } from './pages/Auth';
 import { Home } from './pages/Home';
 import { Progress } from './pages/Progress';
 import { Account } from './pages/Account';
+import { Spaces, SpaceDetail } from './pages/Spaces';
+import { TaskWorkspace } from './pages/TaskWorkspace';
+import { Shifts } from './pages/Shifts';
+import { Reminders } from './pages/Reminders';
+import { AccessTools, Welcome } from './pages/AccessTools';
 
 export function AppContent() {
   const { user, loading } = useAuth();
@@ -17,19 +22,31 @@ export function AppContent() {
       </div>
     );
   }
-  const isAuthRoute = hash === '#/acceso' || hash === '#/registro';
+  const isAuthRoute = ['#/acceso', '#/registro', '#/recuperar', '#/bienvenida'].includes(hash);
   
   if (!user && !isAuthRoute) {
     navigate('#/acceso');
     return null;
   }
 
-  if (user && isAuthRoute) {
+  if (user && ['#/acceso', '#/registro', '#/bienvenida'].includes(hash)) {
     navigate('#/inicio');
     return null;
   }
 
   switch (hash) {
+    case '#/bienvenida': return <Welcome navigate={navigate}/>;
+    case '#/recuperar': return <AccessTools navigate={navigate}/>;
+    case '#/verificar-correo': return <AccessTools navigate={navigate} verify/>;
+    case '#/espacios': return <Spaces navigate={navigate}/>;
+    case '#/escritorio': return <TaskWorkspace navigate={navigate} mode="fisica"/>;
+    case '#/digital': return <TaskWorkspace navigate={navigate} mode="digital"/>;
+    case '#/correos': return <TaskWorkspace navigate={navigate} mode="correo"/>;
+    case '#/archivos': return <TaskWorkspace navigate={navigate} mode="archivo"/>;
+    case '#/kanban': return <TaskWorkspace navigate={navigate} mode="kanban"/>;
+    case '#/archivadas': return <TaskWorkspace navigate={navigate} mode="archivada"/>;
+    case '#/turnos': return <Shifts navigate={navigate}/>;
+    case '#/recordatorios': return <Reminders navigate={navigate}/>;
     case '#/acceso':
       return <Auth key="login" isRegister={false} navigate={navigate} />;
     case '#/registro':
@@ -41,6 +58,7 @@ export function AppContent() {
     case '#/perfil':
       return <Account navigate={navigate} />;
     default:
+      if (user && /^#\/espacio\/[0-9a-f-]{36}$/i.test(hash)) return <SpaceDetail key={hash} id={hash.split('/')[2]} navigate={navigate}/>;
       if (user) {
         navigate('#/inicio');
       } else {

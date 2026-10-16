@@ -185,6 +185,9 @@ export function Auth({ isRegister, navigate }: AuthProps) {
           </Button>
         </form>
 
+        {!isRegister && <button className="text-primary text-sm min-h-11 mt-3" onClick={() => navigate('#/recuperar')}>Olvidé mi contraseña</button>}
+        <button className="text-text-secondary text-sm min-h-11 mt-2" onClick={() => navigate('#/bienvenida')}>Conoce Antilia</button>
+
         <div className="mt-8 text-center text-sm text-text-secondary">
           {isRegister ? (
             <>

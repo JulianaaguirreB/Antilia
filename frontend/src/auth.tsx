@@ -6,6 +6,7 @@ export interface User {
   name: string;
   email: string;
   created_at: string;
+  email_verified_at?: string | null;
 }
 
 interface AuthContextType {
