@@ -1,8 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { AuthProvider } from './auth';
-import { App } from './App';
-import './index.css';
+import { AuthProvider } from './features/auth/context/AuthContext';
+import { App } from './app/App';
+import './app/styles.css';
 import '@fontsource-variable/inter';
 import { Capacitor } from '@capacitor/core';
 
