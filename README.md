@@ -1,158 +1,60 @@
 # Antilia
 
-Aplicación web para celular que ayuda a asistentes administrativos de empresas medianas de Bogotá a mantener ordenado su espacio de trabajo físico y digital en pocos minutos al día. Proyecto del equipo Antilia para PIETI 2026-2.
+Aplicación para iPhone y web que ayuda al personal administrativo a organizar tareas físicas y digitales en pocos minutos al día.
 
-**App publicada:** https://antilia-delta.vercel.app
+- **Usar la app:** https://antilia-delta.vercel.app
+- **Instalar en iPhone:** [descargar el IPA e instrucciones](distribucion/ios/README.md).
+- **Instalar desde el navegador:** [guía de la web instalable](docs/instalacion/web-instalable.md).
+- **Trabajar en el proyecto:** [ejecución local, pruebas y despliegue](docs/desarrollo/ejecucion-y-despliegue.md).
+- **Consultar las guías:** [índice de documentación](docs/README.md).
 
-Publicación inicial comprobada el 11 de octubre de 2026: Vercel con PostgreSQL de Neon en plan Free. Esta rama incorpora 20 comprobaciones del recorrido móvil y conserva las 33 pruebas de API; ambas suites y la compilación de producción pasaron localmente. La publicación de las mejoras debe volver a comprobarse tras integrar la rama. La prueba automática no sustituye la comprobación desde un celular ajeno al equipo.
+## Organización
 
-## Qué hace la versión v0.1 (Release 1)
-
-El job principal es: **crear una cuenta → ver las tareas de orden del día → completar una → ver la racha actualizada.**
-
-| # | Función | Dónde se ve |
-|---|---|---|
-| 1 | Registro e inicio de sesión con correo y contraseña. La sesión dura 7 días. | Pantallas Acceso y Registro |
-| 2 | Crear una tarea física o digital con solo título y tipo | Botón "Nueva tarea" |
-| 3 | Completar una tarea con un toque, con la barra "Progreso del día" | Inicio |
-| 4 | Racha de días seguidos y racha más alta, con aviso al subir | Inicio y Progreso |
-| 5 | Filtros Físicas/Digitales, errores que dicen cómo corregir y diseño para celular | Todas las pantallas |
-
-Incluye búsqueda, historial, actividad real de los últimos 7 días, confirmación de contraseña y validación de correo en pantalla y servidor. La validación comprueba formato; no confirma propiedad del buzón.
-
-Todavía no incluye inicio de sesión con Google, recordatorio por correo ni bloqueo después de intentos fallidos.
-
-## Mejoras de Release 1
-
-Interfaz diseñada para celular con formularios accesibles, botones táctiles, navegación clara y estados de carga. El historial y los filtros usan las tareas reales del usuario. La gráfica semanal calcula las fechas en Bogotá. La cuenta de uso personal se administra fuera del repositorio; no se publican contraseñas.
-
-## Cómo está organizado
-
-```
+```text
 Antilia/
-├── backend/     API REST en Node.js + Express + PostgreSQL (JWT y bcrypt)
-├── frontend/    Interfaz en React + TypeScript + Tailwind (Vite)
-├── api/         Entrada de la API cuando se despliega en Vercel
-├── qa/          Prueba automática del recorrido completo en vista de celular
-└── vercel.json  Configuración del despliegue
+├── frontend/       Pantallas React, estilos, íconos y configuración iPhone
+│   ├── src/app/    Inicio, navegación y estilos
+│   ├── src/features/ Funciones con sus pantallas y componentes
+│   ├── src/shared/ Interfaz, cliente API y utilidades compartidas
+│   └── public/     Íconos, manifiesto y recursos estáticos
+├── backend/        Servidor Express y PostgreSQL
+│   ├── src/modules/ Funciones y servicios del servidor
+│   ├── src/shared/ Validaciones, permisos y manejo de errores
+│   ├── src/infrastructure/ PostgreSQL y envío de correo
+│   ├── migrations/ Cambios versionados de la base de datos
+│   ├── scripts/    Arranque de prueba, recordatorios y comprobaciones
+│   └── test/       Pruebas del backend
+├── api/            Entrada de Express para Vercel
+├── qa/             Pruebas de recorridos y datos de prueba
+├── distribucion/
+│   └── ios/        IPA descargable, hash e instrucciones
+├── docs/
+│   ├── producto/   Diseño y alcance
+│   ├── instalacion/ Guías de instalación
+│   ├── uso/        Uso de la cámara
+│   ├── desarrollo/ API, ejecución y publicación
+│   └── entregas/   Seguimiento de entregas
+├── .github/
+│   └── workflows/  Compilación automática del IPA
+└── vercel.json     Instalación, compilación y rutas de Vercel
 ```
 
-En local, el backend sirve la API en `/api` y también la interfaz ya compilada (`frontend/dist`), así que todo queda en `http://localhost:3000`. En Vercel, la interfaz se publica como archivos estáticos y `/api/*` llega a la misma app de Express.
+Consulta la [arquitectura y reglas de organización](docs/desarrollo/arquitectura.md) para ubicar código o agregar funciones.
 
-## Ejecutar en local
+## Estado del producto
 
-### Requisitos
+Incluye tareas, perfil, espacios, agenda, tablero, mediciones, distribución del escritorio guardada en el servidor, mascota de racha Astra y sesiones de orden de cinco minutos. El cliente iPhone consulta la API HTTPS de Vercel y PostgreSQL de Neon; el computador del equipo no necesita estar encendido. La vista de desarrollo local usa datos separados.
 
-- [Node.js 22 LTS](https://nodejs.org/) (incluye npm)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) abierto y con el motor funcionando, para la base de datos. Si ya tienes PostgreSQL, puedes omitir Docker y poner tu cadena en `DATABASE_URL`.
-- Git
+Las mejoras están en `developer`; `main` conserva la versión anterior. El IPA distribuido indica el commit de su compilación en sus instrucciones. La prueba en el iPhone físico sigue siendo necesaria. El correo automático y la recuperación requieren configurar proveedor y remitente. La cámara estima distancias con una referencia, sin escaneo 3D ni detección automática de objetos.
 
-### Windows (PowerShell)
+## Guías principales
 
-```powershell
-git clone https://github.com/JulianaaguirreB/Antilia.git
-Set-Location .\Antilia
-
-# 1. Backend: dependencias y configuración
-Set-Location .\backend
-npm.cmd ci
-node -e "const fs=require('fs');const c=require('crypto');let s=fs.readFileSync('.env.example','utf8');s=s.replace(/^JWT_SECRET=.*$/m,'JWT_SECRET='+c.randomBytes(32).toString('hex'));fs.writeFileSync('.env',s)"
-
-# 2. Base de datos (la primera vez descarga PostgreSQL)
-docker compose up -d
-npm.cmd run migrate
-
-# 3. Frontend: compilar la interfaz
-Set-Location ..\frontend
-npm.cmd ci
-npm.cmd run build
-
-# 4. Arrancar
-Set-Location ..\backend
-npm.cmd start
-```
-
-### macOS / Linux
-
-```bash
-git clone https://github.com/JulianaaguirreB/Antilia.git
-cd Antilia/backend
-npm ci
-node -e "const fs=require('fs');const c=require('crypto');let s=fs.readFileSync('.env.example','utf8');s=s.replace(/^JWT_SECRET=.*$/m,'JWT_SECRET='+c.randomBytes(32).toString('hex'));fs.writeFileSync('.env',s)"
-docker compose up -d
-npm run migrate
-cd ../frontend && npm ci && npm run build
-cd ../backend && npm start
-```
-
-Abre **http://localhost:3000**. Para probar con el celular en la misma red Wi-Fi, usa la IP del computador, por ejemplo `http://192.168.1.20:3000`.
-
-El comando `node -e ...` crea `backend/.env` a partir de `.env.example` con una clave `JWT_SECRET` aleatoria. El servidor no arranca si la clave es la de ejemplo.
-
-### Modo desarrollo (para editar la interfaz)
-
-Usa dos terminales: `npm run dev` en `backend/` y `npm run dev` en `frontend/`. Luego abre `http://localhost:5173`. Vite recarga los cambios al instante y envía `/api` al backend del puerto 3000.
-
-### Problemas comunes
-
-| Síntoma | Causa probable |
-|---|---|
-| `JWT_SECRET debe tener al menos 32 caracteres` | Falta el paso del comando `node -e` o se borró `.env` |
-| `ECONNREFUSED ... 5432` | Docker Desktop no está abierto o `docker compose up -d` no terminó |
-| `{"error":"Ruta no encontrada."}` en `localhost:3000` | No se compiló la interfaz (`npm run build` en `frontend/`) |
-| En PowerShell, `npm` dice que la ejecución de scripts está deshabilitada | Usa `npm.cmd` en lugar de `npm` |
-
-## Pruebas
-
-Con el servidor corriendo, desde `backend/`:
-
-```bash
-npm run smoke          # 33 comprobaciones de la API
-npm run smoke:streak   # reglas de la racha (solo con base local)
-```
-
-Recorrido completo en un navegador con pantalla de celular (registro, tareas, racha, progreso, perfil). Desde `qa/`:
-
-```bash
-npm ci
-npx playwright install chromium
-npm run recorrido
-```
-
-Para probar la versión publicada: `$env:BASE_URL="https://..."; npm.cmd run recorrido` en PowerShell, o `BASE_URL=https://... npm run recorrido` en macOS/Linux. Las capturas quedan en `qa/evidencias/`. Cada ejecución crea una cuenta de prueba nueva.
-
-## Despliegue en Vercel
-
-1. Crear una base PostgreSQL gratuita (por ejemplo, Neon desde *Vercel → Storage*) y copiar su cadena de conexión.
-2. Crear las tablas una sola vez desde tu computador, en `backend/`:
-   ```powershell
-   $env:DATABASE_URL="postgresql://...?sslmode=require"; $env:DATABASE_SSL="true"; npm.cmd run migrate
-   ```
-3. En Vercel, importar el repositorio con **Root Directory vacío (la raíz del repo)** y Framework Preset **Other**. `vercel.json` ya define la instalación, la compilación y las rutas.
-4. En *Settings → Environment Variables*, agregar:
-   - `DATABASE_URL`: la cadena de la base
-   - `DATABASE_SSL`: `true`
-   - `JWT_SECRET`: un texto aleatorio de 64 caracteres. Puedes generarlo con `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
-5. Desplegar y comprobar `https://<tu-app>.vercel.app/api/health`. Debe responder `"status":"ok"`.
-
-Si falta una variable, la API responde con un error que dice cuál es.
-
-## Rutas de la API
-
-| Método | Ruta | Función |
-|---|---|---|
-| GET | `/api/health` | Estado del servidor |
-| POST | `/api/auth/register` | Crear cuenta |
-| POST | `/api/auth/login` | Iniciar sesión |
-| GET | `/api/auth/me` | Consultar el usuario |
-| GET | `/api/tasks` | Tareas pendientes (`?status=completada` o `?status=all`; `?type=fisica` o `?type=digital`) |
-| POST | `/api/tasks` | Crear tarea `{ title, type: "fisica" \| "digital" }` |
-| PATCH | `/api/tasks/:id/complete` | Completar tarea y actualizar la racha |
-| GET | `/api/streak` | Racha actual y récord |
-
-Las rutas de usuario, tareas y racha requieren `Authorization: Bearer <token>`. Registro y login devuelven ese token.
-
-**Regla de la racha** (hora de Bogotá): al completar la primera tarea del día, la racha sube en 1 si la última actividad fue ayer y vuelve a 1 si fue antes. Si pasa un día completo sin completar tareas, la racha mostrada es 0. Siempre se conserva el récord.
+- [Diseño y alcance](docs/producto/diseno-y-alcance.md)
+- [API y servicios del backend](docs/desarrollo/backend.md)
+- [Medir con cámara](docs/uso/medir-con-camara.md)
+- [Instalar con Sideloadly](docs/instalacion/iphone-sideloadly.md)
+- [Pruebas de la app](qa/README.md)
+- [Seguimiento del Release 2](docs/entregas/release2.md)
 
 ## Equipo
 

@@ -3,22 +3,28 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-const authRoutes = require("./routes/auth");
-const taskRoutes = require("./routes/tasks");
-const streakRoutes = require("./routes/streak");
+const apiRoutes = require("./routes");
+const { errorHandler } = require("./shared/middleware/error-handler");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", service: "antilia-backend", release: "v0.1" });
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) res.set('Cache-Control', 'no-store');
+  if (req.body === undefined) req.body = {};
+  next();
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api/tasks", taskRoutes);
-app.use("/api/streak", streakRoutes);
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", service: "antilia-backend", release: "v0.2-dev" });
+});
+
+app.get('/api/capabilities', (req, res) => {
+  res.json({ email_configured: require('./infrastructure/mail/email').emailConfigured(), scheduler_configured: Boolean(process.env.CRON_SECRET && process.env.CRON_SECRET.length >= 32), timezone: 'America/Bogota' });
+});
+
+app.use("/api", apiRoutes);
 
 app.use("/api", (req, res) => {
   res.status(404).json({ error: "Ruta no encontrada." });
@@ -39,27 +45,7 @@ app.get(/^(?!\/api)/, (req, res, next) => {
   });
 });
 
-app.use((err, req, res, next) => {
-  const invalidJson = (err.status === 400 || err.statusCode === 400) && !err.isValidation && (err.name === "SyntaxError" || /json|unexpected token|expected property name/i.test(err.message || ""));
-  if (err.type === "entity.parse.failed" || invalidJson) {
-    return res.status(400).json({ error: "JSON inválido." });
-  }
-  if (err.type === "entity.too.large") {
-    return res.status(413).json({ error: "La solicitud es demasiado grande." });
-  }
-
-  const status = err.status || err.statusCode || 500;
-
-  if (status >= 400 && status < 500) {
-    if (err.isValidation) {
-      return res.status(status).json({ error: err.message });
-    }
-    return res.status(status).json({ error: "Solicitud inválida." });
-  }
-
-  console.error(err);
-  res.status(500).json({ error: "Error interno." });
-});
+app.use(errorHandler);
 
 module.exports = app;
 

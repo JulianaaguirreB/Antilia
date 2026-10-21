@@ -1,0 +1,8 @@
+CREATE TABLE desks (
+  user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL CHECK (char_length(name) BETWEEN 1 AND 80),
+  width_cm NUMERIC(7,2) NOT NULL CHECK (width_cm BETWEEN 20 AND 1000),
+  depth_cm NUMERIC(7,2) NOT NULL CHECK (depth_cm BETWEEN 20 AND 1000),
+  layout JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

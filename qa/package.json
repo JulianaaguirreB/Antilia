@@ -5,7 +5,8 @@
   "description": "Pruebas de punta a punta del job principal de Antilia",
   "type": "module",
   "scripts": {
-    "recorrido": "node recorrido.mjs"
+    "recorrido": "node recorrido.mjs",
+    "recorrido:release2": "node recorrido-release2.mjs"
   },
   "devDependencies": {
     "playwright": "^1.48.0"
