@@ -10,6 +10,7 @@ import { TaskWorkspace } from './pages/TaskWorkspace';
 import { Shifts } from './pages/Shifts';
 import { Reminders } from './pages/Reminders';
 import { AccessTools, Welcome } from './pages/AccessTools';
+import { InstallApp } from './components/InstallApp';
 
 export function AppContent() {
   const { user, loading } = useAuth();
@@ -100,6 +101,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 export function App() {
   return (
     <ErrorBoundary>
+      <InstallApp />
       <AppContent />
     </ErrorBoundary>
   );

@@ -4,6 +4,8 @@ Aplicación web para celular que ayuda a asistentes administrativos de empresas 
 
 **App publicada:** https://antilia-delta.vercel.app
 
+**Instalar en el celular:** consulta [la guía de Android y iPhone](INSTALAR_EN_CELULAR.md). Antilia se instala como PWA y abre desde su ícono; no requiere un computador encendido. Las tareas necesitan internet.
+
 ## Avance de Release 2 en developer
 
 Esta rama añade espacios, tablero, agenda, perfil editable, recuperación de acceso y configuración de recordatorios. La versión nueva se prueba por separado en http://localhost:3102; requiere el computador encendido. La URL pública anterior corresponde a Release 1 hasta integrar y publicar los cambios.
