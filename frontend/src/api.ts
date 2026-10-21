@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -7,7 +9,7 @@ export class ApiError extends Error {
   }
 }
 
-const BASE_URL = '/api';
+const BASE_URL = Capacitor.isNativePlatform() ? 'https://antilia-delta.vercel.app/api' : '/api';
 
 let unauthorizedHandler: (() => void) | null = null;
 

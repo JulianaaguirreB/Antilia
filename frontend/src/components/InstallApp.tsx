@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 
 interface InstallPrompt extends Event {
   prompt(): Promise<void>;
@@ -41,7 +42,7 @@ export function InstallApp() {
       setMessage('Puedes usar el menú del navegador para instalar Antilia.');
     } finally { setBusy(false); }
   }
-  if (installed) return null;
+  if (installed || Capacitor.isNativePlatform()) return null;
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   return <aside aria-label="Instalar Antilia" className="mx-auto w-full max-w-lg px-6 py-3 bg-bg-main text-text-main">
     <button type="button" disabled={busy} onClick={install} aria-expanded={open} aria-controls="install-help" className="w-full rounded-2xl border border-primary/30 px-4 py-3 text-primary font-semibold focus-visible:outline-2 disabled:opacity-60">{busy ? 'Abriendo instalación…' : prompt ? 'Instalar Antilia en este dispositivo' : 'Cómo instalar Antilia'}</button>
