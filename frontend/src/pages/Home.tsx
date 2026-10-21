@@ -201,7 +201,7 @@ export function Home({ navigate }: HomeProps) {
   return (
     <div className="min-h-dvh bg-bg-main pb-[calc(140px+env(safe-area-inset-bottom))]">
       <div className="max-w-[480px] mx-auto px-4 pt-6">
-        <div className="flex items-center justify-between mb-6"><div className="flex items-center gap-2"><span className="brand-mark !w-8 !h-8 !text-lg !rounded-xl">a</span><span className="font-bold text-lg">antilia.</span></div><span className="eyebrow">Tu espacio, en orden</span></div>
+        <div className="flex items-center justify-between mb-6"><div className="flex items-center gap-2"><img src="/icons/icon-192.png" alt="" className="brand-mark !w-8 !h-8 !text-lg !rounded-xl"/><span className="font-bold text-lg">antilia.</span></div><span className="eyebrow">Tu espacio, en orden</span></div>
         <header className="mb-6 flex justify-between items-start gap-3">
           <div>
             <h1 className="text-2xl font-bold text-text-main">Hola, {firstName}</h1>
@@ -222,6 +222,7 @@ export function Home({ navigate }: HomeProps) {
           </div>
         )}
 
+        <button className="surface p-4 w-full text-left mb-4 border-primary/30" onClick={()=>navigate('#/sesion')}><span className="eyebrow">Un momento para ti</span><strong className="block text-primary mt-2">Cinco minutos de orden →</strong><span className="text-xs text-text-secondary">Elige una tarea y empieza una sesión corta.</span></button>
         <section aria-label="Accesos de organización" className="grid grid-cols-2 gap-3 mb-6">{[['#/espacios','Tus espacios','Físicos y digitales'],['#/escritorio','Tu escritorio','Un paso a la vez'],['#/turnos','Tu agenda','Reserva tu tiempo'],['#/recordatorios','Recordatorios','Tus horarios']].map(([path,title,text]) => <button key={path} className="surface p-4 text-left" onClick={() => navigate(path)}><span className="font-semibold block text-sm">{title} →</span><span className="text-xs text-text-secondary">{text}</span></button>)}</section>
         <div className="hero-card mb-6">
           <p className="eyebrow mb-3">Tu enfoque de hoy</p>
