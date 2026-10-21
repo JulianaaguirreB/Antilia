@@ -31,6 +31,7 @@ app.use("/api/streak", streakRoutes);
 app.use('/api/spaces', require('./routes/spaces'));
 app.use('/api/shifts', require('./routes/shifts'));
 app.use('/api/stats', require('./routes/stats'));
+app.use('/api/measurements', require('./routes/measurements'));
 app.use('/api/reminders', require('./routes/reminders'));
 app.use('/api/email-verification', require('./routes/email-verification'));
 app.use('/api/password-reset', require('./routes/password-reset'));

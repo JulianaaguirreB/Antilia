@@ -72,6 +72,7 @@ export function Account({ navigate }: AccountProps) {
           </span>
         </div>
 
+        <div className="surface p-4 grid gap-2 mb-5"><h2 className="font-bold">Configuración</h2><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/recordatorios')}>Recordatorios y alertas →</button><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/privacidad')}>Privacidad y datos →</button></div>
         <section className="surface p-5 mb-6"><p className="eyebrow mb-3">Cómo funciona tu racha</p><p className="text-sm text-text-secondary leading-relaxed">Completa una tarea cada día para mantenerla. Varias tareas en el mismo día cuentan como un solo día. Tu récord se conserva.</p><p className="mt-4 text-xs text-text-secondary">Tus tareas se guardan en tu cuenta y solo tú puedes consultarlas.</p></section>
         <Button 
           variant="secondary" 

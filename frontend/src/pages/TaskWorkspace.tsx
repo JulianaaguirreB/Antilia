@@ -4,6 +4,8 @@ import { Input, Button } from '../components/ui';
 import { FieldSelect, Modal, Notice, ReleasePage, ResourceState, useResource } from '../components/ReleaseLayout';
 import type { Navigate } from '../components/ReleaseLayout';
 import type { Space } from './Spaces';
+import { DeskPlan } from '../components/DeskPlan';
+import { weekActivity } from '../dates';
 
 export interface WorkspaceTask { id: string; title: string; type: 'fisica' | 'digital'; status: string; digital_kind: string; reference_url: string | null; space_id: string | null; due_at: string | null; completed_at: string | null; }
 
@@ -49,6 +51,8 @@ export function TaskWorkspace({ navigate, mode }: { navigate: Navigate; mode: 'f
   const titles = { fisica: 'Orden del escritorio', digital: 'Organización digital', correo: 'Correos pendientes', archivo: 'Archivos y carpetas', kanban: 'Tu tablero', archivada: 'Tareas archivadas' };
   const tasks = result.data?.tasks.filter(task => (!['correo','archivo'].includes(mode) || task.digital_kind === mode) && (mode !== 'kanban' || task.status === status) && task.title.toLocaleLowerCase().includes(search.toLocaleLowerCase())) || [];
   return <ReleasePage title={titles[mode]} subtitle={mode === 'correo' ? 'Registra los correos que necesitas revisar. Antilia no accede a tu buzón.' : mode === 'archivo' ? 'Organiza pendientes y enlaces a tus archivos. Antilia no lee ni borra archivos de tu dispositivo.' : 'Haz visible lo pendiente y avanza paso a paso.'} navigate={navigate} active={mode === 'fisica' ? '#/espacios' : '#/digital'} back={mode === 'fisica' ? '#/espacios' : '#/digital'}>
+    {mode === 'fisica' && <section className="surface p-5 mb-5"><h2 className="font-bold mb-4">Esquema de distribución</h2><DeskPlan/><button className="text-primary font-semibold mt-3 min-h-11" onClick={()=>navigate('#/medir-espacio')}>Medir mi espacio →</button></section>}
+    {mode === 'digital' && <section className="surface p-5 mb-5"><h2 className="font-bold">Calendario semanal</h2><p className="text-xs text-text-secondary mt-1 mb-4">Días con tareas digitales completadas</p><div className="flex justify-between gap-2">{weekActivity(result.data?.tasks||[]).map(day=><div className="text-center" key={day.key}><span className="text-xs block mb-2">{day.label}</span><span className={`week-dot ${day.count?'is-active':''}`} aria-label={`${day.date}: ${day.count} completadas`}>{day.count?'✓':'·'}</span></div>)}</div></section>}
     {mode === 'digital' && <div className="grid grid-cols-2 gap-3 mb-5">{[['#/correos','Correos'],['#/archivos','Archivos'],['#/kanban','Tablero'],['#/archivadas','Archivadas']].map(([path,label]) => <button key={path} className="surface text-left p-4 font-semibold text-primary min-h-16" onClick={() => navigate(path)}>{label} →</button>)}</div>}
     {mode !== 'archivada' && <Button className="w-full mb-4" onClick={() => setCreate(true)}>{mode === 'correo' ? 'Agregar correo pendiente' : mode === 'archivo' ? 'Agregar archivo pendiente' : 'Nueva tarea'}</Button>}
     <div className="mb-5"><Input label="Buscar en esta lista" type="search" value={search} onChange={e => setSearch(e.target.value)}/></div>

@@ -49,6 +49,7 @@ export function Progress({ navigate }: ProgressProps) {
   return (
     <div className="min-h-dvh bg-bg-main pb-24">
       <div className="max-w-[480px] mx-auto px-4 pt-6">
+        <div className="grid grid-cols-2 gap-3 mb-5"><button className="surface p-4 text-primary font-semibold text-sm" onClick={()=>navigate('#/metricas')}>Métricas y logros →</button><button className="surface p-4 text-primary font-semibold text-sm" onClick={()=>navigate('#/estado')}>Estado general →</button></div>
         <header className="mb-8">
           <h1 className="text-2xl font-bold text-text-main">Mi Racha</h1>
           <p className="text-text-secondary text-sm mt-1">Tu constancia, vista con claridad</p>

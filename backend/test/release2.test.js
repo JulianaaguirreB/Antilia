@@ -75,7 +75,7 @@ after(async () => {
 
 test('migraciones repetibles y esquema con datos aislados', async () => {
   const result = await pool.query('SELECT name FROM schema_migrations ORDER BY name');
-  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql']);
+  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql']);
   assert.equal((await request('/spaces')).status, 401);
   assert.equal((await request('/shifts')).status, 401);
   assert.equal((await request('/reminders')).status, 401);
@@ -263,6 +263,20 @@ test('recuperar acceso no revela cuentas y revoca sesiones previas', async () =>
   assert.equal(login.status, 200);
   assert.equal((await request('/auth/me', { token: login.data.token })).status, 200);
   assert.equal((await request('/password-reset/confirm', { method: 'POST', body: { email: user.user.email, token, password: 'OtraClave2026' } })).status, 400);
+});
+
+test('mediciones manuales se guardan sin exponer datos ajenos', async () => {
+  const a=await register('mediciona');
+  const b=await register('medicionb');
+  assert.equal((await request('/measurements')).status,401);
+  assert.equal((await request('/measurements',{method:'POST',token:a.token,body:{search_minutes:-1,misplaced_items:2}})).status,400);
+  assert.equal((await request('/measurements',{method:'POST',token:a.token,body:{search_minutes:5,misplaced_items:2,clear_width_cm:0}})).status,400);
+  const saved=await request('/measurements',{method:'POST',token:a.token,body:{search_minutes:12,misplaced_items:3,clear_width_cm:54,notes:'Línea base'}});
+  assert.equal(saved.status,201);
+  const own=await request('/measurements',{token:a.token});
+  assert.equal(own.data.measurements.length,1);
+  assert.equal(own.data.measurements[0].search_minutes,12);
+  assert.equal((await request('/measurements',{token:b.token})).data.measurements.length,0);
 });
 
 test('proveedor sin configurar no simula envíos', async () => {
