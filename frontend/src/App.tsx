@@ -10,6 +10,7 @@ import { TaskWorkspace } from './pages/TaskWorkspace';
 import { Shifts } from './pages/Shifts';
 import { Reminders } from './pages/Reminders';
 import { AccessTools, Welcome } from './pages/AccessTools';
+import { Desk } from './pages/Desk';
 import { InstallApp } from './components/InstallApp';
 import { Insights, MeasureSpace, Privacy } from './pages/Insights';
 
@@ -37,6 +38,7 @@ export function AppContent() {
   }
 
   switch (hash) {
+    case '#/mi-escritorio': return <Desk navigate={navigate}/>;
     case '#/medir-espacio': return <MeasureSpace navigate={navigate}/>;
     case '#/metricas': return <Insights navigate={navigate}/>;
     case '#/estado': return <Insights navigate={navigate} summary/>;

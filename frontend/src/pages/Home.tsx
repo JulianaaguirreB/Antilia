@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { api, ApiError } from '../api';
 import { useAuth } from '../auth';
 import { isCompletedToday } from '../dates';
+import { StreakMascot } from '../components/StreakMascot';
 import { Navigation } from '../components/Navigation';
 import { Icons } from '../components/Icons';
 import { Button, Input } from '../components/ui';
@@ -210,7 +211,7 @@ export function Home({ navigate }: HomeProps) {
             onClick={() => navigate('#/progreso')}
             className="flex items-center gap-1.5 bg-primary-soft text-primary px-3 min-h-[44px] rounded-full text-sm font-medium"
           >
-            <Icons.TrendingUp className="w-4 h-4" />
+            <StreakMascot streak={streak} compact/>
             Racha: {streak?.current_streak || 0}
           </button>
         </header>

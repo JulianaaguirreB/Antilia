@@ -1,0 +1,32 @@
+import {useEffect,useState} from 'react';
+import {api} from '../api';
+import {Button,Input} from '../components/ui';
+import {FieldSelect,Notice,ReleasePage,ResourceState,useResource} from '../components/ReleaseLayout';
+import type {Navigate} from '../components/ReleaseLayout';
+type Kind='monitor'|'lampara'|'planta'|'archivador'|'teclado';
+type Item={id:string;kind:Kind;x:number;y:number};
+type DeskData={name:string;width_cm:number;depth_cm:number;layout:Item[];updated_at?:string};
+const labels:Record<Kind,string>={monitor:'Monitor',lampara:'Lámpara',planta:'Planta',archivador:'Archivador',teclado:'Teclado'};
+const initial:DeskData={name:'Mi escritorio',width_cm:120,depth_cm:60,layout:[{id:'monitor',kind:'monitor',x:50,y:22},{id:'lampara',kind:'lampara',x:18,y:20},{id:'teclado',kind:'teclado',x:50,y:70}]};
+export function Desk({navigate}:{navigate:Navigate}){
+ const result=useResource<{desk:DeskData|null}>('/desk');
+ const [desk,setDesk]=useState<DeskData>(initial);
+ const [selected,setSelected]=useState('monitor');
+ const [kind,setKind]=useState<Kind>('planta');
+ const [busy,setBusy]=useState(false);
+ const [dirty,setDirty]=useState(false);
+ const [error,setError]=useState('');
+ const [saved,setSaved]=useState(false);
+ useEffect(()=>{if(result.data?.desk){const value=result.data.desk;setDesk({...value,width_cm:Number(value.width_cm),depth_cm:Number(value.depth_cm)});setSelected(value.layout[0]?.id||'');}},[result.data]);
+ useEffect(()=>{if(!dirty)return;const warn=(event:BeforeUnloadEvent)=>{event.preventDefault();};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn);},[dirty]);
+ const change=(value:DeskData)=>{setDesk(value);setDirty(true);setSaved(false);};
+ const item=desk.layout.find(i=>i.id===selected);
+ const move=(x:number,y:number)=>change({...desk,layout:desk.layout.map(i=>i.id===selected?{...i,x:Math.max(5,Math.min(95,x)),y:Math.max(5,Math.min(95,y))}:i)});
+ return <ReleasePage title="Mi escritorio" subtitle="Diseña tu distribución y guárdala en tu cuenta." navigate={navigate} active="#/espacios" back="#/espacios"><ResourceState {...result} retry={result.reload}/>{!result.loading&&!result.error&&<form onSubmit={async event=>{event.preventDefault();setBusy(true);setError('');setSaved(false);try{const response=await api<{desk:DeskData}>('/desk',{method:'PUT',body:JSON.stringify({name:desk.name,width_cm:desk.width_cm,depth_cm:desk.depth_cm,layout:desk.layout})});setDesk({...response.desk,width_cm:Number(response.desk.width_cm),depth_cm:Number(response.desk.depth_cm)});setDirty(false);setSaved(true);}catch(err){setError((err as Error).message);}finally{setBusy(false);}}}>
+ <fieldset disabled={busy} className="grid gap-4"><Input label="Nombre del escritorio" maxLength={80} required value={desk.name} onChange={e=>change({...desk,name:e.target.value})}/><div className="grid grid-cols-2 gap-3"><Input label="Ancho en cm" type="number" step={0.01} min={20} max={1000} required value={desk.width_cm||''} onChange={e=>change({...desk,width_cm:Number(e.target.value)})}/><Input label="Fondo en cm" type="number" step={0.01} min={20} max={1000} required value={desk.depth_cm||''} onChange={e=>change({...desk,depth_cm:Number(e.target.value)})}/></div>
+ <section className="surface p-4"><p className="font-semibold mb-2">Tu distribución</p><p className="text-xs text-text-secondary mb-4">Selecciona un objeto y toca donde quieres colocarlo. También puedes usar los controles de posición.</p><svg viewBox="0 0 400 240" role="img" aria-label="Distribución guardable del escritorio" className="w-full touch-manipulation rounded-2xl border border-primary/25 bg-primary-soft" onPointerDown={e=>{if(!selected||busy)return;const rect=e.currentTarget.getBoundingClientRect();move((e.clientX-rect.left)/rect.width*100,(e.clientY-rect.top)/rect.height*100);}}><rect x="90" y="82" width="220" height="90" rx="12" fill="white" stroke="#004cff" strokeDasharray="4 4" opacity=".7"/><text x="200" y="128" textAnchor="middle" fill="#004cff" fontSize="12">Deja espacio libre para trabajar</text>{desk.layout.map(i=><g key={i.id} transform={`translate(${i.x*4},${i.y*2.4})`}><rect x="-28" y="-16" width="56" height="32" rx="7" fill={i.id===selected?'#004cff':'white'} stroke="#004cff"/><text textAnchor="middle" dominantBaseline="middle" fontSize="8" fill={i.id===selected?'white':'#162444'}>{labels[i.kind]}</text></g>)}</svg><p className="text-xs text-text-secondary mt-3">Esquema orientativo. Las figuras no representan el tamaño real de los objetos ni detectan choques.</p></section>
+ <FieldSelect label="Objeto seleccionado" value={selected} onChange={setSelected}><option value="">Selecciona un objeto</option>{desk.layout.map((i,n)=><option value={i.id} key={i.id}>{labels[i.kind]} {n+1}</option>)}</FieldSelect>
+ {item&&<div className="surface p-4 grid gap-4"><label className="text-sm">Posición horizontal: {Math.round(item.x)} %<input className="block w-full mt-3 accent-primary" type="range" min="5" max="95" value={item.x} onChange={e=>move(Number(e.target.value),item.y)}/></label><label className="text-sm">Posición vertical: {Math.round(item.y)} %<input className="block w-full mt-3 accent-primary" type="range" min="5" max="95" value={item.y} onChange={e=>move(item.x,Number(e.target.value))}/></label><button type="button" className="text-red-700 min-h-11" onClick={()=>{change({...desk,layout:desk.layout.filter(i=>i.id!==selected)});setSelected('');}}>Quitar objeto seleccionado</button></div>}
+ <FieldSelect label="Objeto para agregar" value={kind} onChange={v=>setKind(v as Kind)}>{Object.entries(labels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</FieldSelect><button className="text-primary min-h-11 font-semibold" type="button" disabled={desk.layout.length>=12} onClick={()=>{const id=crypto.randomUUID();change({...desk,layout:[...desk.layout,{id,kind,x:50,y:50}]});setSelected(id);}}>Agregar objeto ({desk.layout.length}/12)</button>
+ {error&&<Notice error>{error}</Notice>}{saved&&<Notice>Escritorio guardado en tu cuenta. Lo encontrarás al volver a entrar.</Notice>}{dirty&&<p className="text-xs text-text-secondary" role="status">Tienes cambios por guardar.</p>}<Button loading={busy}>Guardar escritorio</Button></fieldset></form>}<button className="text-primary min-h-11 mt-5" onClick={()=>navigate('#/medir-espacio')}>Medir con cámara →</button></ReleasePage>;
+}

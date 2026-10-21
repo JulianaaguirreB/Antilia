@@ -75,7 +75,7 @@ after(async () => {
 
 test('migraciones repetibles y esquema con datos aislados', async () => {
   const result = await pool.query('SELECT name FROM schema_migrations ORDER BY name');
-  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql']);
+  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql']);
   assert.equal((await request('/spaces')).status, 401);
   assert.equal((await request('/shifts')).status, 401);
   assert.equal((await request('/reminders')).status, 401);
@@ -277,6 +277,20 @@ test('mediciones manuales se guardan sin exponer datos ajenos', async () => {
   assert.equal(own.data.measurements.length,1);
   assert.equal(own.data.measurements[0].search_minutes,12);
   assert.equal((await request('/measurements',{token:b.token})).data.measurements.length,0);
+});
+
+test('escritorio conserva distribución y dimensiones por usuario', async()=>{
+ const a=await register('desk-a');const b=await register('desk-b');
+ assert.equal((await request('/desk')).status,401);
+ const body={name:'Escritorio de trabajo',width_cm:120,depth_cm:60,layout:[{id:'monitor',kind:'monitor',x:50,y:20}]};
+ assert.equal((await request('/desk',{method:'PUT',token:a.token,body})).status,200);
+ assert.deepEqual((await request('/desk',{token:a.token})).data.desk.layout,body.layout);
+ assert.equal((await request('/desk',{token:b.token})).data.desk,null);
+ assert.equal((await request('/desk',{method:'PUT',token:a.token,body:{...body,width_cm:0}})).status,400);
+ assert.equal((await request('/desk',{method:'PUT',token:a.token,body:{...body,layout:[{id:'monitor',kind:'monitor',x:120,y:20}]}})).status,400);
+ assert.equal((await request('/desk',{method:'PUT',token:a.token,body:{...body,layout:[...body.layout,...body.layout]}})).status,400);
+ assert.equal((await request('/desk',{method:'PUT',token:a.token,body:{...body,name:'Nuevo nombre',layout:[]}})).status,200);
+ assert.equal((await request('/desk',{token:a.token})).data.desk.name,'Nuevo nombre');
 });
 
 test('proveedor sin configurar no simula envíos', async () => {

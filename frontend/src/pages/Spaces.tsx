@@ -19,6 +19,7 @@ export function Spaces({ navigate }: { navigate: Navigate }) {
   const open = (space: Space | null) => { setEditing(space); setName(space?.name || ''); setDescription(space?.description || ''); setType(space?.type || 'fisica'); setError(''); };
   return <ReleasePage title="Organización física" subtitle="Un lugar para cada cosa. Organiza tu escritorio y tus espacios digitales." navigate={navigate} active="#/espacios">
     <div className="flex gap-3 mb-4"><button className="surface p-4 flex-1 text-primary font-semibold text-sm" onClick={()=>navigate('#/escritorio')}>Orden del escritorio →</button><button className="surface p-4 flex-1 text-primary font-semibold text-sm" onClick={()=>navigate('#/medir-espacio')}>Medir espacio →</button></div>
+    <button className="surface p-4 w-full text-left text-primary font-semibold mb-4" onClick={()=>navigate('#/mi-escritorio')}>Mi escritorio guardado →</button>
     <Button className="w-full mb-4" onClick={() => open(null)}>Agregar espacio</Button><button className="text-sm text-primary mb-5 min-h-11" onClick={() => setArchived(!archived)}>{archived ? 'Ver espacios activos' : 'Ver espacios archivados'}</button>
     <ResourceState {...result} retry={result.reload}/>
     {!result.loading && !result.error && result.data?.spaces.length === 0 && <div className="surface p-8 text-center"><p className="text-xl font-semibold mb-2">Tu orden empieza aquí</p><p className="text-sm text-text-secondary">Crea un espacio físico o digital para agrupar tus tareas.</p></div>}

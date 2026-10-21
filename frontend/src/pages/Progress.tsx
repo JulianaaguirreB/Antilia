@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api, ApiError } from '../api';
+import { StreakMascot } from '../components/StreakMascot';
 import { Navigation } from '../components/Navigation';
 import { Task, Streak } from './Home';
 import { weekActivity } from '../dates';
@@ -62,16 +63,7 @@ export function Progress({ navigate }: ProgressProps) {
         )}
 
         <div className="surface p-8 text-center mb-6 flex flex-col items-center">
-          <div className="w-32 h-32 rounded-full border-[8px] border-primary-soft flex items-center justify-center mb-6">
-            <div className="text-center">
-              <span className="block text-4xl font-bold text-primary leading-none mb-1">
-                {current}
-              </span>
-              <span className="text-sm font-medium text-text-secondary uppercase tracking-wider">
-                {current === 1 ? 'Día' : 'Días'}
-              </span>
-            </div>
-          </div>
+          <StreakMascot streak={streak}/>
           
           <h2 className="text-lg font-semibold text-text-main mb-2">
             Racha más alta: {best} {best === 1 ? 'día' : 'días'}
