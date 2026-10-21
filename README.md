@@ -1,18 +1,20 @@
 # Antilia
 
-Aplicación web para celular que ayuda a asistentes administrativos de empresas medianas de Bogotá a mantener ordenado su espacio de trabajo físico y digital en pocos minutos al día. Proyecto del equipo Antilia para PIETI 2026-2.
+Aplicación para iPhone y web que ayuda a asistentes administrativos de empresas medianas de Bogotá a mantener ordenado su espacio de trabajo físico y digital en pocos minutos al día. Proyecto del equipo Antilia para PIETI 2026-2.
 
 **App publicada:** https://antilia-delta.vercel.app
 
-**Instalar en el celular:** consulta [la guía de Android y iPhone](INSTALAR_EN_CELULAR.md). Antilia se instala como PWA y abre desde su ícono; no requiere un computador encendido. Las tareas necesitan internet.
+**App iPhone:** [descargar IPA e instrucciones de Sideloadly](distribucion/ios/README.md). Incluye la cámara, el escritorio guardado y Astra, la mascota animada de racha. El IPA necesita firma antes de instalarse.
+
+**Alternativa web instalable:** consulta [la guía de PWA para Android y iPhone](INSTALAR_EN_CELULAR.md). Ambas versiones usan el servidor de Vercel y PostgreSQL de Neon; no requieren un computador encendido. Las tareas necesitan internet.
 
 ## Avance de Release 2 en developer
 
-Esta rama añade espacios, tablero, agenda, perfil editable, recuperación de acceso y configuración de recordatorios. La versión nueva se prueba por separado en http://localhost:3102; requiere el computador encendido. La URL pública anterior corresponde a Release 1 hasta integrar y publicar los cambios.
+Esta rama añade espacios, tablero, agenda, perfil editable, recuperación de acceso, configuración de recordatorios, mediciones, distribución persistente del escritorio y Astra. Las mejoras están publicadas en la URL anterior desde developer. Main conserva la versión anterior. La vista opcional de desarrollo en http://localhost:3102 usa una base local independiente y sí necesita el computador encendido.
 
 Consulta [cómo abrir y configurar las mejoras](backend/README_RELEASE2.md) y [el avance y los pendientes de entrega](backend/ESTADO_RELEASE2.md). El correo real y el programador requieren configuración; no se simulan envíos en la app. La validación con usuarios, los hallazgos, la landing, el video, el reporte y el tag v0.2 siguen pendientes.
 
-Publicación inicial comprobada el 11 de octubre de 2026: Vercel con PostgreSQL de Neon en plan Free. Esta rama incorpora 20 comprobaciones del recorrido móvil y conserva las 33 pruebas de API; ambas suites y la compilación de producción pasaron localmente. La publicación de las mejoras debe volver a comprobarse tras integrar la rama. La prueba automática no sustituye la comprobación desde un celular ajeno al equipo.
+Última publicación comprobada el 21 de octubre de 2026: Vercel con PostgreSQL de Neon. Pasaron 18 pruebas del backend y las comprobaciones de escritorio y estados de Astra. Se verificó el guardado y consulta del escritorio en producción. La compilación iPhone terminó correctamente. Estas pruebas no sustituyen la instalación y uso desde un celular ajeno al equipo.
 
 ## Qué hace la versión v0.1 (Release 1)
 
