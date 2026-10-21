@@ -6,13 +6,13 @@ Aplicación para iPhone y web que ayuda a asistentes administrativos de empresas
 
 **App iPhone:** [descargar IPA e instrucciones de Sideloadly](distribucion/ios/README.md). Incluye la cámara, el escritorio guardado y Astra, la mascota animada de racha. El IPA necesita firma antes de instalarse.
 
-**Alternativa web instalable:** consulta [la guía de PWA para Android y iPhone](INSTALAR_EN_CELULAR.md). Ambas versiones usan el servidor de Vercel y PostgreSQL de Neon; no requieren un computador encendido. Las tareas necesitan internet.
+**Alternativa web instalable:** consulta [la guía de PWA para Android y iPhone](docs/instalacion/web-instalable.md). Ambas versiones usan el servidor de Vercel y PostgreSQL de Neon; no requieren un computador encendido. Las tareas necesitan internet.
 
 ## Avance de Release 2 en developer
 
 Esta rama añade espacios, tablero, agenda, perfil editable, recuperación de acceso, configuración de recordatorios, mediciones, distribución persistente del escritorio y Astra. Las mejoras están publicadas en la URL anterior desde developer. Main conserva la versión anterior. La vista opcional de desarrollo en http://localhost:3102 usa una base local independiente y sí necesita el computador encendido.
 
-Consulta [cómo abrir y configurar las mejoras](backend/README_RELEASE2.md) y [el avance y los pendientes de entrega](backend/ESTADO_RELEASE2.md). El correo real y el programador requieren configuración; no se simulan envíos en la app. La validación con usuarios, los hallazgos, la landing, el video, el reporte y el tag v0.2 siguen pendientes.
+Consulta [cómo abrir y configurar las mejoras](docs/desarrollo/backend.md) y [el avance y los pendientes de entrega](docs/entregas/release2.md). El correo real y el programador requieren configuración; no se simulan envíos en la app. La validación con usuarios, los hallazgos, la landing, el video, el reporte y el tag v0.2 siguen pendientes.
 
 Última publicación comprobada el 21 de octubre de 2026: Vercel con PostgreSQL de Neon. Pasaron 18 pruebas del backend y las comprobaciones de escritorio y estados de Astra. Se verificó el guardado y consulta del escritorio en producción. La compilación iPhone terminó correctamente. Estas pruebas no sustituyen la instalación y uso desde un celular ajeno al equipo.
 
