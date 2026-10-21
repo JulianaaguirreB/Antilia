@@ -1,9 +1,9 @@
 const express = require('express');
 const crypto = require('crypto');
-const { requireAuth } = require('../middleware/auth');
-const { transaction, problem, route } = require('../http');
-const { body } = require('../release2-validation');
-const { sendEmail, emailConfigured } = require('../services/email');
+const { requireAuth } = require('../../shared/middleware/auth');
+const { transaction, problem, route } = require('../../shared/http');
+const { body } = require('../../shared/release2-validation');
+const { sendEmail, emailConfigured } = require('../../infrastructure/mail/email');
 
 const router = express.Router();
 router.use(requireAuth);

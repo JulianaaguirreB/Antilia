@@ -1,11 +1,11 @@
 const express = require('express');
-const { pool } = require('../db');
-const { requireAuth } = require('../middleware/auth');
-const { validateString } = require('../validate');
-const { body, uuid, boolean } = require('../release2-validation');
-const { transaction, route, problem } = require('../http');
-const { schedule, nextDaily } = require('../services/reminder-schedule');
-const { emailConfigured } = require('../services/email');
+const { pool } = require('../../infrastructure/database/pool');
+const { requireAuth } = require('../../shared/middleware/auth');
+const { validateString } = require('../../shared/validate');
+const { body, uuid, boolean } = require('../../shared/release2-validation');
+const { transaction, route, problem } = require('../../shared/http');
+const { schedule, nextDaily } = require('./reminder-schedule');
+const { emailConfigured } = require('../../infrastructure/mail/email');
 
 const router = express.Router();
 router.use(requireAuth);

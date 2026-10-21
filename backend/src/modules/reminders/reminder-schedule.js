@@ -1,5 +1,5 @@
-const { instant } = require('../release2-validation');
-const { problem } = require('../http');
+const { instant } = require('../../shared/release2-validation');
+const { problem } = require('../../shared/http');
 
 function nextDaily(localTime, after = new Date()) {
   if (typeof localTime !== 'string' || !/^([01]\d|2[0-3]):[0-5]\d(?::00)?$/.test(localTime)) throw problem(400, 'local_time debe tener formato HH:MM.');

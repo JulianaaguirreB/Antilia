@@ -1,10 +1,10 @@
 const express = require('express');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const { validateEmail, validatePassword } = require('../validate');
-const { route, transaction, problem } = require('../http');
-const { body } = require('../release2-validation');
-const { sendEmail, emailConfigured } = require('../services/email');
+const { validateEmail, validatePassword } = require('../../shared/validate');
+const { route, transaction, problem } = require('../../shared/http');
+const { body } = require('../../shared/release2-validation');
+const { sendEmail, emailConfigured } = require('../../infrastructure/mail/email');
 
 const router = express.Router();
 router.post('/request', route(async (req, res) => {

@@ -57,7 +57,7 @@ before(async () => {
     emails.push(JSON.parse(options.body));
     return new Response(JSON.stringify({ id: crypto.randomUUID() }), { status: 200 });
   };
-  pool = require('../src/db').pool;
+  pool = require('../src/infrastructure/database/pool').pool;
   const app = require('../src/app');
   server = app.listen(0, '127.0.0.1');
   await new Promise(resolve => server.once('listening', resolve));
@@ -190,13 +190,13 @@ test('recordatorios configuran hora, propietario y desactivación', async () => 
 });
 
 test('hora diaria cruza medianoche de Bogotá sin usar la fecha UTC', () => {
-  const { nextDaily } = require('../src/services/reminder-schedule');
+  const { nextDaily } = require('../src/modules/reminders/reminder-schedule');
   assert.equal(nextDaily('23:00', new Date('2026-10-17T03:00:00Z')), '2026-10-17T04:00:00.000Z');
   assert.equal(nextDaily('09:00', new Date('2026-10-17T14:00:00Z')), '2026-10-18T14:00:00.000Z');
 });
 
 test('dos workers concurrentes no duplican correos y los reintentos conservan identidad', async () => {
-  const { dispatchReminders } = require('../src/services/reminder-dispatcher');
+  const { dispatchReminders } = require('../src/modules/reminders/reminder-dispatcher');
   const a = users[0];
   await pool.query('UPDATE reminders SET enabled = false');
   const inserted = await pool.query("INSERT INTO reminders(user_id,title,schedule_type,next_run_at) VALUES($1, 'Prueba worker', 'once', date_trunc('milliseconds', now() - interval '10 seconds')) RETURNING id", [a.user.id]);
@@ -217,7 +217,7 @@ test('dos workers concurrentes no duplican correos y los reintentos conservan id
 });
 
 test('vencidos y desactivados no se envían; cambio de correo pausa recordatorios', async () => {
-  const { dispatchReminders } = require('../src/services/reminder-dispatcher');
+  const { dispatchReminders } = require('../src/modules/reminders/reminder-dispatcher');
   const a = users[0];
   await pool.query("INSERT INTO reminders(user_id,title,schedule_type,next_run_at) VALUES($1, 'Vencido', 'once', now() - interval '10 minutes')", [a.user.id]);
   const result = await dispatchReminders({ send: async () => { throw new Error('No se debe enviar'); } });
@@ -301,7 +301,7 @@ test('proveedor sin configurar no simula envíos', async () => {
     assert.equal(caps.data.email_configured, false);
     assert.equal((await request('/password-reset/request', { method: 'POST', body: { email: 'algo@example.com' } })).status, 503);
     assert.equal((await request('/email-verification/request', { method: 'POST', token: users[1].token })).status, 503);
-    const { sendEmail } = require('../src/services/email');
+    const { sendEmail } = require('../src/infrastructure/mail/email');
     await assert.rejects(sendEmail({ to: 'nobody@example.com', subject: 'Test', text: 'Test', idempotencyKey: 'test' }), /no está configurado/);
   } finally {
     process.env.RESEND_API_KEY = previous;

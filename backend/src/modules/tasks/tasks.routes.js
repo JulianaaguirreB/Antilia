@@ -1,9 +1,9 @@
 const express = require("express");
-const { pool } = require("../db");
-const { requireAuth } = require("../middleware/auth");
-const { validateString, validateType } = require("../validate");
-const { body, uuid, instant, queryText, digitalKind, referenceUrl } = require('../release2-validation');
-const { problem, route, transaction } = require('../http');
+const { pool } = require("../../infrastructure/database/pool");
+const { requireAuth } = require("../../shared/middleware/auth");
+const { validateString, validateType } = require("../../shared/validate");
+const { body, uuid, instant, queryText, digitalKind, referenceUrl } = require('../../shared/release2-validation');
+const { problem, route, transaction } = require('../../shared/http');
 
 const router = express.Router();
 router.use(requireAuth);

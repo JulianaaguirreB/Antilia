@@ -1,6 +1,6 @@
 const express = require("express");
-const { pool } = require("../db");
-const { requireAuth } = require("../middleware/auth");
+const { pool } = require("../../infrastructure/database/pool");
+const { requireAuth } = require("../../shared/middleware/auth");
 
 const router = express.Router();
 router.get("/", requireAuth, async (req, res) => {

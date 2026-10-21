@@ -1,4 +1,4 @@
-const { problem } = require('../http');
+const { problem } = require('../../shared/http');
 
 function emailConfigured() {
   return Boolean(process.env.RESEND_API_KEY && process.env.REMINDER_FROM);

@@ -1,6 +1,6 @@
-const { pool } = require('../db');
-const { transaction } = require('../http');
-const { sendEmail, emailConfigured } = require('./email');
+const { pool } = require('../../infrastructure/database/pool');
+const { transaction } = require('../../shared/http');
+const { sendEmail, emailConfigured } = require('../../infrastructure/mail/email');
 const { nextDaily } = require('./reminder-schedule');
 
 async function dispatchReminders({ limit = 10, send = sendEmail } = {}) {

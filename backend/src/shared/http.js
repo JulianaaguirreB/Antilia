@@ -1,4 +1,4 @@
-const { pool } = require('./db');
+const { pool } = require('../infrastructure/database/pool');
 
 function problem(status, message) {
   return Object.assign(new Error(message), { status, isValidation: true });

@@ -1,9 +1,9 @@
 const express = require('express');
-const { pool } = require('../db');
-const { requireAuth } = require('../middleware/auth');
-const { body } = require('../release2-validation');
-const { route, problem } = require('../http');
-const { validateString } = require('../validate');
+const { pool } = require('../../infrastructure/database/pool');
+const { requireAuth } = require('../../shared/middleware/auth');
+const { body } = require('../../shared/release2-validation');
+const { route, problem } = require('../../shared/http');
+const { validateString } = require('../../shared/validate');
 const router = express.Router();
 router.use(requireAuth);
 router.get('/', route(async (req, res) => {

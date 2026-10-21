@@ -1,11 +1,11 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { pool } = require("../db");
-const { validateString, validateEmail, validatePassword } = require("../validate");
-const { requireAuth } = require("../middleware/auth");
-const { route, problem, transaction } = require('../http');
-const { body } = require('../release2-validation');
+const { pool } = require("../../infrastructure/database/pool");
+const { validateString, validateEmail, validatePassword } = require("../../shared/validate");
+const { requireAuth } = require("../../shared/middleware/auth");
+const { route, problem, transaction } = require('../../shared/http');
+const { body } = require('../../shared/release2-validation');
 
 const router = express.Router();
 

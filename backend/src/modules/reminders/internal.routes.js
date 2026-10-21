@@ -1,7 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
-const { route, problem } = require('../http');
-const { dispatchReminders } = require('../services/reminder-dispatcher');
+const { route, problem } = require('../../shared/http');
+const { dispatchReminders } = require('./reminder-dispatcher');
 
 const router = express.Router();
 router.post('/reminders/dispatch', route(async (req, res) => {

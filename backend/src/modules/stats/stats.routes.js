@@ -1,7 +1,7 @@
 const express = require('express');
-const { pool } = require('../db');
-const { requireAuth } = require('../middleware/auth');
-const { route, problem } = require('../http');
+const { pool } = require('../../infrastructure/database/pool');
+const { requireAuth } = require('../../shared/middleware/auth');
+const { route, problem } = require('../../shared/http');
 
 const router = express.Router();
 router.use(requireAuth);

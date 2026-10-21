@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
-const { pool } = require("./db");
+const { pool } = require("./infrastructure/database/pool");
 
 async function migrate() {
   const dir = path.join(__dirname, "..", "migrations");
