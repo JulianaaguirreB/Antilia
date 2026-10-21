@@ -13,10 +13,14 @@ Aplicación para iPhone y web que ayuda al personal administrativo a organizar t
 ```text
 Antilia/
 ├── frontend/       Pantallas React, estilos, íconos y configuración iPhone
-│   ├── src/        Componentes, pantallas y conexión con la API
+│   ├── src/app/    Inicio, navegación y estilos
+│   ├── src/features/ Funciones con sus pantallas y componentes
+│   ├── src/shared/ Interfaz, cliente API y utilidades compartidas
 │   └── public/     Íconos, manifiesto y recursos estáticos
 ├── backend/        Servidor Express y PostgreSQL
-│   ├── src/        Rutas, servicios, permisos y conexión de datos
+│   ├── src/modules/ Funciones y servicios del servidor
+│   ├── src/shared/ Validaciones, permisos y manejo de errores
+│   ├── src/infrastructure/ PostgreSQL y envío de correo
 │   ├── migrations/ Cambios versionados de la base de datos
 │   ├── scripts/    Arranque de prueba, recordatorios y comprobaciones
 │   └── test/       Pruebas del backend
@@ -34,6 +38,8 @@ Antilia/
 │   └── workflows/  Compilación automática del IPA
 └── vercel.json     Instalación, compilación y rutas de Vercel
 ```
+
+Consulta la [arquitectura y reglas de organización](docs/desarrollo/arquitectura.md) para ubicar código o agregar funciones.
 
 ## Estado del producto
 

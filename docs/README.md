@@ -16,6 +16,8 @@
 
 ## Desarrollo y pruebas
 
+- [Arquitectura](desarrollo/arquitectura.md): responsabilidades, dependencias y ubicación de cada función.
+
 - [Ejecución y despliegue](desarrollo/ejecucion-y-despliegue.md): requisitos, comandos, API y publicación.
 - [Backend](desarrollo/backend.md): servicios y funciones del Release 2.
 - [Pruebas de recorridos](../qa/README.md): preparación y comprobaciones de la app.
