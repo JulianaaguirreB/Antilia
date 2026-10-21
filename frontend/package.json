@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@capacitor/camera": "8.2.6",
     "@capacitor/core": "8.5.3",
     "@capacitor/ios": "8.5.3",
     "@fontsource-variable/inter": "^5.1.0",

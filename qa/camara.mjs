@@ -1,0 +1,33 @@
+import { chromium,devices } from 'playwright';
+import assert from 'node:assert/strict';
+import {mkdirSync} from 'node:fs';
+const base=process.env.BASE_URL||'http://localhost:3102';
+if(!['localhost','127.0.0.1'].includes(new URL(base).hostname))throw new Error('Prueba de cámara solo en entorno local.');
+const browser=await chromium.launch();
+try{
+  const context=await browser.newContext({...devices['iPhone 13']});
+  const account=await context.request.post(base+'/api/auth/register',{data:{name:'Prueba cámara',email:`camera-${Date.now()}@example.com`,password:'PruebaCamara2026'}});
+  assert.equal(account.status(),201);
+  const {token}=await account.json();
+  await context.addInitScript(token=>localStorage.setItem('antilia_token',token),token);
+  const page=await context.newPage();
+  await page.goto(base+'/#/medir-espacio');
+  await page.getByLabel('Foto del escritorio').setInputFiles(new URL('./fixtures/regla.png',import.meta.url).pathname.replace(/^\/([A-Z]:)/,'$1'));
+  await page.getByRole('img',{name:'Tu escritorio para medir'}).waitFor();
+  await page.getByLabel('Longitud de la referencia en cm').fill('20');
+  const area=page.getByRole('img',{name:'Marca cuatro puntos sobre la foto'});
+  const box=await area.boundingBox();
+  for(const [x,y] of [[100,100],[300,100],[100,300],[700,300]])await area.click({position:{x:x/1000*box.width,y:y/600*box.height}});
+  await page.getByText('Ancho estimado: 60 cm',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Usar esta medida',exact:true}).click();
+  assert.equal(await page.getByLabel('Ancho despejado en cm (opcional)').inputValue(),'60');
+  await page.getByLabel('Minutos buscando documentos hoy').fill('5');
+  await page.getByLabel('Objetos o archivos fuera de lugar').fill('2');
+  await page.getByRole('button',{name:'Guardar medición',exact:true}).click();
+  await page.getByText('Medición guardada en tu cuenta.',{exact:true}).waitFor();
+  await page.reload();
+  await page.getByText('60 cm despejados',{exact:true}).waitFor();
+  mkdirSync('qa/evidencias/camara',{recursive:true});
+  await page.screenshot({path:'qa/evidencias/camara/medicion-guardada.png',fullPage:true});
+  console.log('PASA: calibración 20 cm, estimación 60 cm, formulario, guardado y persistencia. Imagen sintética; no sustituye prueba física de cámara.');
+}finally{await browser.close();}
