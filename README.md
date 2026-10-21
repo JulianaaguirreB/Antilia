@@ -11,7 +11,6 @@ Antilia es una aplicación para personal administrativo de oficinas medianas en 
 | Dato | Información |
 |---|---|
 | Entrega | 25 de octubre de 2026, 23:59 |
-| Demo ante la Junta | 29 de octubre de 2026 |
 | Rama de trabajo | `developer` |
 | Tag previsto | `v0.2`, pendiente de crear al cerrar la entrega |
 | Estado | Desarrollo implementado; evidencias de validación y cierre de entrega pendientes |
