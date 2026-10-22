@@ -383,6 +383,15 @@ test('Gmail OAuth protege estado y cuenta, sincroniza sin duplicar y aísla mens
 });
 
 
+test('Gmail solicita cada cabecera como parámetro independiente', async () => {
+ const google=require('../src/modules/mailbox/google');
+ let requested;
+ const oauth={request:async options=>{requested=new URL(options.url);return {data:{ok:true}};}};
+ assert.deepEqual(await google.googleRequest(oauth,'messages/test',{format:'metadata',metadataHeaders:['Subject','From']}),{ok:true});
+ assert.deepEqual(requested.searchParams.getAll('metadataHeaders'),['Subject','From']);
+ assert.equal(requested.searchParams.get('format'),'metadata');
+});
+
 test('SMTP entrega al transporte y oculta errores del proveedor', async () => {
  const nodemailer=require('nodemailer');
  const original=nodemailer.createTransport;

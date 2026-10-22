@@ -22,7 +22,11 @@ function unseal(text) {
 }
 async function googleRequest(oauth, path, params = {}) {
  try {
-  const response = await oauth.request({ url: `https://gmail.googleapis.com/gmail/v1/users/me/${path}`, params, timeout: 12000 });
+  const url = new URL(`https://gmail.googleapis.com/gmail/v1/users/me/${path}`);
+  for (const [key, value] of Object.entries(params)) {
+   for (const item of Array.isArray(value) ? value : [value]) url.searchParams.append(key, String(item));
+  }
+  const response = await oauth.request({ url: url.toString(), timeout: 12000 });
   return response.data;
  } catch (error) {
   const status = error.response?.status;
