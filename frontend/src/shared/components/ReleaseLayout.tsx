@@ -6,11 +6,11 @@ import { api } from '../api/client';
 export type Navigate = (path: string) => void;
 
 export function ReleasePage({ title, subtitle, children, navigate, active = '#/inicio', back }: { title: string; subtitle?: string; children: ReactNode; navigate: Navigate; active?: string; back?: string }) {
-  return <div className="min-h-dvh bg-bg-main"><main className="page-content"><header className="mb-6"><div className="flex items-center justify-between mb-5"><button aria-label="Ir a inicio" onClick={() => navigate('#/inicio')} className="flex items-center gap-2 font-bold"><img src="/icons/icon-192.png" alt="" className="brand-mark !w-8 !h-8 !text-lg"/>antilia.</button>{back && <button className="text-sm text-primary min-h-11" onClick={() => navigate(back)}>← Volver</button>}</div><h1 className="text-3xl font-bold">{title}</h1>{subtitle && <p className="text-sm text-text-secondary mt-2 leading-relaxed">{subtitle}</p>}</header>{children}</main><Navigation currentPath={active} navigate={navigate}/></div>;
+  return <div className="min-h-dvh bg-bg-main"><main className="page-content"><header className="page-heading mb-6"><div className="flex items-center justify-between mb-5"><button aria-label="Ir a inicio" onClick={() => navigate('#/inicio')} className="brand-bar flex items-center gap-2 font-bold"><img src="/icons/icon-192.png" alt="" className="brand-mark !w-8 !h-8 !text-lg"/>antilia.</button>{back && <button className="text-sm text-primary min-h-11" onClick={() => navigate(back)}>← Volver</button>}</div><h1 className="text-3xl font-bold">{title}</h1>{subtitle && <p className="text-sm text-text-secondary mt-2 leading-relaxed">{subtitle}</p>}</header>{children}</main><Navigation currentPath={active} navigate={navigate}/></div>;
 }
 
 export function Notice({ children, error = false }: { children: ReactNode; error?: boolean }) {
-  return <p role={error ? 'alert' : 'status'} className={`rounded-2xl p-4 text-sm mb-4 ${error ? 'bg-error/10 text-red-800' : 'bg-primary-soft text-[#413572]'}`}>{children}</p>;
+  return <p role={error ? 'alert' : 'status'} className={`rounded-2xl p-4 text-sm mb-4 ${error ? 'bg-error/10 text-red-800' : 'bg-primary-soft text-[#21466c]'}`}>{children}</p>;
 }
 
 export function Modal({ title, children, onClose, busy = false }: { title: string; children: ReactNode; onClose: () => void; busy?: boolean }) {

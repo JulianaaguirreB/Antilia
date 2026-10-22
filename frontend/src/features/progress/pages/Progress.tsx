@@ -62,7 +62,7 @@ export function Progress({ navigate }: ProgressProps) {
           </div>
         )}
 
-        <div className="surface p-8 text-center mb-6 flex flex-col items-center">
+        <div className="surface progress-universe p-8 text-center mb-6 flex flex-col items-center">
           <StreakMascot streak={streak}/>
           
           <h2 className="text-lg font-semibold text-text-main mb-2">
@@ -86,7 +86,7 @@ export function Progress({ navigate }: ProgressProps) {
             <span className="text-sm text-text-secondary">Tareas Físicas</span>
           </div>
           <div className="bg-white p-4 rounded-[16px] border border-border-main flex flex-col items-center justify-center text-center">
-            <span className="text-3xl font-bold text-[#c026d3] mb-1">{digitalCount}</span>
+            <span className="text-3xl font-bold text-[#8a6827] mb-1">{digitalCount}</span>
             <span className="text-sm text-text-secondary">Tareas Digitales</span>
           </div>
         </div>

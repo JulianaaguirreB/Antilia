@@ -93,10 +93,10 @@ export function Auth({ isRegister, navigate }: AuthProps) {
   }, []);
 
   return (
-    <div key={isRegister ? 'register' : 'login'} className="flex flex-col min-h-dvh max-w-[480px] mx-auto bg-bg-main p-6 pb-[env(safe-area-inset-bottom)]">
+    <div key={isRegister ? 'register' : 'login'} className="auth-screen flex flex-col min-h-dvh max-w-[480px] mx-auto bg-bg-main p-6 pb-[env(safe-area-inset-bottom)]">
       <div className="flex-1 flex flex-col justify-center">
-        <div className="flex items-center gap-3 mb-10"><span className="brand-mark" aria-hidden="true">a</span><span className="text-xl font-bold tracking-tight">antilia<span className="text-primary">.</span></span></div>
-        <div className="mb-6 rounded-[28px] bg-primary-soft p-6"><p className="eyebrow mb-3">Un espacio para enfocarte</p><p className="text-2xl font-semibold leading-tight text-[#39315f]">Menos desorden.<br/>Más calma en tu día.</p><div className="mt-5 flex gap-2"><span className="rounded-full bg-white px-3 py-1.5 text-xs text-primary">Organiza</span><span className="rounded-full bg-white px-3 py-1.5 text-xs text-primary">Completa</span><span className="rounded-full bg-white px-3 py-1.5 text-xs text-primary">Avanza</span></div></div>
+        <div className="brand-bar flex items-center gap-3 mb-7"><img src="/icons/icon-192.png" alt="" className="brand-mark"/><div><span className="text-xl font-bold tracking-tight">antilia.</span><span className="block text-[10px] uppercase tracking-[.2em] text-text-secondary">Haz espacio para ti</span></div></div>
+        <div className="auth-intro mb-8"><p className="eyebrow mb-3">Tu pequeña constelación de orden</p><h2 className="text-[29px] font-semibold leading-tight">Menos desorden.<br/>Más espacio<br/>para brillar.</h2><p className="text-sm text-blue-100/90 mt-4 max-w-60 leading-relaxed">Un pendiente a la vez. Organiza tu espacio y encuentra tu propio ritmo.</p><div className="mt-6 flex gap-4"><span className="auth-step"><b>1</b>Organiza</span><span className="auth-step"><b>2</b>Completa</span><span className="auth-step"><b>3</b>Avanza</span></div></div>
         <h1 className="text-[28px] font-bold text-text-main mb-2">
           {isRegister ? 'Crea tu cuenta' : 'Qué bueno verte'}
         </h1>
