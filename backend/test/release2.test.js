@@ -40,6 +40,8 @@ async function verify(user) {
 before(async () => {
   await admin.query(`CREATE DATABASE "${databaseName}"`);
   created = true;
+  process.env.NODE_ENV = 'test';
+  for (const name of ['SMTP_HOST','SMTP_USER','SMTP_PASS','SMTP_FROM']) delete process.env[name];
   const testUrl = new URL(adminUrl);
   testUrl.pathname = `/${databaseName}`;
   process.env.DATABASE_URL = testUrl.toString();
@@ -75,7 +77,7 @@ after(async () => {
 
 test('migraciones repetibles y esquema con datos aislados', async () => {
   const result = await pool.query('SELECT name FROM schema_migrations ORDER BY name');
-  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql']);
+  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql', '005_gmail.sql']);
   assert.equal((await request('/spaces')).status, 401);
   assert.equal((await request('/shifts')).status, 401);
   assert.equal((await request('/reminders')).status, 401);
@@ -306,4 +308,97 @@ test('proveedor sin configurar no simula envíos', async () => {
   } finally {
     process.env.RESEND_API_KEY = previous;
   }
+});
+
+
+test('Gmail clasifica asuntos laborales y excluye spam y comercios bloqueados', () => {
+ const {classifyMessage}=require('../src/modules/mailbox/classifier');
+ assert.equal(classifyMessage({subject:'Proyecto Antilia entrega final',sender:'jefe@example.com'}).category,'proyectos');
+ assert.equal(classifyMessage({subject:'Reunión del equipo',sender:'jefe@example.com'}).category,'reuniones');
+ assert.equal(classifyMessage({subject:'Factura del cliente',sender:'jefe@example.com'}).category,'documentos');
+ assert.equal(classifyMessage({subject:'Solicitud de trabajo',sender:'jefe@example.com'}).category,'trabajo');
+ assert.equal(classifyMessage({subject:'Proyecto',sender:'Temu <ventas@em.temu.com>'}),null);
+ assert.equal(classifyMessage({subject:'Trabajo',sender:'jefe@example.com',labels:['SPAM']}),null);
+ assert.equal(classifyMessage({subject:'Proyecto',sender:'jefe@example.com',labels:['CATEGORY_PROMOTIONS']}),null);
+ assert.equal(classifyMessage({subject:'Oferta de descuento proyecto',sender:'ventas@example.com'}),null);
+ assert.equal(classifyMessage({subject:'Hola amiga',sender:'amiga@example.com'}),null);
+});
+
+test('Gmail OAuth protege estado y cuenta, sincroniza sin duplicar y aísla mensajes', async () => {
+ const google=require('../src/modules/mailbox/google');
+ const saved={client:google.client,googleRequest:google.googleRequest};
+ const keys=['GOOGLE_CLIENT_ID','GOOGLE_CLIENT_SECRET','GOOGLE_REDIRECT_URI','APP_URL','GMAIL_TOKEN_KEY'];
+ const previous=Object.fromEntries(keys.map(k=>[k,process.env[k]]));
+ Object.assign(process.env,{GOOGLE_CLIENT_ID:'fake-client',GOOGLE_CLIENT_SECRET:'fake-secret',GOOGLE_REDIRECT_URI:'http://localhost:3102/api/mailbox/callback',APP_URL:'http://localhost:3102',GMAIL_TOKEN_KEY:crypto.randomBytes(32).toString('base64')});
+ const a=await register('buzona'),b=await register('buzonb');
+ const {OAuth2Client}=require('google-auth-library');
+ let profileEmail=a.user.email;
+ let messageList=['project','spam','store','meeting'];
+ google.client=()=>{
+  const client=new OAuth2Client('fake-client','fake-secret',process.env.GOOGLE_REDIRECT_URI);
+  client.getToken=async()=>({tokens:{refresh_token:'sensitive-refresh-token',access_token:'mock',scope:'https://www.googleapis.com/auth/gmail.readonly'}});
+  return client;
+ };
+ google.googleRequest=async(oauth,path)=>{
+  if(path==='profile')return {emailAddress:profileEmail};
+  if(path==='messages')return {messages:messageList.map(id=>({id}))};
+  const id=path.split('/')[1];
+  return {threadId:id,internalDate:String(Date.now()),labelIds:id==='spam'?['SPAM']:[],snippet:'Vista previa',payload:{mimeType:'text/plain',body:{data:Buffer.from('Contenido realista sin HTML <script>').toString('base64url')},headers:[{name:'Subject',value:id==='meeting'?'Reunión del equipo':'Proyecto de trabajo'},{name:'From',value:id==='store'?'Tienda <ventas@temu.com>':'Jefe <jefe@example.com>'}]}};
+ };
+ try {
+  assert.equal((await request('/mailbox/status')).status,401);
+  const connect=await request('/mailbox/connect',{method:'POST',token:a.token});
+  assert.equal(connect.status,200);
+  const auth=new URL(connect.data.url);assert.equal(auth.origin,'https://accounts.google.com');assert.equal(auth.searchParams.get('code_challenge_method'),'S256');
+  const state=auth.searchParams.get('state');
+  const callback=await realFetch(base+'/mailbox/callback?state='+state+'&code=mock',{redirect:'manual'});
+  assert.equal(callback.status,303);assert.match(callback.headers.get('location'),/gmail=conectado/);
+  assert.match((await realFetch(base+'/mailbox/callback?state='+state+'&code=mock',{redirect:'manual'})).headers.get('location'),/gmail=error/);
+  const stored=await pool.query('SELECT refresh_token FROM gmail_connections WHERE user_id=$1',[a.user.id]);
+  assert.notEqual(stored.rows[0].refresh_token,'sensitive-refresh-token');assert.equal(google.unseal(stored.rows[0].refresh_token),'sensitive-refresh-token');
+  const sync=await request('/mailbox/sync',{method:'POST',token:a.token,body:{}});assert.equal(sync.status,200);assert.equal(sync.data.imported,2);
+  await request('/mailbox/sync',{method:'POST',token:a.token,body:{}});
+  let messages=await request('/mailbox/messages',{token:a.token});assert.equal(messages.data.messages.length,2);
+  const message=messages.data.messages.find(m=>m.gmail_id==='project');
+  assert.equal((await request('/mailbox/messages',{token:b.token})).data.messages.length,0);
+  assert.equal((await request('/mailbox/messages/'+message.id+'/content',{token:b.token})).status,404);
+  assert.equal((await request('/mailbox/messages/'+message.id+'/content',{token:a.token})).data.text,'Contenido realista sin HTML <script>');
+  assert.equal((await request('/mailbox/messages/'+message.id,{method:'PATCH',token:b.token,body:{category:'trabajo'}})).status,404);
+  await request('/mailbox/messages/'+message.id,{method:'PATCH',token:a.token,body:{category:'documentos'}});
+  await request('/mailbox/sync',{method:'POST',token:a.token,body:{}});
+  messages=await request('/mailbox/messages?category=documentos',{token:a.token});assert.equal(messages.data.messages.length,1);
+  assert.equal((await request('/mailbox/messages?offset=-1',{token:a.token})).status,400);
+  assert.equal((await request('/mailbox/connection',{method:'DELETE',token:a.token})).status,200);
+  assert.equal((await request('/mailbox/messages',{token:a.token})).data.messages.length,0);
+  assert.equal((await request('/mailbox/status',{token:a.token})).data.connected,false);
+  profileEmail=b.user.email;
+  const wrong=await request('/mailbox/connect',{method:'POST',token:a.token});
+  const refused=await realFetch(base+'/mailbox/callback?code=mock&state='+new URL(wrong.data.url).searchParams.get('state'),{redirect:'manual'});
+  assert.match(refused.headers.get('location'),/gmail=error/);
+  assert.equal((await request('/mailbox/status',{token:a.token})).data.connected,false);
+ } finally {
+  Object.assign(google,saved);
+  for(const k of keys){if(previous[k]===undefined)delete process.env[k];else process.env[k]=previous[k];}
+ }
+});
+
+
+test('SMTP entrega al transporte y oculta errores del proveedor', async () => {
+ const nodemailer=require('nodemailer');
+ const original=nodemailer.createTransport;
+ const keys=['RESEND_API_KEY','REMINDER_FROM','SMTP_HOST','SMTP_USER','SMTP_PASS','SMTP_FROM'];
+ const previous=Object.fromEntries(keys.map(k=>[k,process.env[k]]));
+ delete process.env.RESEND_API_KEY;
+ Object.assign(process.env,{SMTP_HOST:'smtp.invalid',SMTP_USER:'sender@example.com',SMTP_PASS:'fake',SMTP_FROM:'Antilia <sender@example.com>'});
+ let received;
+ let closed=false;
+ nodemailer.createTransport=()=>({sendMail:async mail=>{received=mail;return{accepted:['recipient@example.com'],messageId:'smtp-test-id'};},close:()=>{closed=true;}});
+ try {
+  const service=require('../src/infrastructure/mail/email');
+  assert.equal(service.emailConfigured(),true);
+  assert.equal(await service.sendEmail({to:'recipient@example.com',subject:'Recuperación',text:'Mensaje de prueba'}),'smtp-test-id');
+  assert.equal(received.to,'recipient@example.com');assert.equal(closed,true);
+  nodemailer.createTransport=()=>({sendMail:async()=>{throw new Error('secret provider text');},close:()=>{}});
+  await assert.rejects(service.sendEmail({to:'recipient@example.com',subject:'Test',text:'Test'}),error=>error.status===503&&!error.message.includes('secret'));
+ } finally {nodemailer.createTransport=original;for(const k of keys){if(previous[k]===undefined)delete process.env[k];else process.env[k]=previous[k];}}
 });
