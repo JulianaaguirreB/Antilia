@@ -1,6 +1,6 @@
 # Correo real y selección de Gmail
 
-Esta integración está implementada para configuración local. No se han conectado cuentas reales, enviado correos reales, publicado cambios ni aplicado migraciones en Neon con este avance.
+El código está publicado en Vercel y la migración `005_gmail.sql` se aplicó en Neon el 22 de octubre de 2026, después de copiar las tablas públicas al esquema privado `release2_backup_20261022_gmail`. Google está en modo de prueba con dos cuentas autorizadas y credenciales privadas en Vercel. Falta que cada usuario conecte su buzón y comprobar lectura real. Los envíos siguen pendientes de la contraseña de aplicación del remitente; no se han verificado correos reales.
 
 ## Dos servicios diferentes
 
@@ -34,7 +34,7 @@ Resend sigue siendo compatible mediante `RESEND_API_KEY` y `REMINDER_FROM`. Si a
 8. Autoriza la lectura desde Google. Si Google bloquea el consentimiento, revisa la configuración y los usuarios de prueba; no ignores advertencias de seguridad.
 9. Vuelve a Correos y pulsa Actualizar correos. Puedes continuar con mensajes anteriores y corregir una categoría.
 
-Para producción registra también `https://antilia-delta.vercel.app/api/mailbox/callback`, establece las variables y aplica la nueva migración en el entorno correspondiente antes de publicar. Esto requiere un respaldo y la revisión del despliegue; no se ha ejecutado en este avance.
+El entorno público usa `https://antilia-delta.vercel.app/api/mailbox/callback`, variables privadas en Vercel y la migración aplicada con respaldo. No incluyas los secretos ni las copias de datos en Git. Una nueva instalación debe configurar su propio cliente, clave y base antes de conectar cuentas.
 
 Gmail de solo lectura es un alcance restringido. Google puede exigir verificación y evaluación de seguridad al abrir la aplicación a usuarios externos, especialmente al almacenar datos del buzón en el servidor. El modo de pruebas limita los usuarios y puede hacer vencer los tokens de actualización a los siete días. No presentes el piloto como una integración pública verificada.
 
