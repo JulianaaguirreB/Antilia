@@ -17,7 +17,8 @@ import { Insights, MeasureSpace, Privacy } from '../features/insights/pages/Insi
 
 export function AppContent() {
   const { user, loading } = useAuth();
-  const { hash, navigate } = useHashRoute();
+  const { hash: fullHash, navigate } = useHashRoute();
+  const hash = fullHash.split('?')[0];
 
   if (loading) {
     return (
