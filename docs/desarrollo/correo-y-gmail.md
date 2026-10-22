@@ -1,6 +1,6 @@
 # Correo real y selección de Gmail
 
-El código está publicado en Vercel y la migración `005_gmail.sql` se aplicó en Neon el 22 de octubre de 2026, después de copiar las tablas públicas al esquema privado `release2_backup_20261022_gmail`. Google está en modo de prueba con dos cuentas autorizadas y credenciales privadas en Vercel. Falta que cada usuario conecte su buzón y comprobar lectura real. Los envíos siguen pendientes de la contraseña de aplicación del remitente; no se han verificado correos reales.
+El código está publicado en Vercel y la migración `005_gmail.sql` se aplicó en Neon el 22 de octubre de 2026, después de copiar las tablas públicas al esquema privado `release2_backup_20261022_gmail`. Google está en modo de prueba con dos cuentas autorizadas y credenciales privadas en Vercel. Se conectó un buzón real y se importó un mensaje relevante. El remitente SMTP está activo: Google aceptó la credencial y la usuaria confirmó la recepción del correo de recuperación enviado desde producción. Las credenciales están fuera de Git.
 
 ## Dos servicios diferentes
 
@@ -52,8 +52,8 @@ Gmail de solo lectura es un alcance restringido. Google puede exigir verificaci�
 
 ## Verificación
 
-Las pruebas locales simulan Google y SMTP para no leer buzones ni enviar correos reales. Cubren clasificación, exclusión, estado OAuth de un solo uso, correo de cuenta coincidente, cifrado, sincronización sin duplicados, aislamiento, lectura y eliminación al desconectar. Una prueba con cuentas autorizadas sigue siendo necesaria.
+Las pruebas automáticas simulan Google y SMTP para no leer buzones ni enviar correos reales. Cubren clasificación, exclusión, estado OAuth de un solo uso, correo de cuenta coincidente, cifrado, sincronización sin duplicados, aislamiento, lectura y eliminación al desconectar. Las 22 pruebas pasan, incluida una regresión que exige solicitar las cabeceras Subject y From como parámetros separados.
 
-El 22 de octubre de 2026 pasaron las 21 pruebas del backend y la compilación web. Después del despliegue se comprobó la URL pública sin sesión de Vercel y, con una cuenta ficticia `@example.com`, registro, inicio de sesión, creación y completado de una tarea y racha de un día. También se verificaron la bandeja vacía, la configuración OAuth pública, el alcance de solo lectura, la redirección de regreso y el rechazo de un estado OAuth inválido. El botón público abrió el selector real de cuentas de Google. Estas comprobaciones no constituyen una validación con usuarios reales ni verifican todavía la lectura de buzones o el envío de correos.
+El 22 de octubre de 2026 se comprobó la URL pública sin sesión de Vercel y, con una cuenta ficticia `@example.com`, registro, inicio de sesión, creación y completado de una tarea y racha de un día. También se verificaron la bandeja vacía, la configuración OAuth pública, el alcance de solo lectura, la redirección de regreso y el rechazo de un estado OAuth inválido. Con autorización de la titular se completó OAuth de un Gmail real, se guardó una coincidencia tras revisar grupos de 20 mensajes y se solicitó recuperación en producción; la titular confirmó la recepción. No se cambió su contraseña durante la prueba. Estas comprobaciones técnicas no reemplazan la validación con cinco usuarios reales exigida por el release.
 
 Referencias: https://developers.google.com/workspace/gmail/api/auth/scopes · https://developers.google.com/identity/protocols/oauth2/web-server · https://developers.google.com/workspace/gmail/api/guides/filtering

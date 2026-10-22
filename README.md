@@ -6,7 +6,7 @@ Antilia es una aplicación para personal administrativo de oficinas medianas en 
 
 **[Abrir Antilia](https://antilia-delta.vercel.app)** · **[Instalar en iPhone](distribucion/ios/README.md)** · **[Documentación](docs/README.md)**
 
-> Correo: selección de Gmail y recuperación por Resend o SMTP implementadas. El piloto de Gmail está configurado para dos cuentas de prueba en la URL pública; cada usuario debe autorizar su buzón. Los envíos siguen pendientes de la credencial privada del remitente. [Configuración](docs/desarrollo/correo-y-gmail.md).
+> Correo: Gmail de solo lectura y recuperación por SMTP activos en la URL pública. Se verificaron la importación de un mensaje relevante y la recepción del correo de recuperación. El piloto de Google permite dos cuentas de prueba; cada usuario debe autorizar su buzón. [Configuración](docs/desarrollo/correo-y-gmail.md).
 
 ## Release 2
 
