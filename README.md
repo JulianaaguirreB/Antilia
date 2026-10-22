@@ -4,7 +4,7 @@ Organiza tu espacio de trabajo, completa tus pendientes y construye un hábito d
 
 Antilia es una aplicación para personal administrativo de oficinas medianas en Bogotá. Reúne tareas físicas y digitales, espacios, turnos y progreso personal en una interfaz pensada para celular. Está disponible en web y como cliente para iPhone.
 
-**[Abrir Antilia](https://antilia-delta.vercel.app)** · **[Instalar en iPhone](distribucion/ios/README.md)** · **[Documentación](docs/README.md)**
+**[Abrir Antilia](https://antilia-delta.vercel.app)** · **[Descargar APK Android](https://antilia-delta.vercel.app/downloads/antilia.apk)** · **[Instalar en iPhone](distribucion/ios/README.md)** · **[Documentación](docs/README.md)**
 
 > Correo: Gmail de solo lectura y recuperación por SMTP activos en la URL pública. Se verificaron la importación de un mensaje relevante y la recepción del correo de recuperación. El piloto de Google permite dos cuentas de prueba; cada usuario debe autorizar su buzón. [Configuración](docs/desarrollo/correo-y-gmail.md).
 
