@@ -1,6 +1,7 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const crypto = require('node:crypto');
 const base = process.env.BASE_URL || 'http://localhost:3102';
 (async () => {
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
@@ -18,6 +19,12 @@ const base = process.env.BASE_URL || 'http://localhost:3102';
     const data = await file.body();
     assert.equal(data.subarray(0, 2).toString(), 'PK');
     assert.ok(data.length > 1000000);
+    const expected = fs.readFileSync('distribucion/android/Antilia-Android.sha256', 'utf8').trim().split(/\s+/)[0];
+    assert.equal(crypto.createHash('sha256').update(data).digest('hex'), expected);
+    if (new URL(base).protocol === 'https:') {
+      assert.match(file.headers()['content-type'], /application\/vnd\.android\.package-archive/);
+      assert.match(file.headers()['content-disposition'], /attachment; filename="Antilia-Android.apk"/);
+    }
     fs.mkdirSync('qa/evidencias/apk', { recursive: true });
     await page.screenshot({ path: 'qa/evidencias/apk/android.png', fullPage: true });
     const ios = await browser.newContext({ viewport: { width: 390, height: 844 }, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1' });
