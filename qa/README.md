@@ -31,6 +31,7 @@ Ejecuta los archivos desde la raíz del repositorio. El entorno de prueba del Re
 | `camara.mjs` | Medición con una foto de referencia y guardado |
 | `escritorio-mascota.mjs` | Guardado del escritorio y estados de la mascota |
 | `sesion.mjs` | Temporizador, pausa, recarga y tarea completada |
+| `mailbox.mjs` | Bandeja simulada, lectura segura, categorías, desconexión y recuperación sin proveedor |
 
 Por ejemplo:
 

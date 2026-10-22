@@ -16,6 +16,8 @@
 
 ## Desarrollo y pruebas
 
+- [Correo real y Gmail](desarrollo/correo-y-gmail.md): configuración del remitente, permisos de Google y límites de selección.
+
 - [Arquitectura](desarrollo/arquitectura.md): responsabilidades, dependencias y ubicación de cada función.
 
 - [Ejecución y despliegue](desarrollo/ejecucion-y-despliegue.md): requisitos, comandos, API y publicación.

@@ -6,6 +6,8 @@ Antilia es una aplicación para personal administrativo de oficinas medianas en 
 
 **[Abrir Antilia](https://antilia-delta.vercel.app)** · **[Instalar en iPhone](distribucion/ios/README.md)** · **[Documentación](docs/README.md)**
 
+> Correo: recuperación por Resend o SMTP y selección de Gmail implementadas. OAuth de Google está preparado para pruebas locales con dos cuentas autorizadas; falta configurar las credenciales del entorno público, el remitente y comprobar envíos y lectura reales. [Configuración](docs/desarrollo/correo-y-gmail.md).
+
 ## Release 2
 
 | Dato | Información |
@@ -145,7 +147,7 @@ Los recorridos de navegador y su preparación están en [qa/README.md](qa/README
 - Los correos reales de verificación, recuperación y recordatorios requieren configurar proveedor, remitente y, para recordatorios, ejecución programada.
 - Los recordatorios siguen un horario configurado; no aprenden hábitos automáticamente.
 - La cámara usa una referencia conocida para estimar medidas. No hace escaneo 3D ni detecta objetos automáticamente.
-- Los pendientes de correos y archivos no se sincronizan con Gmail ni con almacenamiento externo.
+- Los pendientes manuales siguen separados de Gmail. La nueva selección de correo requiere OAuth de Google y no está activada hasta configurarlo; los archivos no se sincronizan con almacenamiento externo.
 - Los datos se actualizan al consultar o realizar cambios; no hay sincronización instantánea entre dispositivos.
 - El IPA es una compilación sin firma que se instala con Sideloadly. Su versión está indicada en la guía; la instalación y los permisos deben comprobarse en un iPhone físico.
 
