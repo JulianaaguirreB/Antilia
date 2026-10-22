@@ -54,4 +54,6 @@ Gmail de solo lectura es un alcance restringido. Google puede exigir verificaci�
 
 Las pruebas locales simulan Google y SMTP para no leer buzones ni enviar correos reales. Cubren clasificación, exclusión, estado OAuth de un solo uso, correo de cuenta coincidente, cifrado, sincronización sin duplicados, aislamiento, lectura y eliminación al desconectar. Una prueba con cuentas autorizadas sigue siendo necesaria.
 
+El 22 de octubre de 2026 pasaron las 21 pruebas del backend y la compilación web. Después del despliegue se comprobó la URL pública sin sesión de Vercel y, con una cuenta ficticia `@example.com`, registro, inicio de sesión, creación y completado de una tarea y racha de un día. También se verificaron la bandeja vacía, la configuración OAuth pública, el alcance de solo lectura, la redirección de regreso y el rechazo de un estado OAuth inválido. El botón público abrió el selector real de cuentas de Google. Estas comprobaciones no constituyen una validación con usuarios reales ni verifican todavía la lectura de buzones o el envío de correos.
+
 Referencias: https://developers.google.com/workspace/gmail/api/auth/scopes · https://developers.google.com/identity/protocols/oauth2/web-server · https://developers.google.com/workspace/gmail/api/guides/filtering
