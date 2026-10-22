@@ -13,4 +13,6 @@ router.use('/email-verification', require('./modules/auth/email-verification.rou
 router.use('/password-reset', require('./modules/auth/password-reset.routes'));
 router.use('/internal', require('./modules/reminders/internal.routes'));
 
+router.use('/mailbox', require('./modules/mailbox/mailbox.routes'));
+
 module.exports = router;
