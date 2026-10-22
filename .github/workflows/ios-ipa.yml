@@ -40,7 +40,7 @@ jobs:
           npx cap add ios --packagemanager SPM
           npx cap sync ios
           python3 - <<'PY'
-          import json, shutil, plistlib
+          import json, shutil, plistlib, os
           from pathlib import Path
           target = Path('ios/App/App/Assets.xcassets/AppIcon.appiconset')
           target.mkdir(parents=True, exist_ok=True)
@@ -48,6 +48,8 @@ jobs:
           (target / 'Contents.json').write_text(json.dumps({'images': [{'filename': 'AppIcon.png', 'idiom': 'universal', 'platform': 'ios', 'size': '1024x1024'}], 'info': {'author': 'xcode', 'version': 1}}))
           plist = Path('ios/App/App/Info.plist')
           settings = plistlib.loads(plist.read_bytes())
+          settings['CFBundleShortVersionString'] = '0.2.1'
+          settings['CFBundleVersion'] = os.environ['GITHUB_RUN_NUMBER']
           settings['NSCameraUsageDescription'] = 'Antilia usa la cámara para tomar una foto del escritorio y estimar distancias con una referencia que tú marcas.'
           settings['NSPhotoLibraryUsageDescription'] = 'Antilia permite elegir una foto del escritorio para medir distancias con una referencia.'
           settings['NSPhotoLibraryAddUsageDescription'] = 'Antilia solo guarda fotos en tu biblioteca si tú lo solicitas.'
