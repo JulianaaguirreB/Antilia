@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api, ApiError } from '../../../shared/api/client';
-import { StreakMascot } from '../components/StreakMascot';
+import { StreakMascot, streakAppearance } from '../components/StreakMascot';
 import { Navigation } from '../../../shared/components/Navigation';
 import { Task, Streak } from '../../home/pages/Home';
 import { weekActivity } from '../../../shared/lib/dates';
@@ -41,7 +41,8 @@ export function Progress({ navigate }: ProgressProps) {
 
   if (error) return <div className="page-content"><h1 className="text-2xl font-bold mb-4">Mi Racha</h1><p role="alert" className="surface p-5 text-error">{error}</p><button className="mt-4 text-primary" onClick={() => window.location.reload()}>Reintentar</button><Navigation currentPath="#/progreso" navigate={navigate} /></div>;
   const week = weekActivity(tasks);
-  const current = streak?.current_streak || 0;
+  const appearance = streakAppearance(streak);
+  const current = appearance.days;
   const best = streak?.best_streak || 0;
   
   const physicalCount = tasks.filter(t => t.type === 'fisica').length;
@@ -64,13 +65,14 @@ export function Progress({ navigate }: ProgressProps) {
 
         <div className="surface progress-universe p-8 text-center mb-6 flex flex-col items-center">
           <StreakMascot streak={streak}/>
+          {!appearance.lit&&<button className="lumi-activate" onClick={()=>navigate('#/inicio')}>✦ Encender mi racha</button>}
           
           <h2 className="text-lg font-semibold text-text-main mb-2">
             Racha más alta: {best} {best === 1 ? 'día' : 'días'}
           </h2>
           
           <p className="text-sm text-text-secondary max-w-[240px] mx-auto">
-            {current === 0 
+            {!appearance.lit && current > 0 ? 'Un pequeño paso hoy mantiene viva tu constelación.' : current === 0 
               ? 'Completa una tarea hoy para empezar tu racha.'
               : current === best && best > 0
                 ? '¡Racha más alta! Sigue manteniendo tu entorno despejado.'

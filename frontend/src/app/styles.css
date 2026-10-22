@@ -107,10 +107,10 @@ button:focus-visible,a:focus-visible { outline:3px solid #b48730; outline-offset
 .order-ring span { font-size:12px; color:#526782; }
 @media(min-width:600px) { body { background:radial-gradient(ellipse at 15% 10%,#c6e5fa,transparent 45%),radial-gradient(ellipse at 85% 85%,#e7dcbd,transparent 50%),#dce6f2; } #root { max-width:520px; margin:auto; min-height:100dvh; background:#f3f7fc; box-shadow:0 0 90px #17324f20; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
-.streak-companion { --star-light:#dbe2ef; --star-dark:#b9c7de; --star-outline:#8093b0; color:#9aabc4; display:flex; flex-direction:column; align-items:center; text-align:center; padding-bottom:22px; }
-.constellation-lit { --star-light:#aaf1ff; --star-dark:#449cdb; --star-outline:#2672a6; color:#65b9e9; }
+.streak-companion { --star-light:#9cddff; --star-dark:#428bc8; --star-outline:#3377b0; color:#80c5f3; display:flex; flex-direction:column; align-items:center; text-align:center; padding-bottom:22px; }
+.constellation-lit, .constellation-radiant { --star-light:#fff4ab; --star-dark:#f4b93e; --star-outline:#d59825; color:#ffda76; }
 .constellation-radiant { --star-light:#fff6b4; --star-dark:#ffb853; --star-outline:#d99821; color:#dfa434; }
-.constellation-waiting { --star-light:#e5f4ff; --star-dark:#99bfdc; --star-outline:#668cab; color:#99c7e7; }
+.constellation-waiting { --star-light:#9cddff; --star-dark:#428bc8; --star-outline:#3377b0; color:#80c5f3; }
 .constellation-mascot { width:240px; max-width:100%; overflow:visible; }
 .star-body { transform-origin:120px 106px; animation:star-float 4s ease-in-out infinite; }
 .star-eyes { transform-origin:120px 108px; animation:star-blink 6s infinite; }
@@ -126,3 +126,19 @@ button:focus-visible,a:focus-visible { outline:3px solid #b48730; outline-offset
 @keyframes star-glow { 0%,100%{opacity:.6}50%{opacity:1} }
 
 .page-heading h1:before { content:""; display:block; width:38px; height:4px; border-radius:8px; background:linear-gradient(90deg,#b58c34,#83cdf3); margin-bottom:16px; }
+
+.lumi-status { display:inline-flex; align-items:center; padding:5px 12px; border:1px solid currentColor; border-radius:100px; font-size:11px; font-weight:700; letter-spacing:.04em; margin:0 0 14px; }
+.lumi-message { position:relative; margin-top:20px; max-width:285px; padding:16px 18px; border-radius:18px; background:rgb(126 193 242 / 9%); border:1px solid rgb(126 193 242 / 22%); color:#c6def3; line-height:1.6; }
+.lumi-voice { color:#e6f4ff; font-size:16px; font-weight:700; margin:0; }
+.constellation-lit .lumi-message,.constellation-radiant .lumi-message { background:rgb(255 218 118 / 8%); border-color:rgb(255 218 118 / 25%); }
+.constellation-lit .lumi-voice,.constellation-radiant .lumi-voice { color:#ffe7a4; }
+.constellation-lit .star-body,.constellation-radiant .star-body { animation:lumi-dance 1.7s ease-in-out infinite; }
+.constellation-radiant .star-body { animation-duration:1.35s; }
+.constellation-waiting .star-body,.constellation-sleeping .star-body { animation:lumi-sigh 5s ease-in-out infinite; }
+.lumi-arms { transform-origin:120px 120px; animation:lumi-wave .85s ease-in-out infinite alternate; }
+.lumi-activate { background:linear-gradient(110deg,#ffe7a4,#efbc56); color:#122c50; font-weight:750; padding:13px 22px; border-radius:14px; margin:0 0 24px; box-shadow:0 6px 24px #e7b44d22; }
+.lumi-activate:hover { filter:brightness(1.08); }
+.lumi-activate:focus-visible { outline:3px solid #8edbff; outline-offset:5px; }
+@keyframes lumi-dance { 0%,100% {transform:translateY(0) rotate(-9deg)} 25% {transform:translateY(-13px) rotate(8deg)} 50% {transform:translateY(-3px) rotate(9deg)} 75% {transform:translateY(-13px) rotate(-8deg)} }
+@keyframes lumi-wave { from {transform:scaleY(.88)} to {transform:scaleY(1.12)} }
+@keyframes lumi-sigh { 0%,100% {transform:translateY(3px) rotate(-5deg)} 50% {transform:translateY(0) rotate(-2deg)} }
