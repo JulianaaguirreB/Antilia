@@ -181,3 +181,56 @@
 .wardrobe-preview-zone .lumi-dressing-preview .is-compact .constellation-mascot { width:172px;height:144px; }
 .wardrobe-preview-zone .wardrobe-moods { margin-bottom:12px; }
 .lumi-dressing-preview .streak-companion.is-compact { width:172px; height:144px; padding:0; }
+
+/* A little dressing room: the character stays in sight while its wardrobe changes. */
+.lumi-boutique { padding:0!important;overflow:hidden!important;display:flex;flex-direction:column;max-height:94dvh!important;background:#fffcf7; }
+.lumi-boutique>div:first-child { padding:16px 20px 10px;margin:0;align-items:center;flex-shrink:0; }
+.lumi-boutique>div:first-child h2 { font-size:19px;letter-spacing:-.03em;font-weight:800; }
+.lumi-boutique>div:first-child>button { background:#f0ece7;width:36px;height:36px; }
+.boutique-stage { position:relative;isolation:isolate;margin:0 12px;border-radius:24px;background:radial-gradient(ellipse at 50% 70%,#faf0d6 0%,#eee6f4 60%,#e4eaf5 100%);overflow:hidden;flex-shrink:0; }
+.boutique-stage-heading { display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0;gap:8px;color:#6c6480;font-size:9px;font-weight:750;letter-spacing:.11em; }
+.boutique-piece-count { font-size:10px;letter-spacing:0;font-weight:600;background:#ffffff80;border-radius:20px;padding:5px 9px; }
+.lumi-boutique .lumi-dressing-preview { background:none;padding:0;position:relative;z-index:1; }
+.lumi-boutique .lumi-dressing-preview .streak-companion.is-compact { width:230px;height:190px; }
+.lumi-boutique .lumi-dressing-preview .constellation-mascot { width:230px;height:190px;filter:drop-shadow(0 9px 7px #84718b24); }
+.boutique-plinth { position:absolute;width:164px;height:29px;background:linear-gradient(#ffffffc9,#ded8e7);border-radius:50%;left:calc(50% - 82px);top:195px;box-shadow:0 8px 0 #d2cbd9,0 17px 18px #9e90aa26;z-index:0; }
+.boutique-whisper { position:relative;z-index:1;font-size:12px;color:#675571;font-style:italic;text-align:center;margin:3px 12px 9px;min-height:18px; }
+.boutique-spark { position:absolute;color:#9d83aa;opacity:.6;line-height:1; }
+.boutique-spark-one { font-size:43px;left:25px;top:80px;transform:rotate(-15deg); }
+.boutique-spark-two { font-size:25px;right:28px;top:140px;color:#b69455; }
+.lumi-boutique .wardrobe-moods { width:max-content;margin:0 auto 13px;background:#ffffff80;padding:3px;border-radius:24px;gap:2px; }
+.lumi-boutique .wardrobe-moods button { min-height:32px;padding:5px 15px;font-size:11px;background:none;color:#655d76; }
+.lumi-boutique .wardrobe-moods [aria-pressed=true] { background:#fffdf7;color:#263f5a;box-shadow:0 2px 6px #6e638c18; }
+.boutique-tabs { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:10px 12px 0;gap:5px;flex-shrink:0; }
+.boutique-tabs>button { position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px 8px;min-height:66px;border-radius:15px 15px 0 0;color:#7d7b86;border-bottom:3px solid transparent; }
+.boutique-tabs>button[aria-selected=true] { background:#f5efdf;border-color:#c59b46;color:#263f5a; }
+.boutique-tabs .garment-art { width:34px;height:29px;filter:drop-shadow(0 2px 1px #463f521a); }
+.boutique-tabs span { font-size:11px;font-weight:750; }
+.boutique-tabs i { position:absolute;right:12px;top:7px;width:5px;height:5px;background:#c4a352;border-radius:50%; }
+.boutique-shelf { padding:14px 20px 18px;overflow:auto;min-height:110px;overscroll-behavior:contain; }
+.boutique-shelf-heading { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px; }
+.boutique-shelf-heading h3 { font-weight:800;font-size:14px; }
+.boutique-shelf-heading>span { font-size:10px;color:#78818d; }
+.boutique-item-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px 12px; }
+.boutique-item { position:relative;min-width:0;display:flex;flex-direction:column;gap:7px;align-items:center;justify-content:flex-start; }
+.boutique-item-art { position:relative;display:grid;place-items:center;width:100%;aspect-ratio:1.15;border:2px solid transparent;border-radius:18px;transition:transform .15s,border-color .15s; }
+.boutique-item:hover .boutique-item-art { transform:translateY(-2px); }
+.boutique-item[aria-pressed=true] .boutique-item-art { border-color:#b7933e;box-shadow:0 0 0 3px #e9dbaa55; }
+.boutique-item .garment-art { width:83%;height:70px;overflow:visible;filter:drop-shadow(0 4px 2px #463f5221); }
+.boutique-item .garment-empty { width:65%;height:62px;color:#aaa2a0;filter:none; }
+.boutique-item>span { font-size:11px;line-height:1.25;color:#40536a;text-align:center;font-weight:600; }
+.boutique-selected { position:absolute;right:-5px;bottom:-5px;width:23px;height:23px;display:grid;place-items:center;border-radius:50%;background:#183d5f;color:#fff2c9;border:2px solid #fffcf7; }
+.boutique-selected svg { width:17px;height:17px; }
+.boutique-footer { padding:12px 20px max(12px,env(safe-area-inset-bottom));border-top:1px solid #ece8df;box-shadow:0 -5px 20px #57698605;flex-shrink:0;background:#fffcf7; }
+.boutique-footer>div { display:flex;align-items:center;gap:12px;justify-content:space-between; }
+.boutique-footer .app-button { min-height:46px;padding:10px 16px;font-size:13px;border-radius:16px; }
+.boutique-reset { color:#62718a;font-size:11px;min-height:44px;text-align:left; }
+.boutique-footer>p { font-size:10px;text-align:center;color:#8b8c92;margin-top:7px; }
+.lumi-boutique button:focus-visible { outline:3px solid #6b9bc1;outline-offset:2px; }
+@media(min-width:640px) { .lumi-boutique {border-radius:28px!important;max-width:500px;} }
+@media(max-height:740px) { .lumi-boutique .lumi-dressing-preview .streak-companion.is-compact,.lumi-boutique .lumi-dressing-preview .constellation-mascot {width:180px;height:150px;} .boutique-plinth {top:157px;width:132px;left:calc(50% - 66px);} .boutique-whisper{font-size:10px;} .boutique-stage-heading{padding-top:9px;} .boutique-tabs{padding-top:6px;} .boutique-tabs>button{min-height:58px;} }
+@media(prefers-reduced-motion:reduce) { .boutique-item-art { transition:none; } }
+
+.lumi-boutique .wardrobe-moods button { white-space:nowrap;flex:none; }
+.boutique-footer .app-button { white-space:nowrap;font-size:12px;padding-inline:12px; }
+@media(max-height:740px) { .lumi-boutique .lumi-dressing-preview .streak-companion.is-compact,.lumi-boutique .lumi-dressing-preview .constellation-mascot {width:158px;height:130px;} .boutique-plinth {top:136px;width:116px;left:calc(50% - 58px);} }

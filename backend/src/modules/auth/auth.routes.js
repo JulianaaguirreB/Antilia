@@ -131,8 +131,9 @@ router.patch('/appearance', requireAuth, route(async (req, res) => {
     if (bytes.length < 4 || bytes[0] !== 255 || bytes[1] !== 216 || bytes[bytes.length-2] !== 255 || bytes[bytes.length-1] !== 217) throw problem(400, 'La imagen no es un JPG válido.');
   }
   if (input.lumi_style !== undefined) {
-    const style = body(input.lumi_style, ['outfit', 'hair', 'hat']);
-    const options = { outfit: ['none','sweater','overalls','cape'], hair: ['none','curls','pink','silver'], hat: ['none','beanie','party','crown'] };
+    const style = body(input.lumi_style, ['outfit', 'hair', 'hat', 'glasses']);
+    const options = { outfit: ['none','sweater','overalls','cape'], hair: ['none','curls','pink','silver'], hat: ['none','beanie','party','crown'], glasses: ['none','round','sun','heart'] };
+    if (style.glasses === undefined) style.glasses = 'none';
     for (const key of Object.keys(options)) if (!options[key].includes(style[key])) throw problem(400, 'Elige las prendas disponibles en el vestidor.');
   }
   const result = await pool.query(`UPDATE users SET
