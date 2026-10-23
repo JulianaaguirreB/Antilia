@@ -1,6 +1,6 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode, useEffect } from 'react';
 import { useAuth } from '../features/auth/context/AuthContext';
-import { useHashRoute } from './routing';
+import { useHashRoute, rememberLoginDestination, loginDestination, clearLoginDestination } from './routing';
 import { Auth } from '../features/auth/pages/Auth';
 import { Home } from '../features/home/pages/Home';
 import { Progress } from '../features/progress/pages/Progress';
@@ -19,6 +19,7 @@ export function AppContent() {
   const { user, loading } = useAuth();
   const { hash: fullHash, navigate } = useHashRoute();
   const hash = fullHash.split('?')[0];
+  useEffect(()=>{if(user&&!loading&&!['#/acceso','#/registro','#/bienvenida','#/recuperar'].includes(hash))clearLoginDestination();},[user,loading,hash]);
 
   if (loading) {
     return (
@@ -30,12 +31,13 @@ export function AppContent() {
   const isAuthRoute = ['#/acceso', '#/registro', '#/recuperar', '#/bienvenida'].includes(hash);
   
   if (!user && !isAuthRoute) {
+    rememberLoginDestination(hash);
     navigate('#/acceso');
     return null;
   }
 
   if (user && ['#/acceso', '#/registro', '#/bienvenida'].includes(hash)) {
-    navigate('#/inicio');
+    navigate(loginDestination());
     return null;
   }
 

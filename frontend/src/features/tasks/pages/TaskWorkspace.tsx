@@ -5,7 +5,7 @@ import { Input, Button } from '../../../shared/components/ui';
 import { FieldSelect, Modal, Notice, ReleasePage, ResourceState, useResource } from '../../../shared/components/ReleaseLayout';
 import type { Navigate } from '../../../shared/components/ReleaseLayout';
 import type { Space } from '../../spaces/pages/Spaces';
-import { DeskPlan } from '../../desk/components/DeskPlan';
+import { DeskEntry } from '../../desk/components/DeskEntry';
 import { weekActivity } from '../../../shared/lib/dates';
 
 export interface WorkspaceTask { id: string; title: string; type: 'fisica' | 'digital'; status: string; digital_kind: string; reference_url: string | null; space_id: string | null; due_at: string | null; completed_at: string | null; }
@@ -53,7 +53,7 @@ export function TaskWorkspace({ navigate, mode }: { navigate: Navigate; mode: 'f
   const tasks = result.data?.tasks.filter(task => (!['correo','archivo'].includes(mode) || task.digital_kind === mode) && (mode !== 'kanban' || task.status === status) && task.title.toLocaleLowerCase().includes(search.toLocaleLowerCase())) || [];
   return <ReleasePage title={titles[mode]} subtitle={mode === 'correo' ? 'Tu selección de Gmail y tus pendientes manuales, en un solo lugar.' : mode === 'archivo' ? 'Organiza pendientes y enlaces a tus archivos. Antilia no lee ni borra archivos de tu dispositivo.' : 'Haz visible lo pendiente y avanza paso a paso.'} navigate={navigate} active={mode === 'fisica' ? '#/espacios' : '#/digital'} back={mode === 'fisica' ? '#/espacios' : '#/digital'}>
     {mode === 'correo' && <><MailboxPanel/><h2 className="font-bold text-xl mb-3">Pendientes agregados por ti</h2><p className="text-sm text-text-secondary mb-5">Estas tareas son independientes de los mensajes importados de Gmail.</p></>}
-    {mode === 'fisica' && <section className="surface p-5 mb-5"><h2 className="font-bold mb-4">Esquema de distribución</h2><DeskPlan/><button className="text-primary font-semibold mt-3 min-h-11" onClick={()=>navigate('#/medir-espacio')}>Medir mi espacio →</button></section>}
+    {mode === 'fisica' && <section className="surface p-5 mb-5"><h2 className="font-bold mb-4">Tu mesa y tus tareas</h2><DeskEntry navigate={navigate}/><button className="text-primary font-semibold mt-3 min-h-11" onClick={()=>navigate('#/medir-espacio')}>Medir mi espacio →</button></section>}
     {mode === 'digital' && <section className="surface p-5 mb-5"><h2 className="font-bold">Calendario semanal</h2><p className="text-xs text-text-secondary mt-1 mb-4">Días con tareas digitales completadas</p><div className="flex justify-between gap-2">{weekActivity(result.data?.tasks||[]).map(day=><div className="text-center" key={day.key}><span className="text-xs block mb-2">{day.label}</span><span className={`week-dot ${day.count?'is-active':''}`} aria-label={`${day.date}: ${day.count} completadas`}>{day.count?'✓':'·'}</span></div>)}</div></section>}
     {mode === 'digital' && <div className="grid grid-cols-2 gap-3 mb-5">{[['#/correos','Correos'],['#/archivos','Archivos'],['#/kanban','Tablero'],['#/archivadas','Archivadas']].map(([path,label]) => <button key={path} className="surface text-left p-4 font-semibold text-primary min-h-16" onClick={() => navigate(path)}>{label} →</button>)}</div>}
     {mode !== 'archivada' && <Button className="w-full mb-4" onClick={() => setCreate(true)}>{mode === 'correo' ? 'Agregar correo pendiente' : mode === 'archivo' ? 'Agregar archivo pendiente' : 'Nueva tarea'}</Button>}

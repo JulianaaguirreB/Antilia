@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Input, Button } from '../../../shared/components/ui';
 import { validateEmail, validatePassword, validateName } from '../../../shared/lib/validation';
 import { Icons } from '../../../shared/components/Icons';
+import { loginDestination } from '../../../app/routing';
 
 interface AuthProps {
   isRegister: boolean;
@@ -55,6 +56,7 @@ export function Auth({ isRegister, navigate }: AuthProps) {
     }
 
     setLoading(true);
+    const destination=loginDestination();
     try {
       if (isRegister) {
         const res = await api('/auth/register', {
@@ -71,7 +73,7 @@ export function Auth({ isRegister, navigate }: AuthProps) {
       }
       const meRes = await api<{ user: any }>('/auth/me');
       login(localStorage.getItem('antilia_token') || '', meRes.user);
-      navigate('#/inicio');
+      navigate(destination);
     } catch (err) {
       if (err instanceof ApiError) {
         setGlobalError(err.message);
@@ -97,6 +99,7 @@ export function Auth({ isRegister, navigate }: AuthProps) {
       <div className="flex-1 flex flex-col justify-center">
         <div className="brand-bar flex items-center gap-3 mb-7"><img src="/icons/icon-192.png" alt="" className="brand-mark"/><div><span className="text-xl font-bold tracking-tight">antilia.</span><span className="block text-[10px] uppercase tracking-[.2em] text-text-secondary">Haz espacio para ti</span></div></div>
         <div className="auth-intro mb-8"><p className="eyebrow mb-3">Tu pequeña constelación de orden</p><h2 className="text-[29px] font-semibold leading-tight">Menos desorden.<br/>Más espacio<br/>para brillar.</h2><p className="text-sm text-blue-100/90 mt-4 max-w-60 leading-relaxed">Un pendiente a la vez. Organiza tu espacio y encuentra tu propio ritmo.</p><div className="mt-6 flex gap-4"><span className="auth-step"><b>1</b>Organiza</span><span className="auth-step"><b>2</b>Completa</span><span className="auth-step"><b>3</b>Avanza</span></div></div>
+        <p className="rounded-xl bg-primary-soft text-primary text-sm p-3 mb-5">Ya disponible: escritorio 3D con tres mesas y tarjetas para tus objetos. Entra a tu cuenta para abrirlo.</p>
         <h1 className="text-[28px] font-bold text-text-main mb-2">
           {isRegister ? 'Crea tu cuenta' : 'Qué bueno verte'}
         </h1>
