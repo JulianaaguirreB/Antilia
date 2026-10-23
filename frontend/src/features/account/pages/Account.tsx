@@ -48,11 +48,11 @@ export function Account({ navigate }: AccountProps) {
   return (
     <div className="min-h-dvh bg-bg-main pb-24">
       <div className="max-w-[480px] mx-auto px-4 pt-6">
-        <header className="mb-8">
-          <p className="eyebrow mb-2">Tu espacio personal</p><h1 className="text-2xl font-bold text-text-main">Mi Cuenta</h1><p className="text-text-secondary text-sm mt-2">Tu información y lo que has logrado.</p>
+        <header className="cosmic-heading profile-heading mb-6">
+          <p className="eyebrow mb-2">Tu espacio personal</p><h1 className="text-2xl font-bold text-text-main">Este es tu espacio</h1><p className="text-text-secondary text-sm mt-2">Lo que has cuidado, lo que has logrado y lo que viene.</p>
         </header>
 
-        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-border-main flex flex-col items-center text-center mb-6">
+        <div className="profile-passport bg-white p-6 rounded-[24px] shadow-sm border border-border-main flex flex-col items-center text-center mb-6">
           <div className="w-20 h-20 bg-primary-soft text-primary rounded-full flex items-center justify-center text-2xl font-bold mb-4">
             {initials}
           </div>

@@ -1,4 +1,5 @@
-import { Component, ErrorInfo, ReactNode, useEffect } from 'react';
+import { BootSplash, introWasSeen } from '../shared/components/BootSplash';
+import { Component, ErrorInfo, ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '../features/auth/context/AuthContext';
 import { useHashRoute, rememberLoginDestination, loginDestination, clearLoginDestination } from './routing';
 import { Auth } from '../features/auth/pages/Auth';
@@ -111,10 +112,17 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 }
 
 export function App() {
+  const {loading}=useAuth();
+  const {hash}=useHashRoute();
+  const [introComplete,setIntroComplete]=useState(introWasSeen);
+  const preserveStreak=hash.split('?')[0]==='#/progreso';
   return (
     <ErrorBoundary>
-      <InstallApp />
-      <AppContent />
+      {!introComplete&&<BootSplash ready={!loading} onDone={()=>setIntroComplete(true)}/>}
+      <div className={preserveStreak?'preserve-streak':'antilia-world'} inert={!introComplete}>
+        <InstallApp />
+        <AppContent />
+      </div>
     </ErrorBoundary>
   );
 }

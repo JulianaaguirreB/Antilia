@@ -4,6 +4,7 @@ import { AuthProvider } from './features/auth/context/AuthContext';
 import { App } from './app/App';
 import './app/styles.css';
 import '@fontsource-variable/inter';
+import '@fontsource-variable/nunito-sans';
 import { Capacitor } from '@capacitor/core';
 
 if ('serviceWorker' in navigator && import.meta.env.PROD && !Capacitor.isNativePlatform()) {

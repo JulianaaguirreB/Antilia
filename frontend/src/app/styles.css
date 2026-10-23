@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./universe.css";
 
 @theme {
   --color-primary: #173e75;

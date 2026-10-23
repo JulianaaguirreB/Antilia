@@ -9,7 +9,7 @@ export function Navigation({ currentPath, navigate }: NavigationProps) {
   const items = [
     { id: '#/inicio', label: 'Inicio', icon: Icons.Home },
     { id: '#/espacios', label: 'Espacios', icon: Icons.Spaces },
-    { id: '#/digital', label: 'Digital', icon: Icons.Folder },
+    { id: '#/digital', label: 'Correos y archivos', icon: Icons.Folder },
     { id: '#/progreso', label: 'Progreso', icon: Icons.TrendingUp },
     { id: '#/perfil', label: 'Perfil', icon: Icons.User },
   ];
@@ -30,7 +30,7 @@ export function Navigation({ currentPath, navigate }: NavigationProps) {
               }`}
             >
               <Icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-              <span className={`text-[12px] ${isActive ? 'font-medium' : 'font-normal'}`}>
+              <span className={`nav-label text-[12px] ${isActive ? 'font-medium' : 'font-normal'}`}>
                 {item.label}
               </span>
             </button>

@@ -204,10 +204,10 @@ export function Home({ navigate }: HomeProps) {
     <div className="min-h-dvh bg-bg-main pb-[calc(140px+env(safe-area-inset-bottom))]">
       <div className="home-shell max-w-[480px] mx-auto px-5 pt-6">
         <div className="flex items-center justify-between mb-6"><div className="flex items-center gap-2"><img src="/icons/icon-192.png" alt="" className="brand-mark !w-8 !h-8 !text-lg !rounded-xl"/><span className="font-bold text-lg">antilia.</span></div><span className="home-date">{new Intl.DateTimeFormat('es-CO', {weekday:'short',day:'numeric',month:'short',timeZone:'America/Bogota'}).format(new Date())}</span></div>
-        <header className="mb-6 flex justify-between items-start gap-3">
+        <header className="home-welcome mb-6 flex justify-between items-start gap-3">
           <div>
             <h1 className="text-2xl font-bold text-text-main">Hola, {firstName}</h1>
-            <p className="text-text-secondary text-sm mt-1">Pequeños pasos, un día más ligero</p>
+            <p className="text-text-secondary text-sm mt-1">Tu espacio empieza contigo.</p>
           </div>
           <button 
             onClick={() => navigate('#/progreso')}
@@ -230,7 +230,7 @@ export function Home({ navigate }: HomeProps) {
         <div className="hero-card mb-6">
           <p className="eyebrow mb-3">Tu enfoque de hoy</p>
           <div className="flex justify-between items-end mb-3">
-            <h2 className="font-semibold text-white">Progreso del Día</h2>
+            <h2 className="font-semibold text-white">Así va tu día</h2>
             <div className="text-right">
               <span className="text-3xl font-bold text-white">{pct}%</span>
               <span className="text-white/70 text-xs ml-1">Completado</span>
@@ -246,7 +246,7 @@ export function Home({ navigate }: HomeProps) {
         </div>
 
         <DailyCompass key={user?.id} userId={user?.id || 'local'} completed={completedTodayCount} pending={tasks.filter(t=>['pendiente','en_progreso'].includes(t.status)).length} navigate={navigate}/>
-        <div className="flex items-center justify-between mb-3"><h2 className="font-bold text-lg">Tu universo de orden</h2><span className="eyebrow">Explora</span></div>
+        <div className="flex items-center justify-between mb-3"><h2 className="font-bold text-lg">A tu ritmo</h2><span className="eyebrow">Explora</span></div>
         <section className="explore-strip" aria-label="Más herramientas">{[['#/kanban','Tablero'],['#/medir-espacio','Medir espacio'],['#/correos','Correos'],['#/archivos','Archivos'],['#/metricas','Estadísticas']].map(([path,title])=><button key={path} onClick={()=>navigate(path)}>{title} ↗</button>)}</section>
         <div className="flex gap-2 mb-4 rounded-2xl bg-white p-1 border border-border-main/60"><button onClick={() => setView('hoy')} aria-pressed={view === 'hoy'} className={`flex-1 rounded-xl py-3 text-sm font-semibold ${view === 'hoy' ? 'bg-primary-soft text-primary' : 'text-text-secondary'}`}>Hoy</button><button onClick={() => setView('historial')} aria-pressed={view === 'historial'} className={`flex-1 rounded-xl py-3 text-sm font-semibold ${view === 'historial' ? 'bg-primary-soft text-primary' : 'text-text-secondary'}`}>Historial</button></div>
         <div className="mb-4"><Input id="task-search" label="Buscar tus tareas" placeholder="Escribe una palabra del título" value={search} onChange={e => setSearch(e.target.value)} type="search" /></div>
@@ -260,13 +260,13 @@ export function Home({ navigate }: HomeProps) {
                 tab === t ? 'bg-text-main text-white' : 'bg-white text-text-secondary border border-border-main'
               }`}
             >
-              {t === 'todas' ? 'Todas' : t === 'fisica' ? 'Físicas' : 'Digitales'}
+              {t === 'todas' ? 'Todas' : t === 'fisica' ? 'En mi espacio' : 'Correos y archivos'}
             </button>
           ))}
         </div>
 
         <div>
-          <h3 className="font-semibold text-text-main mb-4">{view === 'historial' ? 'Tareas completadas' : 'Tareas de Hoy'}</h3>
+          <h3 className="font-semibold text-text-main mb-4">{view === 'historial' ? 'Tareas completadas' : 'Un paso a la vez'}</h3>
           
           {filteredTasks.length === 0 ? (
             <div className="text-center py-10 bg-white rounded-[16px] border border-border-main border-dashed">
@@ -307,7 +307,7 @@ export function Home({ navigate }: HomeProps) {
                         ? 'bg-[#f0f9ff] text-[#0284c7]' 
                         : 'bg-[#fff4d7] text-[#8a6827]'
                     }`}>
-                      {task.type === 'fisica' ? 'Físico' : 'Digital'}
+                      {task.type === 'fisica' ? 'En mi espacio' : 'Correos y archivos'}
                     </span>
                   </div>
                 </div>
