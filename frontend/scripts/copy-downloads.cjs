@@ -6,3 +6,5 @@ fs.mkdirSync(target, { recursive: true });
 for (const [source, name] of [['Antilia-Android.apk', 'antilia.apk'], ['Antilia-Android.sha256', 'antilia.sha256']]) {
   fs.copyFileSync(path.join(root, 'distribucion/android', source), path.join(target, name));
 }
+
+fs.copyFileSync(path.join(root, 'distribucion/ios/Antilia-iPhone.ipa'), path.join(target, 'antilia.ipa'));

@@ -1,3 +1,5 @@
+import { Landing } from '../features/landing/Landing';
+import { LandingMetrics } from '../features/landing/LandingMetrics';
 import { BootSplash, introWasSeen } from '../shared/components/BootSplash';
 import { Component, ErrorInfo, ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '../features/auth/context/AuthContext';
@@ -22,6 +24,8 @@ export function AppContent() {
   const hash = fullHash.split('?')[0];
   useEffect(()=>{if(user&&!loading&&!['#/acceso','#/registro','#/bienvenida','#/recuperar'].includes(hash))clearLoginDestination();},[user,loading,hash]);
 
+  if (hash==='#/'||hash==='#/landing') return <Landing navigate={navigate}/>;
+
   if (loading) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-bg-main text-text-secondary">
@@ -43,6 +47,7 @@ export function AppContent() {
   }
 
   switch (hash) {
+    case '#/visitas': return <LandingMetrics navigate={navigate}/>;
     case '#/sesion': return <FocusSession navigate={navigate}/>;
     case '#/mi-escritorio': return <Desk navigate={navigate}/>;
     case '#/medir-espacio': return <MeasureSpace navigate={navigate}/>;
@@ -115,12 +120,13 @@ export function App() {
   const {loading}=useAuth();
   const {hash}=useHashRoute();
   const [introComplete,setIntroComplete]=useState(introWasSeen);
+  const landing=['#/','#/landing'].includes(hash.split('?')[0]);
   const preserveStreak=hash.split('?')[0]==='#/progreso';
   return (
     <ErrorBoundary>
-      {!introComplete&&<BootSplash ready={!loading} onDone={()=>setIntroComplete(true)}/>}
-      <div className={preserveStreak?'preserve-streak':'antilia-world'} inert={!introComplete}>
-        <InstallApp />
+      {!landing&&!introComplete&&<BootSplash ready={!loading} onDone={()=>setIntroComplete(true)}/>}
+      <div className={preserveStreak?'preserve-streak':'antilia-world'} inert={!landing&&!introComplete}>
+        {!landing&&<InstallApp />}
         <AppContent />
       </div>
     </ErrorBoundary>

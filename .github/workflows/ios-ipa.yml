@@ -48,10 +48,10 @@ jobs:
           (target / 'Contents.json').write_text(json.dumps({'images': [{'filename': 'AppIcon.png', 'idiom': 'universal', 'platform': 'ios', 'size': '1024x1024'}], 'info': {'author': 'xcode', 'version': 1}}))
           plist = Path('ios/App/App/Info.plist')
           settings = plistlib.loads(plist.read_bytes())
-          settings['CFBundleShortVersionString'] = '0.3.1'
+          settings['CFBundleShortVersionString'] = '0.3.2'
           settings['CFBundleVersion'] = os.environ['GITHUB_RUN_NUMBER']
-          settings['NSCameraUsageDescription'] = 'Antilia usa la cámara para tomar una foto del escritorio y estimar distancias con una referencia que tú marcas.'
-          settings['NSPhotoLibraryUsageDescription'] = 'Antilia permite elegir una foto del escritorio para medir distancias con una referencia.'
+          settings['NSCameraUsageDescription'] = 'Antilia usa la cámara cuando eliges tomar tu foto de perfil o medir un escritorio con una referencia que tú marcas.'
+          settings['NSPhotoLibraryUsageDescription'] = 'Antilia permite elegir tu foto de perfil o una foto del escritorio para medir con una referencia.'
           settings['NSPhotoLibraryAddUsageDescription'] = 'Antilia solo guarda fotos en tu biblioteca si tú lo solicitas.'
           plist.write_bytes(plistlib.dumps(settings))
           PY

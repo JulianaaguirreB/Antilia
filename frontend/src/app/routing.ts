@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { useState, useEffect } from 'react';
 
 const returnPaths=new Set(['#/inicio','#/mi-escritorio','#/medir-espacio','#/espacios','#/escritorio','#/progreso','#/digital','#/sesion','#/metricas','#/estado','#/perfil','#/turnos','#/recordatorios','#/correos','#/archivos','#/kanban','#/archivadas','#/privacidad']);
@@ -13,11 +14,11 @@ export function clearLoginDestination() {
 }
 
 export function useHashRoute() {
-  const [hash, setHash] = useState(() => window.location.hash || '#/inicio');
+  const [hash, setHash] = useState(() => window.location.hash || (Capacitor.isNativePlatform()?'#/inicio':'#/'));
 
   useEffect(() => {
     const onHashChange = () => {
-      setHash(window.location.hash || '#/inicio');
+      setHash(window.location.hash || (Capacitor.isNativePlatform()?'#/inicio':'#/'));
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);

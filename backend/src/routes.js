@@ -15,4 +15,6 @@ router.use('/internal', require('./modules/reminders/internal.routes'));
 
 router.use('/mailbox', require('./modules/mailbox/mailbox.routes'));
 
+router.use('/landing', require('./modules/landing/landing.routes'));
+
 module.exports = router;
