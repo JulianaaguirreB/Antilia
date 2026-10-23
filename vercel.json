@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "npm ci --prefix backend && npm ci --prefix frontend",
-  "buildCommand": "npm run build --prefix frontend && node frontend/scripts/copy-downloads.cjs",
+  "buildCommand": "node backend/scripts/migrate-on-deploy.js && npm run build --prefix frontend && node frontend/scripts/copy-downloads.cjs",
   "outputDirectory": "frontend/dist",
   "headers": [
     { "source": "/downloads/antilia.apk", "headers": [

@@ -77,7 +77,7 @@ after(async () => {
 
 test('migraciones repetibles y esquema con datos aislados', async () => {
   const result = await pool.query('SELECT name FROM schema_migrations ORDER BY name');
-  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql', '005_gmail.sql']);
+  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql', '005_gmail.sql', '006_desk_models.sql']);
   assert.equal((await request('/spaces')).status, 401);
   assert.equal((await request('/shifts')).status, 401);
   assert.equal((await request('/reminders')).status, 401);
@@ -293,6 +293,12 @@ test('escritorio conserva distribución y dimensiones por usuario', async()=>{
  assert.equal((await request('/desk',{method:'PUT',token:a.token,body:{...body,layout:[...body.layout,...body.layout]}})).status,400);
  assert.equal((await request('/desk',{method:'PUT',token:a.token,body:{...body,name:'Nuevo nombre',layout:[]}})).status,200);
  assert.equal((await request('/desk',{token:a.token})).data.desk.name,'Nuevo nombre');
+ const design={...body,model:'esquina',height_cm:76,width_cm:180,depth_cm:160,layout:[{id:'portatil',kind:'personalizado',label:'Portátil de trabajo',x:50,y:20,width_cm:32,depth_cm:24,rotation:90,color:'#d8edff'}]};
+ assert.equal((await request('/desk',{method:'PUT',token:a.token,body:design})).status,200);
+ const stored=(await request('/desk',{token:a.token})).data.desk;
+ assert.equal(stored.model,'esquina');assert.equal(Number(stored.height_cm),76);assert.deepEqual(stored.layout,design.layout);
+ for(const patch of [{model:'inexistente'},{height_cm:0},{layout:[{...design.layout[0],label:'x'.repeat(41)}]},{layout:[{...design.layout[0],rotation:45}]},{layout:[{...design.layout[0],width_cm:-1}]},{layout:[{...design.layout[0],color:'red'}]}])assert.equal((await request('/desk',{method:'PUT',token:a.token,body:{...design,...patch}})).status,400);
+ assert.equal((await request('/desk',{token:b.token})).data.desk,null);
 });
 
 test('proveedor sin configurar no simula envíos', async () => {
