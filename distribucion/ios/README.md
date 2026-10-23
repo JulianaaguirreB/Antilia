@@ -2,7 +2,7 @@
 
 [Descargar Antilia para iPhone](https://github.com/JulianaaguirreB/Antilia/raw/refs/heads/developer/distribucion/ios/Antilia-iPhone.ipa)
 
-Este IPA sin firma es Antilia **0.3.0, compilación 11**, compilado desde cero con Xcode el 23 de octubre de 2026 a partir del código `37660d8`. Incluye la interfaz actual, tres mesas 3D, tarjetas con nombres y posiciones, medición fotográfica de ancho y fondo con corrección de perspectiva, tareas, sesiones de orden, Lumi, Gmail de solo lectura y recuperación por correo. Se conecta al servidor público y a los datos existentes de Antilia; requiere iOS 15 o posterior e internet. Es arm64 para un iPhone real, no para simulador.
+Este IPA sin firma es Antilia **0.3.1, compilación 13**, compilado desde cero con Xcode el 23 de octubre de 2026 a partir del código `dc11773`. Incluye el nuevo diseño inspirado en Lumi, bienvenida animada con escoba y planeta, navegación Correos y archivos, tres mesas 3D, tarjetas con nombres y posiciones, medición fotográfica de ancho y fondo con corrección de perspectiva, tareas, sesiones de orden, Lumi, Gmail de solo lectura y recuperación por correo. Se conecta al servidor público y a los datos existentes de Antilia; requiere iOS 15 o posterior e internet. Es arm64 para un iPhone real, no para simulador.
 
 1. Descarga el archivo `.ipa` en tu computador.
 2. Conecta y desbloquea tu iPhone. Abre Sideloadly y selecciona el dispositivo.
@@ -14,7 +14,7 @@ El archivo no contiene un perfil de Apple ni una cuenta personal. Cada usuario d
 
 La huella SHA-256 está en `Antilia-iPhone.sha256`. En PowerShell puedes comprobarla con `Get-FileHash .\Antilia-iPhone.ipa -Algorithm SHA256`.
 
-La compilación de este paquete está en [GitHub Actions](https://github.com/JulianaaguirreB/Antilia/actions/runs/39962103832). El flujo crea un IPA nuevo cuando cambia el frontend en developer; actualizar este archivo distribuido requiere descargar y comprobar esa nueva compilación. Este paquete no se actualiza automáticamente dentro del iPhone.
+La compilación de este paquete está en [GitHub Actions](https://github.com/JulianaaguirreB/Antilia/actions/runs/39969243179). El flujo crea un IPA nuevo cuando cambia el frontend en developer; actualizar este archivo distribuido requiere descargar y comprobar esa nueva compilación. Este paquete no se actualiza automáticamente dentro del iPhone.
 
 La cámara estima ancho y fondo con una referencia rectangular y corrección de perspectiva; no realiza escaneo 3D ni conteo automático de objetos. Puedes introducir manualmente las medidas tomadas con Medidas de Apple. Los modelos 3D son mesas editables incluidas en Antilia. Gmail y la recuperación por SMTP ya están activos en el servidor. En el iPhone, la autorización de Google usa el navegador nativo; al terminar, ciérralo para volver a Antilia y actualizar la conexión. Google mantiene el piloto limitado a sus usuarios de prueba autorizados. La instalación y permisos todavía deben comprobarse en el iPhone físico.
 
