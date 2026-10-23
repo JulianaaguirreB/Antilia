@@ -1,7 +1,10 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api, setUnauthorizedHandler } from '../../../shared/api/client';
 
+export type LumiStyle = {outfit:'none'|'sweater'|'overalls'|'cape';hair:'none'|'curls'|'pink'|'silver';hat:'none'|'beanie'|'party'|'crown'};
 export interface User {
+  avatar_url?: string | null;
+  lumi_style?: LumiStyle;
   id: string;
   name: string;
   email: string;

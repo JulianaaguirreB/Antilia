@@ -153,3 +153,31 @@
 .antilia-world .app-nav { border-radius:25px; }
 .antilia-world .app-nav [aria-current=page] { background:#345873; border-radius:18px; }
 @media(max-width:360px) { .antilia-world .shortcut-card {grid-template-columns:30px minmax(0,1fr);gap:7px;padding:12px;min-height:105px;} .antilia-world .shortcut-card .shortcut-icon {width:30px;height:30px;padding:4px;} .antilia-world .shortcut-card>.font-semibold {font-size:13px;} .antilia-world .home-welcome h1 {font-size:28px;} }
+
+.profile-photo-button { position:relative;width:88px;height:88px;border-radius:50%;background:#dcebf3;color:#234d6b;font-size:28px;font-weight:800;display:grid;place-items:center;border:3px solid white;box-shadow:0 0 0 2px #d7b76a; }
+.profile-photo-button img,.photo-preview img { width:100%;height:100%;object-fit:cover;border-radius:50%; }
+.profile-photo-button b { position:absolute;right:-4px;bottom:0;background:#173d5f;color:#ffe7a4;border:2px solid white;border-radius:50%;font-size:19px;width:28px;height:28px; }
+.photo-preview { width:160px;height:160px;border-radius:50%;background:#e2edf4;display:grid;place-items:center;margin:0 auto 24px;font-size:38px;font-weight:800;overflow:hidden; }
+.lumi-wardrobe-invitation { background:#fff4d8;border:1px solid #e6d4aa;border-radius:22px;padding:22px;margin-bottom:24px;display:grid;gap:16px; }
+.lumi-wardrobe-invitation h2 { font-weight:800;font-size:21px;margin:7px 0; }
+.lumi-wardrobe-invitation p:not(.eyebrow) { font-size:14px;line-height:1.6;color:#4e6476; }
+.lumi-dressing-preview { background:radial-gradient(ellipse at 50% 30%,#254e78,#0b2043 75%);border-radius:22px;padding:10px 15px 18px;display:grid;place-items:center;color:#c5dcf1; }
+.lumi-dressing-preview .is-compact .constellation-mascot { width:220px;height:184px; }
+.lumi-dressing-preview span { font-size:12px;text-align:center; }
+.wardrobe-moods { display:flex;gap:8px;margin:12px 0 24px; }
+.wardrobe-moods button { min-height:44px;flex:1;border-radius:24px;background:#edf3f7;font-size:13px; }
+.wardrobe-moods [aria-pressed=true] { background:#173d5f;color:#ffe7a4; }
+.wardrobe-category { margin-bottom:24px; }
+.wardrobe-category legend { font-weight:800;margin-bottom:10px; }
+.wardrobe-category>div { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px; }
+.wardrobe-category button { min-height:64px;border:2px solid transparent;border-radius:15px;background:#edf3f7;padding:10px;font-size:13px;text-align:left;display:flex;align-items:center;gap:8px; }
+.wardrobe-category button span { font-size:24px;color:#346382; }
+.wardrobe-category [aria-pressed=true] { background:#fff1c7;border-color:#b7933e; }
+.lumi-tears { animation:lumi-teardrop 2.8s ease-in-out infinite; }
+@keyframes lumi-teardrop { 0%,100% {opacity:.5;transform:translateY(0)} 65% {opacity:1;transform:translateY(4px)} }
+@media(prefers-reduced-motion:reduce) { .lumi-tears {animation:none;} }
+
+.wardrobe-preview-zone { position:sticky;top:-24px;z-index:2;background:white;padding:12px 0 1px; }
+.wardrobe-preview-zone .lumi-dressing-preview .is-compact .constellation-mascot { width:172px;height:144px; }
+.wardrobe-preview-zone .wardrobe-moods { margin-bottom:12px; }
+.lumi-dressing-preview .streak-companion.is-compact { width:172px; height:144px; padding:0; }

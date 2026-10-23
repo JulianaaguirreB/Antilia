@@ -1,0 +1,31 @@
+const {chromium}=require('playwright');const assert=require('node:assert/strict');const fs=require('node:fs');
+const base='http://localhost:3103';
+(async()=>{const browser=await chromium.launch({channel:'chrome',headless:true});try{
+ const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const email=`style-${Date.now()}@example.com`;const password='PruebaEstilo2026';
+ const register=await page.request.post(base+'/api/auth/register',{data:{name:'Prueba Estilo',email,password}});assert.equal(register.status(),201);const {token}=await register.json();
+ await page.addInitScript(token=>{localStorage.setItem('antilia_token',token);sessionStorage.setItem('antilia_intro_seen','1')},token);
+ await page.goto(base+'/#/perfil');await page.getByRole('button',{name:'Cambiar foto de perfil',exact:true}).click();
+ const photo=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=800;c.height=600;const x=c.getContext('2d');x.fillStyle='#70b0cb';x.fillRect(0,0,800,600);x.fillStyle='#ffe390';x.fillRect(250,150,300,300);return c.toDataURL('image/png').split(',')[1]});
+ await page.locator('input[type=file]:not([capture])').setInputFiles({name:'foto.png',mimeType:'image/png',buffer:Buffer.from(photo,'base64')});
+ await page.getByAltText('Vista previa de tu foto').waitFor();assert.equal(await page.locator('input[capture=user]').count(),1);
+ await page.getByRole('button',{name:'Guardar foto',exact:true}).click();await page.getByAltText('Tu foto de perfil').waitFor();
+ await page.reload();await page.getByAltText('Tu foto de perfil').waitFor();
+ const headers={Authorization:`Bearer ${token}`};let me=await (await page.request.get(base+'/api/auth/me',{headers})).json();assert.ok(me.user.avatar_url.startsWith('data:image/jpeg;base64,'));
+ fs.mkdirSync('qa/evidencias/estilo',{recursive:true});await page.screenshot({path:'qa/evidencias/estilo/perfil.png',fullPage:true});
+ await page.goto(base+'/#/progreso');await page.getByRole('button',{name:'Vestir a Lumi',exact:true}).click();const modal=page.getByRole('dialog');
+ await modal.getByRole('button',{name:'Suéter rosa',exact:true}).click();await modal.getByRole('button',{name:'Melena rosa',exact:true}).click();await modal.getByRole('button',{name:'Corona dorada',exact:true}).click();
+ await modal.getByRole('button',{name:'Por encender',exact:true}).click();await modal.locator('.lumi-tears').waitFor();assert.equal(await modal.locator('[data-lumi-outfit=sweater][data-lumi-hair=pink][data-lumi-hat=crown]').count(),1);
+ await modal.locator('.lumi-dressing-preview').screenshot({path:'qa/evidencias/estilo/vestidor-triste.png'});await modal.getByRole('button',{name:'Encendida',exact:true}).click();assert.ok((await modal.locator('.constellation-mascot').boundingBox()).width>=170);await modal.locator('.lumi-dressing-preview').screenshot({path:'qa/evidencias/estilo/vestidor-feliz.png'});
+ await modal.getByRole('button',{name:'Guardar conjunto',exact:true}).click();await modal.waitFor({state:'hidden'});await page.reload();await page.locator('.progress-universe [data-lumi-hat=crown]').waitFor();
+ me=await (await page.request.get(base+'/api/auth/me',{headers})).json();assert.deepEqual(me.user.lumi_style,{outfit:'sweater',hair:'pink',hat:'crown'});assert.ok(me.user.avatar_url);
+ const relogin=await (await page.request.post(base+'/api/auth/login',{data:{email,password}})).json();assert.equal(relogin.user.lumi_style.hat,'crown');assert.ok(relogin.user.avatar_url);
+ const bad=await page.request.patch(base+'/api/auth/appearance',{headers,data:{lumi_style:{outfit:'bad',hair:'none',hat:'none'}}});assert.equal(bad.status(),400);
+ const xss=await page.request.patch(base+'/api/auth/appearance',{headers,data:{avatar_url:'data:image/svg+xml;base64,PHN2Zz4='}});assert.equal(xss.status(),400);
+ const noauth=await page.request.patch(base+'/api/auth/appearance',{data:{avatar_url:null}});assert.equal(noauth.status(),401);
+ const other=await (await page.request.post(base+'/api/auth/register',{data:{name:'Otra cuenta',email:`other-${Date.now()}@example.com`,password}})).json();const otherMe=await (await page.request.get(base+'/api/auth/me',{headers:{Authorization:`Bearer ${other.token}`}})).json();assert.equal(otherMe.user.avatar_url,null);assert.equal(otherMe.user.lumi_style.hat,'none');
+ const initialStreak=await (await page.request.get(base+'/api/streak',{headers})).json();assert.equal(initialStreak.streak.current_streak,0);
+ await page.request.patch(base+'/api/auth/appearance',{headers,data:{avatar_url:null}});me=await (await page.request.get(base+'/api/auth/me',{headers})).json();assert.equal(me.user.avatar_url,null);assert.equal(me.user.lumi_style.hat,'crown');
+ for(const width of [320,430]){await page.setViewportSize({width,height:844});await page.getByRole('button',{name:'Vestir a Lumi',exact:true}).click();assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.getByRole('button',{name:'Cerrar',exact:true}).click();}
+ assert.deepEqual(errors,[]);console.log('PASA: foto de galería, entrada de cámara, persistencia, eliminación, vestuario feliz/triste, aislamiento de cuentas, validación y tamaños móviles.');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

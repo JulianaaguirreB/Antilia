@@ -58,7 +58,7 @@ router.post("/login", async (req, res, next) => {
     }
 
     const result = await pool.query(
-      "SELECT id, name, email, password_hash, token_version FROM users WHERE email = $1",
+      "SELECT id, name, email, password_hash, token_version, avatar_url, lumi_style, created_at, email_verified_at FROM users WHERE email = $1",
       [email]
     );
     const user = result.rows[0];
@@ -75,7 +75,7 @@ router.post("/login", async (req, res, next) => {
     const token = signToken(user.id, user.token_version);
     res.json({
       token,
-      user: { id: user.id, name: user.name, email: user.email },
+      user: { id: user.id, name: user.name, email: user.email, avatar_url: user.avatar_url, lumi_style: user.lumi_style, created_at: user.created_at, email_verified_at: user.email_verified_at },
     });
   } catch (err) {
     next(err);
@@ -85,7 +85,7 @@ router.post("/login", async (req, res, next) => {
 router.get("/me", requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
-      "SELECT id, name, email, email_verified_at, updated_at, created_at FROM users WHERE id = $1",
+      "SELECT id, name, email, email_verified_at, avatar_url, lumi_style, updated_at, created_at FROM users WHERE id = $1",
       [req.userId]
     );
     if (result.rows.length === 0) {
@@ -113,7 +113,7 @@ router.patch('/me', requireAuth, route(async (req, res) => {
         await client.query('DELETE FROM email_verifications WHERE user_id = $1', [req.userId]);
         await client.query('UPDATE reminders SET enabled = false, updated_at = now() WHERE user_id = $1', [req.userId]);
       }
-      const result = await client.query('UPDATE users SET name = $1, email = $2, email_verified_at = CASE WHEN $3 THEN NULL ELSE email_verified_at END, updated_at = now() WHERE id = $4 RETURNING id, name, email, email_verified_at, created_at, updated_at', [name, email, changedEmail, req.userId]);
+      const result = await client.query('UPDATE users SET name = $1, email = $2, email_verified_at = CASE WHEN $3 THEN NULL ELSE email_verified_at END, updated_at = now() WHERE id = $4 RETURNING id, name, email, email_verified_at, avatar_url, lumi_style, created_at, updated_at', [name, email, changedEmail, req.userId]);
       return result.rows[0];
     });
     res.json({ user });
@@ -121,6 +121,28 @@ router.patch('/me', requireAuth, route(async (req, res) => {
     if (error.code === '23505') throw problem(409, 'Ya existe una cuenta con ese correo.');
     throw error;
   }
+}));
+
+router.patch('/appearance', requireAuth, route(async (req, res) => {
+  const input = body(req.body, ['avatar_url', 'lumi_style']);
+  if (input.avatar_url !== undefined && input.avatar_url !== null) {
+    if (typeof input.avatar_url !== 'string' || input.avatar_url.length > 350000 || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(input.avatar_url)) throw problem(400, 'Elige una foto JPG válida de hasta 250 KB.');
+    const bytes = Buffer.from(input.avatar_url.split(',')[1], 'base64');
+    if (bytes.length < 4 || bytes[0] !== 255 || bytes[1] !== 216 || bytes[bytes.length-2] !== 255 || bytes[bytes.length-1] !== 217) throw problem(400, 'La imagen no es un JPG válido.');
+  }
+  if (input.lumi_style !== undefined) {
+    const style = body(input.lumi_style, ['outfit', 'hair', 'hat']);
+    const options = { outfit: ['none','sweater','overalls','cape'], hair: ['none','curls','pink','silver'], hat: ['none','beanie','party','crown'] };
+    for (const key of Object.keys(options)) if (!options[key].includes(style[key])) throw problem(400, 'Elige las prendas disponibles en el vestidor.');
+  }
+  const result = await pool.query(`UPDATE users SET
+    avatar_url = CASE WHEN $2 THEN $3 ELSE avatar_url END,
+    lumi_style = CASE WHEN $4 THEN $5::jsonb ELSE lumi_style END,
+    updated_at = now() WHERE id = $1
+    RETURNING id, name, email, email_verified_at, avatar_url, lumi_style, created_at, updated_at`,
+    [req.userId, input.avatar_url !== undefined, input.avatar_url ?? null, input.lumi_style !== undefined, JSON.stringify(input.lumi_style ?? null)]);
+  if (!result.rows.length) throw problem(404, 'Usuario no encontrado.');
+  res.json({ user: result.rows[0] });
 }));
 
 module.exports = router;

@@ -1,3 +1,4 @@
+import { ProfilePhoto } from '../components/ProfilePhoto';
 import { ActionIcon } from '../../../shared/components/ActionIcon';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/context/AuthContext';
@@ -39,13 +40,6 @@ export function Account({ navigate }: AccountProps) {
 
   if (!user) return null;
 
-  const initials = user.name
-    .split(' ')
-    .slice(0, 2)
-    .map(n => n[0])
-    .join('')
-    .toUpperCase();
-
   return (
     <div className="min-h-dvh bg-bg-main pb-24">
       <div className="max-w-[480px] mx-auto px-4 pt-6">
@@ -54,9 +48,7 @@ export function Account({ navigate }: AccountProps) {
         </header>
 
         <div className="profile-passport bg-white p-6 rounded-[24px] shadow-sm border border-border-main flex flex-col items-center text-center mb-6">
-          <div className="w-20 h-20 bg-primary-soft text-primary rounded-full flex items-center justify-center text-2xl font-bold mb-4">
-            {initials}
-          </div>
+          <ProfilePhoto/>
           <h2 className="text-xl font-bold text-text-main mb-1">{user.name}</h2>
           <p className="text-text-secondary text-sm mb-4">{user.email}</p>
           <p className="text-xs text-text-secondary">

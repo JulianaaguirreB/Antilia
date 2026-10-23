@@ -1,3 +1,4 @@
+import { LumiWardrobe } from '../components/LumiWardrobe';
 import { ActionIcon } from '../../../shared/components/ActionIcon';
 import { useState, useEffect } from 'react';
 import { api, ApiError } from '../../../shared/api/client';
@@ -81,6 +82,7 @@ export function Progress({ navigate }: ProgressProps) {
           </p>
         </div>
 
+        <LumiWardrobe/>
         <section className="surface p-5 mb-6" aria-label="Actividad de los últimos siete días"><p className="eyebrow mb-2">Tu semana</p><h2 className="font-semibold mb-5">Últimos 7 días</h2><div className="grid grid-cols-7 gap-2">{week.map(day => <div key={day.key} className="text-center"><div className="h-24 flex items-end justify-center pb-2"><div className={`w-full max-w-8 rounded-lg ${day.count ? 'bg-primary' : 'bg-primary-soft'}`} style={{ height: `${day.count ? Math.max(12, day.count / Math.max(1,...week.map(d => d.count)) * 80) : 6}px` }} aria-label={`${day.date}: ${day.count} tareas`} /></div><span className="block text-xs text-text-secondary">{day.label}</span><strong className="text-xs">{day.count}</strong></div>)}</div><p className="text-xs text-text-secondary mt-4">Tareas completadas por día, hora de Bogotá.</p></section>
         <h3 className="font-semibold text-text-main mb-4">Total Completadas</h3>
         <div className="grid grid-cols-2 gap-4">
