@@ -121,3 +121,35 @@
 .antilia-world .auth-screen .auth-intro>p { font-size:13px; line-height:1.5; margin-top:10px; }
 .antilia-world .workspace-intro .eyebrow { font-size:10px; letter-spacing:.1em; margin-top:0; margin-bottom:8px; }
 .antilia-world .welcome-hero .text-primary {color:#ffe4a5;}
+/* Calm, compact wayfinding. Icons describe the action instead of pointing at it. */
+.action-icon { width:20px; height:20px; display:inline-block; vertical-align:middle; flex-shrink:0; margin-inline-end:8px; }
+.app-button { gap:9px; }
+.app-button .action-icon { margin:0; }
+.antilia-world .home-welcome { padding:8px 0 14px; background:transparent; border:0; border-radius:0; min-height:100px; }
+.antilia-world .home-welcome h1 { color:#173b5b; font-size:32px; line-height:1.15; }
+.antilia-world .home-welcome p { color:#4b687e; font-size:14px; }
+.antilia-world .home-welcome button { background:#183c5e; color:#fbe3a2; border-radius:22px; }
+.antilia-world .home-shell>section[aria-label="Accesos de organización"] { gap:10px; }
+.antilia-world .shortcut-card { display:grid; grid-template-columns:36px minmax(0,1fr); grid-template-rows:auto auto; align-content:center; column-gap:10px; min-height:106px; padding:14px; border:0; border-radius:17px; background:#deebf4; }
+.antilia-world .shortcut-card:nth-child(2n) { background:#f3e8c9; }
+.antilia-world .shortcut-card:nth-child(3) { background:#dce9ed; }
+.antilia-world .shortcut-card:nth-child(4) { background:#ede5d5; }
+.antilia-world .shortcut-card .shortcut-icon { grid-row:1 / 3; align-self:center; width:36px; height:36px; padding:7px; margin:0; background:transparent; color:#2c5775; border-radius:0; }
+.antilia-world .shortcut-card>.font-semibold { font-weight:800; font-size:14px; line-height:1.3; }
+.antilia-world .shortcut-card>.text-xs { margin-top:5px; font-size:11px; line-height:1.4; color:#4d6576; }
+.antilia-world .focus-invitation { border:0; background:#f8edcb; padding:19px; border-radius:20px; }
+.antilia-world .focus-orbit { width:46px; height:46px; border:0; background:#183e60; color:#f6db96; }
+.antilia-world .focus-orbit .action-icon { width:29px; height:29px; margin:0; }
+.antilia-world .explore-strip button { display:flex; align-items:center; gap:6px; min-height:48px; padding:10px 14px; border:0; background:#e2edf4; font-weight:750; }
+.antilia-world .explore-strip .action-icon { margin:0; width:18px; }
+.antilia-world .workspace-shortcuts>button { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:10px; min-height:110px; border:0; box-shadow:none; background:#e3edf4; font-size:15px; font-weight:800; }
+.antilia-world .workspace-shortcuts>button:nth-child(2) { background:#f3e7c7; }
+.antilia-world .workspace-shortcuts .action-icon { width:25px; height:25px; margin:0; }
+.antilia-world .inbox-door { border:0; border-radius:20px; }
+.antilia-world .inbox-door:nth-child(2) { border-radius:20px; }
+.antilia-world .desk-entry b { display:flex; align-items:center; gap:7px; }
+.antilia-world .desk-entry b .action-icon { width:17px; height:17px; margin:0; }
+.antilia-world .cosmic-heading .eyebrow { letter-spacing:.05em; }
+.antilia-world .app-nav { border-radius:25px; }
+.antilia-world .app-nav [aria-current=page] { background:#345873; border-radius:18px; }
+@media(max-width:360px) { .antilia-world .shortcut-card {grid-template-columns:30px minmax(0,1fr);gap:7px;padding:12px;min-height:105px;} .antilia-world .shortcut-card .shortcut-icon {width:30px;height:30px;padding:4px;} .antilia-world .shortcut-card>.font-semibold {font-size:13px;} .antilia-world .home-welcome h1 {font-size:28px;} }

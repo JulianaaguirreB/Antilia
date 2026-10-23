@@ -1,3 +1,4 @@
+import { ActionIcon } from './ActionIcon';
 import { InputHTMLAttributes, ReactNode, forwardRef, useId } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -70,7 +71,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             Cargando...
           </span>
         ) : (
-          children
+          typeof children==='string'?<><ActionIcon action={children}/><span>{children}</span></>:children
         )}
       </button>
     );

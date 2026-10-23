@@ -35,7 +35,7 @@ try {
   await page.getByRole('heading',{name:'Escritorio de pruebas'}).waitFor();
   check('Espacio físico creado y guardado');
   await snap('02-espacios');
-  await page.getByRole('button',{name:'Ver tareas →',exact:true}).click();
+  await page.getByRole('button',{name:'Ver tareas',exact:true}).click();
   await page.getByRole('button',{name:'Agregar tarea al espacio',exact:true}).click();
   await page.getByLabel('Título de la tarea',{exact:true}).fill('Ordenar documentos');
   await page.getByRole('button',{name:'Guardar tarea',exact:true}).click();
@@ -57,7 +57,7 @@ try {
   check('Correo como pendiente con enlace seguro, sin simular buzón');
   await snap('04-correos');
   await page.locator('nav').getByText('Correos y archivos',{exact:true}).click();
-  await page.getByRole('button',{name:'Mis pendientes →',exact:true}).click();
+  await page.getByRole('button',{name:'Mis pendientes',exact:true}).click();
   await page.getByRole('button',{name:'Empezar',exact:true}).click();
   await page.getByRole('button',{name:'En curso',exact:true}).click();
   await page.getByRole('heading',{name:'Revisar contrato por correo'}).waitFor();
@@ -100,10 +100,10 @@ try {
   await page.getByText('Racha más alta: 1 día',{exact:true}).waitFor();
   check('Organización nueva conserva la racha de un día');
   await snap('09-progreso');
-  await page.getByRole('button',{name:'Métricas y logros →',exact:true}).click();
+  await page.getByRole('button',{name:'Métricas y logros',exact:true}).click();
   await page.getByRole('heading',{name:'Métricas y logros',exact:true}).waitFor();
   await snap('10-metricas');
-  await page.getByRole('button',{name:'Medir si el desorden disminuye →',exact:true}).click();
+  await page.getByRole('button',{name:'Medir si el desorden disminuye',exact:true}).click();
   await page.getByLabel('Minutos buscando documentos hoy',{exact:true}).fill('12');
   await page.getByLabel('Objetos o archivos fuera de lugar',{exact:true}).fill('3');
   await page.getByLabel('Ancho despejado en cm (opcional)',{exact:true}).fill('54');
@@ -114,11 +114,11 @@ try {
   check('Medición manual guardada en servidor y conservada al recargar');
   await snap('11-medicion');
   await page.locator('nav').getByText('Progreso',{exact:true}).click();
-  await page.getByRole('button',{name:'Estado general →',exact:true}).click();
+  await page.getByRole('button',{name:'Estado general',exact:true}).click();
   await page.getByRole('heading',{name:'Estado general',exact:true}).waitFor();
   await snap('12-estado');
   await page.locator('nav').getByText('Perfil',{exact:true}).click();
-  await page.getByRole('button',{name:'Privacidad y datos →',exact:true}).click();
+  await page.getByRole('button',{name:'Privacidad y datos',exact:true}).click();
   await page.getByRole('heading',{name:'Privacidad y datos',exact:true}).waitFor();
   check('Métricas, estado general y privacidad accesibles desde navegación');
   await snap('13-privacidad');

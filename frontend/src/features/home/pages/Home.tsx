@@ -1,3 +1,4 @@
+import { ActionIcon } from '../../../shared/components/ActionIcon';
 import { DeskEntry } from '../../desk/components/DeskEntry';
 import { DailyCompass } from '../components/DailyCompass';
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -207,7 +208,7 @@ export function Home({ navigate }: HomeProps) {
         <header className="home-welcome mb-6 flex justify-between items-start gap-3">
           <div>
             <h1 className="text-2xl font-bold text-text-main">Hola, {firstName}</h1>
-            <p className="text-text-secondary text-sm mt-1">Tu espacio empieza contigo.</p>
+            <p className="text-text-secondary text-sm mt-1">¿Qué quieres ordenar hoy?</p>
           </div>
           <button 
             onClick={() => navigate('#/progreso')}
@@ -225,8 +226,8 @@ export function Home({ navigate }: HomeProps) {
         )}
 
         <DeskEntry navigate={navigate}/>
-        <button className="focus-invitation w-full text-left mb-5" onClick={()=>navigate('#/sesion')}><span className="focus-orbit" aria-hidden="true">✦</span><span><span className="eyebrow">Un respiro para tu espacio</span><strong className="block text-primary mt-1 text-lg">Cinco minutos de orden</strong><span className="text-xs text-text-secondary">Una tarea pequeña. Un cambio que se siente. →</span></span></button>
-        <section aria-label="Accesos de organización" className="grid grid-cols-2 gap-3 mb-6">{[['#/espacios','Tus espacios','Todo en su lugar','spaces'],['#/mi-escritorio','Escritorio 3D','Tres mesas para diseñar','desk'],['#/turnos','Tu agenda','Tiempo para lo importante','agenda'],['#/recordatorios','Recordatorios','Acompaña tu rutina','reminder']].map(([path,title,text,kind]) => <button key={path} className="shortcut-card surface p-4 text-left" onClick={() => navigate(path)}><span className="shortcut-icon block"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">{kind==='spaces'?<><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></>:kind==='desk'?<><path d="M3 14h18M5 14v7m14-7v7M8 4h8v7H8zM12 11v3"/></>:kind==='agenda'?<><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 2v6m10-6v6M3 11h18m-13 4h3m3 0h3"/></>:<><path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4zm5 3h4"/><path d="M12 2v2"/></>}</svg></span><span className="shortcut-arrow" aria-hidden="true">↗</span><span className="font-semibold block text-sm">{title}</span><span className="text-xs text-text-secondary mt-1 block">{text}</span></button>)}</section>
+        <button className="focus-invitation w-full text-left mb-5" onClick={()=>navigate('#/sesion')}><span className="focus-orbit" aria-hidden="true"><ActionIcon action="Empezar"/></span><span><span className="eyebrow">Un respiro para tu espacio</span><strong className="block text-primary mt-1 text-lg">Cinco minutos de orden</strong><span className="text-xs text-text-secondary">Una tarea pequeña. Un cambio que se siente.</span></span></button>
+        <section aria-label="Accesos de organización" className="grid grid-cols-2 gap-3 mb-6">{[['#/espacios','Tus espacios','Todo en su lugar','spaces'],['#/mi-escritorio','Escritorio 3D','Tres mesas para diseñar','desk'],['#/turnos','Tu agenda','Tiempo para lo importante','agenda'],['#/recordatorios','Recordatorios','Acompaña tu rutina','reminder']].map(([path,title,text,kind]) => <button key={path} className="shortcut-card surface p-4 text-left" onClick={() => navigate(path)}><span className="shortcut-icon block"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">{kind==='spaces'?<><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></>:kind==='desk'?<><path d="M3 14h18M5 14v7m14-7v7M8 4h8v7H8zM12 11v3"/></>:kind==='agenda'?<><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 2v6m10-6v6M3 11h18m-13 4h3m3 0h3"/></>:<><path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4zm5 3h4"/><path d="M12 2v2"/></>}</svg></span><span className="font-semibold block text-sm">{title}</span><span className="text-xs text-text-secondary mt-1 block">{text}</span></button>)}</section>
         <div className="hero-card mb-6">
           <p className="eyebrow mb-3">Tu enfoque de hoy</p>
           <div className="flex justify-between items-end mb-3">
@@ -246,8 +247,8 @@ export function Home({ navigate }: HomeProps) {
         </div>
 
         <DailyCompass key={user?.id} userId={user?.id || 'local'} completed={completedTodayCount} pending={tasks.filter(t=>['pendiente','en_progreso'].includes(t.status)).length} navigate={navigate}/>
-        <div className="flex items-center justify-between mb-3"><h2 className="font-bold text-lg">A tu ritmo</h2><span className="eyebrow">Explora</span></div>
-        <section className="explore-strip" aria-label="Más herramientas">{[['#/kanban','Tablero'],['#/medir-espacio','Medir espacio'],['#/correos','Correos'],['#/archivos','Archivos'],['#/metricas','Estadísticas']].map(([path,title])=><button key={path} onClick={()=>navigate(path)}>{title} ↗</button>)}</section>
+        <div className="flex items-center justify-between mb-3"><h2 className="font-bold text-lg">A mano, cuando lo necesites</h2><span className="eyebrow">Explora</span></div>
+        <section className="explore-strip" aria-label="Más herramientas">{[['#/kanban','Tablero'],['#/medir-espacio','Medir espacio'],['#/correos','Correos'],['#/archivos','Archivos'],['#/metricas','Estadísticas']].map(([path,title])=><button key={path} onClick={()=>navigate(path)}><ActionIcon action={path}/>{title}</button>)}</section>
         <div className="flex gap-2 mb-4 rounded-2xl bg-white p-1 border border-border-main/60"><button onClick={() => setView('hoy')} aria-pressed={view === 'hoy'} className={`flex-1 rounded-xl py-3 text-sm font-semibold ${view === 'hoy' ? 'bg-primary-soft text-primary' : 'text-text-secondary'}`}>Hoy</button><button onClick={() => setView('historial')} aria-pressed={view === 'historial'} className={`flex-1 rounded-xl py-3 text-sm font-semibold ${view === 'historial' ? 'bg-primary-soft text-primary' : 'text-text-secondary'}`}>Historial</button></div>
         <div className="mb-4"><Input id="task-search" label="Buscar tus tareas" placeholder="Escribe una palabra del título" value={search} onChange={e => setSearch(e.target.value)} type="search" /></div>
         <div className="flex gap-2 mb-6">

@@ -1,3 +1,4 @@
+import { ActionIcon } from '../../../shared/components/ActionIcon';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/context/AuthContext';
 import { api, ApiError } from '../../../shared/api/client';
@@ -64,7 +65,7 @@ export function Account({ navigate }: AccountProps) {
         </div>
 
         <Button variant="secondary" className="w-full mb-4" onClick={() => { setName(user.name); setEmail(user.email); setPassword(''); setError(''); setEditing(true); }}>Editar mis datos</Button>
-        <button className="surface p-4 text-left w-full mb-6 text-sm text-primary" onClick={() => navigate('#/verificar-correo')}>{user.email_verified_at ? 'Correo verificado ✓' : 'Verificar correo para recordatorios →'}</button>
+        <button className="surface p-4 text-left w-full mb-6 text-sm text-primary" onClick={() => navigate('#/verificar-correo')}><ActionIcon action="Correo"/>{user.email_verified_at ? 'Correo verificado ✓' : 'Verificar correo para recordatorios'}</button>
         <div className="bg-white p-5 rounded-[16px] shadow-sm border border-border-main flex justify-between items-center mb-8">
           <span className="font-medium text-text-main">Tareas hechas</span>
           <span className="text-xl font-bold text-primary">
@@ -72,7 +73,7 @@ export function Account({ navigate }: AccountProps) {
           </span>
         </div>
 
-        <div className="surface p-4 grid gap-2 mb-5"><h2 className="font-bold">Configuración</h2><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/recordatorios')}>Recordatorios y alertas →</button><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/privacidad')}>Privacidad y datos →</button></div>
+        <div className="surface p-4 grid gap-2 mb-5"><h2 className="font-bold">Configuración</h2><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/recordatorios')}><ActionIcon action="Recordatorios y alertas"/><span>Recordatorios y alertas</span></button><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/privacidad')}><ActionIcon action="Privacidad y datos"/><span>Privacidad y datos</span></button></div>
         <section className="surface p-5 mb-6"><p className="eyebrow mb-3">Cómo funciona tu racha</p><p className="text-sm text-text-secondary leading-relaxed">Completa una tarea cada día para mantenerla. Varias tareas en el mismo día cuentan como un solo día. Tu récord se conserva.</p><p className="mt-4 text-xs text-text-secondary">Tus tareas se guardan en tu cuenta y solo tú puedes consultarlas.</p></section>
         <Button 
           variant="secondary" 

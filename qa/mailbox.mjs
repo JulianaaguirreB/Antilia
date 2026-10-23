@@ -33,7 +33,7 @@ try {
  await page.reload();
  await page.getByRole('button',{name:'Actualizar correos',exact:true}).click();
  await page.getByText('2 mensajes revisados; 1 coincidencias guardadas o actualizadas.').waitFor();
- await page.getByRole('button',{name:'Leer y clasificar →'}).click();
+ await page.getByRole('button',{name:'Leer y clasificar'}).click();
  await page.getByText('Texto de correo <script>window.injected=true</script>',{exact:true}).waitFor();
  assert.equal(await page.evaluate(()=>window.injected),undefined);
  await page.getByLabel('Guardar en').selectOption('documentos');

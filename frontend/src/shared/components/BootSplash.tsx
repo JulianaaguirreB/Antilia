@@ -1,3 +1,4 @@
+import { ActionIcon } from './ActionIcon';
 import {useEffect,useRef,useState} from 'react';
 import {BroomArtwork} from './OrbitArtwork';
 export function introWasSeen(){try{return sessionStorage.getItem('antilia_intro_seen')==='1';}catch{return false;}}
@@ -22,6 +23,6 @@ export function BootSplash({ready,onDone}:{ready:boolean;onDone:()=>void}) {
       <p className="boot-status" role="status">{stage==='loading'?'Preparando tu espacio…':stage==='flight'?'Un poco de orden, un nuevo comienzo.':'the space is yours'}</p>
       <p className="boot-caption">{stage==='slogan'?'Haz espacio para lo que te importa.':'Antilia'}</p>
     </div>
-    <button ref={skip} className="boot-skip" onClick={finish}>Saltar bienvenida →</button>
+    <button ref={skip} className="boot-skip" onClick={finish}><ActionIcon action="Saltar bienvenida"/><span>Saltar bienvenida</span></button>
   </section>;
 }
