@@ -1,4 +1,5 @@
 require("dotenv").config();
+if (process.env.NODE_ENV !== "test") require("dotenv").config({ path: require("path").join(__dirname, "..", ".env.integrations") });
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -9,6 +10,7 @@ const { errorHandler } = require("./shared/middleware/error-handler");
 const app = express();
 
 app.use(cors());
+app.use("/api/auth/appearance", express.json({ limit: "512kb" }));
 app.use(express.json());
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) res.set('Cache-Control', 'no-store');

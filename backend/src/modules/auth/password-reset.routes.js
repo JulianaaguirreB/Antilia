@@ -20,7 +20,13 @@ router.post('/request', route(async (req, res) => {
     const token = crypto.randomBytes(32).toString('hex');
     const hash = crypto.createHash('sha256').update(token).digest('hex');
     await client.query("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES($1,$2,now()+interval '30 minutes') ON CONFLICT(user_id) DO UPDATE SET token_hash=EXCLUDED.token_hash,expires_at=EXCLUDED.expires_at,requested_at=now()", [userId, hash]);
-    await sendEmail({ to: email, subject: 'Recupera tu acceso a Antilia', text: `Tu código para recuperar el acceso es:\n${token}\n\nVence en 30 minutos. Si no lo pediste, ignora este mensaje.`, idempotencyKey: `reset-${userId}-${hash}` });
+    let link = '';
+    if (process.env.APP_URL) {
+      const address = new URL(process.env.APP_URL);
+      address.hash = '/recuperar?email=' + encodeURIComponent(email) + '&code=' + token;
+      link = '\n\nTambién puedes abrir este enlace:\n' + address.toString();
+    }
+    await sendEmail({ to: email, subject: 'Recupera tu acceso a Antilia', text: `Tu código para recuperar el acceso es:\n${token}\n\nVence en 30 minutos. Si no lo pediste, ignora este mensaje.${link}`, idempotencyKey: `reset-${userId}-${hash}` });
   });
   res.status(202).json({ message: 'Si existe una cuenta con ese correo, recibirás las instrucciones.' });
 }));

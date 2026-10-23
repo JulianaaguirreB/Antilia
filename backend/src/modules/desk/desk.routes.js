@@ -1,21 +1,14 @@
 const express=require('express');
 const {pool}=require('../../infrastructure/database/pool');
 const {requireAuth}=require('../../shared/middleware/auth');
-const {body}=require('../../shared/release2-validation');
-const {route,problem}=require('../../shared/http');
-const {validateString}=require('../../shared/validate');
+const {route}=require('../../shared/http');
+const {validateDesk}=require('./desk.validation');
 const router=express.Router();
 router.use(requireAuth);
-router.get('/',route(async(req,res)=>{const result=await pool.query('SELECT name,width_cm,depth_cm,layout,updated_at FROM desks WHERE user_id=$1',[req.userId]);res.json({desk:result.rows[0]||null});}));
+router.get('/',route(async(req,res)=>{const result=await pool.query('SELECT name,width_cm,depth_cm,height_cm,model,layout,updated_at FROM desks WHERE user_id=$1',[req.userId]);res.json({desk:result.rows[0]||null});}));
 router.put('/',route(async(req,res)=>{
- const input=body(req.body,['name','width_cm','depth_cm','layout']);
- const name=validateString(input.name,'name',1,80);
- for(const key of ['width_cm','depth_cm'])if(typeof input[key]!=='number'||!Number.isFinite(input[key])||input[key]<20||input[key]>1000)throw problem(400,'Las dimensiones deben estar entre 20 y 1000 cm.');
- if(!Array.isArray(input.layout)||input.layout.length>12)throw problem(400,'La distribución admite hasta 12 objetos.');
- const kinds=new Set(['monitor','lampara','planta','archivador','teclado']);
- const seen=new Set();
- const layout=input.layout.map(item=>{const value=body(item,['id','kind','x','y']);if(typeof value.id!=='string'||!/^[a-z0-9-]{1,40}$/.test(value.id)||seen.has(value.id)||!kinds.has(value.kind))throw problem(400,'Objeto de escritorio inválido.');seen.add(value.id);for(const key of ['x','y'])if(typeof value[key]!=='number'||!Number.isFinite(value[key])||value[key]<5||value[key]>95)throw problem(400,'Los objetos deben permanecer dentro del escritorio.');return {id:value.id,kind:value.kind,x:value.x,y:value.y};});
- const result=await pool.query('INSERT INTO desks(user_id,name,width_cm,depth_cm,layout) VALUES($1,$2,$3,$4,$5) ON CONFLICT(user_id) DO UPDATE SET name=EXCLUDED.name,width_cm=EXCLUDED.width_cm,depth_cm=EXCLUDED.depth_cm,layout=EXCLUDED.layout,updated_at=now() RETURNING name,width_cm,depth_cm,layout,updated_at',[req.userId,name,input.width_cm,input.depth_cm,JSON.stringify(layout)]);
+ const input=validateDesk(req.body);
+ const result=await pool.query('INSERT INTO desks(user_id,name,width_cm,depth_cm,layout,model,height_cm) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(user_id) DO UPDATE SET name=EXCLUDED.name,width_cm=EXCLUDED.width_cm,depth_cm=EXCLUDED.depth_cm,layout=EXCLUDED.layout,model=EXCLUDED.model,height_cm=EXCLUDED.height_cm,updated_at=now() RETURNING name,width_cm,depth_cm,height_cm,model,layout,updated_at',[req.userId,input.name,input.width_cm,input.depth_cm,JSON.stringify(input.layout),input.model,input.height_cm]);
  res.json({desk:result.rows[0]});
 }));
 module.exports=router;

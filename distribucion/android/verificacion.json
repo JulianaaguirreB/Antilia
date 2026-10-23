@@ -1,0 +1,18 @@
+{
+  "version": "0.3.1",
+  "versionCode": 3,
+  "package": "co.antilia.app",
+  "android_minimo": 7,
+  "sdk_minimo": 24,
+  "bytes": 9642273,
+  "sha256": "a62d9ec0cfa12da39383b1e69207ebcfa5548f5ab843232b9da3ae56d5925459",
+  "firma_verificada": true,
+  "alineacion_16KB": true,
+  "debuggable": false,
+  "api": "https://antilia-delta.vercel.app/api",
+  "plugins": [
+    "Browser",
+    "Camera"
+  ],
+  "instalacion_fisica": "pendiente"
+}

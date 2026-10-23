@@ -2,9 +2,11 @@
 
 Organiza tu espacio de trabajo, completa tus pendientes y construye un hábito de orden.
 
-Antilia es una aplicación para personal administrativo de oficinas medianas en Bogotá. Reúne tareas físicas y digitales, espacios, turnos y progreso personal en una interfaz pensada para celular. Está disponible en web y como cliente para iPhone.
+Antilia es una aplicación para personal administrativo de oficinas medianas en Bogotá. Reúne tareas físicas y digitales, espacios, turnos y progreso personal en una interfaz pensada para celular. Está disponible en web y como aplicación para Android e iPhone.
 
-**[Abrir Antilia](https://antilia-delta.vercel.app)** · **[Instalar en iPhone](distribucion/ios/README.md)** · **[Documentación](docs/README.md)**
+**[Abrir Antilia](https://antilia-delta.vercel.app)** · **[Descargar APK Android](https://antilia-delta.vercel.app/downloads/antilia.apk)** · **[Instalar en iPhone](distribucion/ios/README.md)** · **[Documentación](docs/README.md)**
+
+> Correo: Gmail de solo lectura y recuperación por SMTP activos en la URL pública. Se verificaron la importación de un mensaje relevante y la recepción del correo de recuperación. El piloto de Google permite dos cuentas de prueba; cada usuario debe autorizar su buzón. [Configuración](docs/desarrollo/correo-y-gmail.md).
 
 ## Release 2
 
@@ -25,14 +27,16 @@ El objetivo de este release es mejorar el producto con resultados de la validaci
 | Tareas físicas y digitales | Crear, editar, completar y archivar pendientes |
 | Tablero | Organizar tareas por estado y conservar los cambios |
 | Espacios | Crear espacios y asociarles tareas |
-| Mi escritorio | Guardar medidas y distribución, y recuperarlas al volver |
-| Medición con cámara | Estimar medidas usando una foto y una referencia de tamaño conocido |
+| Mi escritorio 3D | Elegir entre tres mesas, colocar tarjetas con nombres propios y guardar la distribución |
+| Medición con cámara | Estimar ancho y fondo corrigiendo la perspectiva con una referencia rectangular |
 | Agenda | Registrar turnos y evitar cruces de horario |
-| Progreso y Astra | Consultar estadísticas, racha y récord, con una mascota animada |
+| Progreso y Lumi | Consultar estadísticas, racha y récord, con una mascota animada |
 | Sesión de orden | Usar un temporizador de cinco minutos con pausa y recuperación al recargar |
 | Recordatorios | Guardar la configuración; el envío real requiere proveedor de correo y programador |
 
 El recorrido principal es: **crear cuenta → organizar una tarea → completarla → consultar la racha y el progreso**. El temporizador por sí solo no completa tareas ni concede una racha.
+
+La versión móvil 0.3.1 incorpora el rediseño inspirado en Lumi, bienvenida animada y navegación Correos y archivos, además de mesa recta, cajonera y mesa en L, hasta 24 tarjetas editables y medición de ancho y fondo. [Uso y límites de la cámara y del editor 3D](docs/ESCRITORIO_3D.md).
 
 ## Cambios candidatos a updates
 
@@ -145,7 +149,7 @@ Los recorridos de navegador y su preparación están en [qa/README.md](qa/README
 - Los correos reales de verificación, recuperación y recordatorios requieren configurar proveedor, remitente y, para recordatorios, ejecución programada.
 - Los recordatorios siguen un horario configurado; no aprenden hábitos automáticamente.
 - La cámara usa una referencia conocida para estimar medidas. No hace escaneo 3D ni detecta objetos automáticamente.
-- Los pendientes de correos y archivos no se sincronizan con Gmail ni con almacenamiento externo.
+- Los pendientes manuales siguen separados de Gmail. La nueva selección de correo requiere OAuth de Google y no está activada hasta configurarlo; los archivos no se sincronizan con almacenamiento externo.
 - Los datos se actualizan al consultar o realizar cambios; no hay sincronización instantánea entre dispositivos.
 - El IPA es una compilación sin firma que se instala con Sideloadly. Su versión está indicada en la guía; la instalación y los permisos deben comprobarse en un iPhone físico.
 

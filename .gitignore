@@ -8,3 +8,6 @@ dist/
 .vercel/
 qa/evidencias/
 *.tsbuildinfo
+.signing/
+*.jks
+*.keystore

@@ -1,6 +1,7 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { BootSplash, introWasSeen } from '../shared/components/BootSplash';
+import { Component, ErrorInfo, ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '../features/auth/context/AuthContext';
-import { useHashRoute } from './routing';
+import { useHashRoute, rememberLoginDestination, loginDestination, clearLoginDestination } from './routing';
 import { Auth } from '../features/auth/pages/Auth';
 import { Home } from '../features/home/pages/Home';
 import { Progress } from '../features/progress/pages/Progress';
@@ -17,7 +18,9 @@ import { Insights, MeasureSpace, Privacy } from '../features/insights/pages/Insi
 
 export function AppContent() {
   const { user, loading } = useAuth();
-  const { hash, navigate } = useHashRoute();
+  const { hash: fullHash, navigate } = useHashRoute();
+  const hash = fullHash.split('?')[0];
+  useEffect(()=>{if(user&&!loading&&!['#/acceso','#/registro','#/bienvenida','#/recuperar'].includes(hash))clearLoginDestination();},[user,loading,hash]);
 
   if (loading) {
     return (
@@ -29,12 +32,13 @@ export function AppContent() {
   const isAuthRoute = ['#/acceso', '#/registro', '#/recuperar', '#/bienvenida'].includes(hash);
   
   if (!user && !isAuthRoute) {
+    rememberLoginDestination(hash);
     navigate('#/acceso');
     return null;
   }
 
   if (user && ['#/acceso', '#/registro', '#/bienvenida'].includes(hash)) {
-    navigate('#/inicio');
+    navigate(loginDestination());
     return null;
   }
 
@@ -108,10 +112,17 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 }
 
 export function App() {
+  const {loading}=useAuth();
+  const {hash}=useHashRoute();
+  const [introComplete,setIntroComplete]=useState(introWasSeen);
+  const preserveStreak=hash.split('?')[0]==='#/progreso';
   return (
     <ErrorBoundary>
-      <InstallApp />
-      <AppContent />
+      {!introComplete&&<BootSplash ready={!loading} onDone={()=>setIntroComplete(true)}/>}
+      <div className={preserveStreak?'preserve-streak':'antilia-world'} inert={!introComplete}>
+        <InstallApp />
+        <AppContent />
+      </div>
     </ErrorBoundary>
   );
 }

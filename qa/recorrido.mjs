@@ -55,7 +55,7 @@ try {
   await page.waitForSelector('text=Hola, Usuario');
   comprobar(true, 'Después del registro se abre el panel principal');
   await captura(page, 'panel-vacio');
-  for (const [titulo, tipo] of [['Ordenar escritorio', 'Física'], ['Limpiar Descargas', 'Digital']]) {
+  for (const [titulo, tipo] of [['Ordenar escritorio', 'Física'], ['Limpiar Descargas', 'Correos y archivos']]) {
     await page.click('text=Nueva tarea');
     await page.fill('#new-task-title', titulo);
     await page.click(`label:has-text("${tipo}")`);
@@ -71,7 +71,7 @@ try {
   comprobar(await page.isVisible('text=1 de 2 tareas'), 'El progreso sube a 1 de 2');
   comprobar(await page.isVisible('text=Racha: 1'), 'La racha se ve en la pantalla principal');
   await captura(page, 'tarea-completada');
-  await page.click('button:has-text("Digitales")');
+  await page.click('button:has-text("Correos y archivos")');
   comprobar(!(await page.isVisible('text=Ordenar escritorio')), 'El filtro Digitales oculta las tareas físicas');
   await page.click('button:has-text("Todas")');
   await page.fill('#task-search', 'Limpiar');
@@ -94,7 +94,7 @@ try {
   await captura(page, 'perfil');
 
   await page.reload();
-  await page.waitForSelector('text=Mi Cuenta');
+  await page.waitForSelector('text=Este es tu espacio');
   comprobar(true, 'La sesión se mantiene al recargar');
 
   await page.click('text=Cerrar Sesión');

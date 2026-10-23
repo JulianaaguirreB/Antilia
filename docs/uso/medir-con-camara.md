@@ -1,13 +1,15 @@
 # Medir espacio con cámara
 
-En la app iPhone, abrir Espacios, Medir espacio y Tomar foto del espacio. El permiso de cámara se solicita al tocar ese botón. Si el permiso está denegado, revisar Ajustes del iPhone o elegir una foto. En web, el navegador ofrece su selector de imágenes y puede ofrecer tomar una foto.
+En Android e iPhone, abre **Espacios → Mi escritorio → Medir ancho y fondo con cámara**. La cámara nativa se solicita solo al tocar **Tomar foto de la mesa**; también puedes elegir una foto. En web, el selector del teléfono ofrece captura o biblioteca según el navegador. Si deniegas el permiso, puedes revisarlo en Ajustes o introducir las medidas manualmente.
 
-Colocar una regla sobre el escritorio y fotografiar desde arriba con buena luz, sin inclinar el celular. La regla y el ancho a medir deben estar sobre el mismo plano y ser paralelos. Escribir la longitud conocida en centímetros. Marcar cuatro puntos: extremos de la referencia y extremos del ancho despejado. Usar esta medida la copia al formulario; Guardar medición la guarda en el servidor con los minutos y el conteo manual de objetos.
+Coloca una hoja A4 plana sobre un tablero rectangular y fotografía todas sus esquinas con buena iluminación. Marca primero las cuatro esquinas de la referencia y después las cuatro del tablero, siempre en este orden: superior izquierda, superior derecha, inferior derecha e inferior izquierda. Introduce el tamaño correcto de la referencia; no presupongas que cualquier hoja es A4.
 
-El cálculo es longitud conocida multiplicada por la proporción entre ambos segmentos de la fotografía. Es una estimación y debe comprobarse con una regla física. No corrige perspectiva ni usa ARKit o LiDAR. No identifica objetos ni calcula automáticamente su cantidad. La foto no se sube al servidor; solo se guardan los valores que confirma el usuario.
+El resultado muestra ancho y fondo estimados. **Usar ancho y fondo** los aplica al escritorio; **Guardar escritorio** conserva ambas dimensiones y el diseño en tu cuenta. En **Medir espacio**, la misma herramienta permite copiar solo el ancho al registro de organización, junto con los minutos y conteos manuales.
 
-Prueba automatizada: fotografía sintética de dimensiones conocidas, referencia de 20 cm, ancho esperado de 60 cm, copia al formulario y persistencia después de recargar. La compilación para iPhone incluye las descripciones de permiso exigidas por iOS. La prueba física de captura, cancelación y permisos debe realizarse en el dispositivo antes de darla por aceptada.
+El cálculo corrige la perspectiva con una homografía plana y rechaza referencias degeneradas o esquinas incoherentes. No usa ARKit ni LiDAR, no identifica objetos y no determina su cantidad. Una referencia pequeña, una hoja doblada o la distorsión de la lente pueden alterar el resultado. Comprueba con una cinta métrica si necesitas precisión para instalar o comprar muebles. La foto se procesa localmente y no se sube al servidor.
 
-Para el piloto, registrar medida real con regla, medida estimada, diferencia, iluminación y posición del teléfono. No afirmar precisión validada antes de tener esos resultados.
+Para una mesa en L, mide el ancho y fondo exteriores e introdúcelos manualmente. En iPhone puedes usar **Medidas de Apple** y transcribir los centímetros al formulario: no hay transferencia automática entre ambas apps.
 
-Correo automático y recuperación de acceso siguen pendientes de una cuenta de correo transaccional y un remitente verificado. Tener la cámara disponible no configura esos servicios.
+Las pruebas `qa/desk-math.cjs` y `qa/desk3d.cjs` comprueban una fotografía sintética de 120 × 70 cm con perspectiva, la aplicación de ambos valores y su persistencia al recargar. Se verificó el guardado y el aislamiento por usuario en la API. Captura, cancelación y permisos siguen necesitando verificación en Android e iPhone físicos. Para el piloto, registra medida real, estimación, diferencia, iluminación y posición del teléfono; no atribuyas precisión validada antes de medirla.
+
+[Guía completa del editor 3D y sus límites](../ESCRITORIO_3D.md).

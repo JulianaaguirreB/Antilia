@@ -9,13 +9,13 @@ export function Navigation({ currentPath, navigate }: NavigationProps) {
   const items = [
     { id: '#/inicio', label: 'Inicio', icon: Icons.Home },
     { id: '#/espacios', label: 'Espacios', icon: Icons.Spaces },
-    { id: '#/digital', label: 'Digital', icon: Icons.Folder },
+    { id: '#/digital', label: 'Correos y archivos', icon: Icons.Folder },
     { id: '#/progreso', label: 'Progreso', icon: Icons.TrendingUp },
     { id: '#/perfil', label: 'Perfil', icon: Icons.User },
   ];
 
   return (
-    <nav aria-label="Navegación principal" className="fixed bottom-0 left-0 right-0 mx-auto max-w-[520px] bg-white/95 backdrop-blur-xl border-t border-border-main/60 pb-[env(safe-area-inset-bottom)] z-40">
+    <nav aria-label="Navegación principal" className="app-nav fixed bottom-0 left-0 right-0 mx-auto max-w-[520px] bg-white/95 backdrop-blur-xl border-t border-border-main/60 pb-[env(safe-area-inset-bottom)] z-40">
       <div className="max-w-[480px] mx-auto flex justify-around items-center h-20 px-2 gap-1 py-3">
         {items.map((item) => {
           const isActive = currentPath === item.id;
@@ -30,7 +30,7 @@ export function Navigation({ currentPath, navigate }: NavigationProps) {
               }`}
             >
               <Icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />
-              <span className={`text-[12px] ${isActive ? 'font-medium' : 'font-normal'}`}>
+              <span className={`nav-label text-[12px] ${isActive ? 'font-medium' : 'font-normal'}`}>
                 {item.label}
               </span>
             </button>

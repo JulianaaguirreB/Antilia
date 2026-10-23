@@ -2,6 +2,8 @@
 
 ## Producto
 
+- [Diseño del universo de Lumi](producto/diseno-lumi.md): lenguaje visual, bienvenida y nombres de navegación.
+
 - [Diseño y alcance](producto/diseno-y-alcance.md): pantallas, recorrido principal y límites de las funciones.
 
 ## Instalación
@@ -12,9 +14,13 @@
 
 ## Uso
 
+- [Escritorio 3D](ESCRITORIO_3D.md): tres modelos, tarjetas editables y medición de ancho y fondo.
+
 - [Medir con cámara](uso/medir-con-camara.md): referencia de tamaño, permisos y límites de la medición.
 
 ## Desarrollo y pruebas
+
+- [Correo real y Gmail](desarrollo/correo-y-gmail.md): configuración del remitente, permisos de Google y límites de selección.
 
 - [Arquitectura](desarrollo/arquitectura.md): responsabilidades, dependencias y ubicación de cada función.
 

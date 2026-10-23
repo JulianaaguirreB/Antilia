@@ -1,3 +1,4 @@
+import { ActionIcon } from './ActionIcon';
 import { InputHTMLAttributes, ReactNode, forwardRef, useId } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -46,9 +47,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, variant = 'primary', loading, className = '', disabled, ...props }, ref) => {
-    const baseStyles = 'min-h-13 px-5 py-3 font-semibold text-base rounded-[16px] transition-colors flex items-center justify-center select-none';
+    const baseStyles = 'app-button min-h-13 px-5 py-3 font-semibold text-base rounded-[16px] transition-colors flex items-center justify-center select-none';
     const variants = {
-      primary: 'bg-primary text-white hover:bg-primary-hover active:bg-primary-hover disabled:bg-primary/50 disabled:cursor-not-allowed',
+      primary: 'app-button-primary bg-primary text-white hover:bg-primary-hover active:bg-primary-hover disabled:bg-primary/50 disabled:cursor-not-allowed',
       secondary: 'bg-primary-soft text-primary hover:bg-primary/20 active:bg-primary/30 disabled:opacity-50 disabled:cursor-not-allowed',
       danger: 'bg-error text-white hover:bg-error/90 active:bg-error/80 disabled:opacity-50 disabled:cursor-not-allowed',
     };
@@ -70,7 +71,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             Cargando...
           </span>
         ) : (
-          children
+          typeof children==='string'?<><ActionIcon action={children}/><span>{children}</span></>:children
         )}
       </button>
     );

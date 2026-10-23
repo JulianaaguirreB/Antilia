@@ -1,3 +1,5 @@
+import { ProfilePhoto } from '../components/ProfilePhoto';
+import { ActionIcon } from '../../../shared/components/ActionIcon';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/context/AuthContext';
 import { api, ApiError } from '../../../shared/api/client';
@@ -38,24 +40,15 @@ export function Account({ navigate }: AccountProps) {
 
   if (!user) return null;
 
-  const initials = user.name
-    .split(' ')
-    .slice(0, 2)
-    .map(n => n[0])
-    .join('')
-    .toUpperCase();
-
   return (
     <div className="min-h-dvh bg-bg-main pb-24">
       <div className="max-w-[480px] mx-auto px-4 pt-6">
-        <header className="mb-8">
-          <p className="eyebrow mb-2">Tu espacio personal</p><h1 className="text-2xl font-bold text-text-main">Mi Cuenta</h1><p className="text-text-secondary text-sm mt-2">Tu información y lo que has logrado.</p>
+        <header className="cosmic-heading profile-heading mb-6">
+          <p className="eyebrow mb-2">Tu espacio personal</p><h1 className="text-2xl font-bold text-text-main">Este es tu espacio</h1><p className="text-text-secondary text-sm mt-2">Lo que has cuidado, lo que has logrado y lo que viene.</p>
         </header>
 
-        <div className="bg-white p-6 rounded-[24px] shadow-sm border border-border-main flex flex-col items-center text-center mb-6">
-          <div className="w-20 h-20 bg-primary-soft text-primary rounded-full flex items-center justify-center text-2xl font-bold mb-4">
-            {initials}
-          </div>
+        <div className="profile-passport bg-white p-6 rounded-[24px] shadow-sm border border-border-main flex flex-col items-center text-center mb-6">
+          <ProfilePhoto/>
           <h2 className="text-xl font-bold text-text-main mb-1">{user.name}</h2>
           <p className="text-text-secondary text-sm mb-4">{user.email}</p>
           <p className="text-xs text-text-secondary">
@@ -64,7 +57,7 @@ export function Account({ navigate }: AccountProps) {
         </div>
 
         <Button variant="secondary" className="w-full mb-4" onClick={() => { setName(user.name); setEmail(user.email); setPassword(''); setError(''); setEditing(true); }}>Editar mis datos</Button>
-        <button className="surface p-4 text-left w-full mb-6 text-sm text-primary" onClick={() => navigate('#/verificar-correo')}>{user.email_verified_at ? 'Correo verificado ✓' : 'Verificar correo para recordatorios →'}</button>
+        <button className="surface p-4 text-left w-full mb-6 text-sm text-primary" onClick={() => navigate('#/verificar-correo')}><ActionIcon action="Correo"/>{user.email_verified_at ? 'Correo verificado ✓' : 'Verificar correo para recordatorios'}</button>
         <div className="bg-white p-5 rounded-[16px] shadow-sm border border-border-main flex justify-between items-center mb-8">
           <span className="font-medium text-text-main">Tareas hechas</span>
           <span className="text-xl font-bold text-primary">
@@ -72,7 +65,7 @@ export function Account({ navigate }: AccountProps) {
           </span>
         </div>
 
-        <div className="surface p-4 grid gap-2 mb-5"><h2 className="font-bold">Configuración</h2><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/recordatorios')}>Recordatorios y alertas →</button><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/privacidad')}>Privacidad y datos →</button></div>
+        <div className="surface p-4 grid gap-2 mb-5"><h2 className="font-bold">Configuración</h2><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/recordatorios')}><ActionIcon action="Recordatorios y alertas"/><span>Recordatorios y alertas</span></button><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/privacidad')}><ActionIcon action="Privacidad y datos"/><span>Privacidad y datos</span></button></div>
         <section className="surface p-5 mb-6"><p className="eyebrow mb-3">Cómo funciona tu racha</p><p className="text-sm text-text-secondary leading-relaxed">Completa una tarea cada día para mantenerla. Varias tareas en el mismo día cuentan como un solo día. Tu récord se conserva.</p><p className="mt-4 text-xs text-text-secondary">Tus tareas se guardan en tu cuenta y solo tú puedes consultarlas.</p></section>
         <Button 
           variant="secondary" 

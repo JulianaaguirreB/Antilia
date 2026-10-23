@@ -1,0 +1,13 @@
+{
+  "version": "0.3.1",
+  "build": "13",
+  "bundle": "co.antilia.app",
+  "minimum_ios": "15.0",
+  "architecture": "arm64",
+  "sha256": "9338d7e8cee103fa79808f567decd790c7d13682d75006b7fecb24b753736c5d",
+  "bytes": 5359561,
+  "signed": false,
+  "source_commit": "dc11773",
+  "workflow_run": 39969243179,
+  "installation_on_device": "pending"
+}
