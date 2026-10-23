@@ -2,7 +2,7 @@
 
 [Descargar APK](https://antilia-delta.vercel.app/downloads/antilia.apk) · [Huella SHA-256](https://antilia-delta.vercel.app/downloads/antilia.sha256)
 
-Versión 0.3.0, compilación 2. Requiere Android 7 o posterior e internet. Conserva la firma anterior para actualizar sin desinstalar. Incluye tres mesas 3D, tarjetas personalizables, medición de ancho y fondo con corrección de perspectiva y Lumi. Se conecta a la API pública de Antilia y a los datos existentes de cada cuenta: tareas, recuperación por correo y acceso a Gmail para los usuarios autorizados del piloto.
+Versión 0.3.1, compilación 3. Requiere Android 7 o posterior e internet. Conserva la firma anterior para actualizar sin desinstalar. Incluye la nueva interfaz inspirada en Lumi, bienvenida animada y navegación Correos y archivos, además de tres mesas 3D, tarjetas personalizables, medición de ancho y fondo con corrección de perspectiva y Lumi. Se conecta a la API pública de Antilia y a los datos existentes de cada cuenta: tareas, recuperación por correo y acceso a Gmail para los usuarios autorizados del piloto.
 
 1. Abre la web de Antilia desde el teléfono Android y pulsa **Descargar Antilia para Android (APK)**.
 2. Abre el archivo descargado. Si Android lo solicita, permite que ese navegador instale el archivo y confirma la instalación.

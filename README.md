@@ -36,7 +36,7 @@ El objetivo de este release es mejorar el producto con resultados de la validaci
 
 El recorrido principal es: **crear cuenta → organizar una tarea → completarla → consultar la racha y el progreso**. El temporizador por sí solo no completa tareas ni concede una racha.
 
-La versión móvil 0.3.0 incorpora mesa recta, cajonera y mesa en L, hasta 24 tarjetas editables y medición de ancho y fondo. [Uso y límites de la cámara y del editor 3D](docs/ESCRITORIO_3D.md).
+La versión móvil 0.3.1 incorpora el rediseño inspirado en Lumi, bienvenida animada y navegación Correos y archivos, además de mesa recta, cajonera y mesa en L, hasta 24 tarjetas editables y medición de ancho y fondo. [Uso y límites de la cámara y del editor 3D](docs/ESCRITORIO_3D.md).
 
 ## Cambios candidatos a updates
 
