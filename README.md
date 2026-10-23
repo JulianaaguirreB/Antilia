@@ -2,7 +2,7 @@
 
 Organiza tu espacio de trabajo, completa tus pendientes y construye un hábito de orden.
 
-Antilia es una aplicación para personal administrativo de oficinas medianas en Bogotá. Reúne tareas físicas y digitales, espacios, turnos y progreso personal en una interfaz pensada para celular. Está disponible en web y como cliente para iPhone.
+Antilia es una aplicación para personal administrativo de oficinas medianas en Bogotá. Reúne tareas físicas y digitales, espacios, turnos y progreso personal en una interfaz pensada para celular. Está disponible en web y como aplicación para Android e iPhone.
 
 **[Abrir Antilia](https://antilia-delta.vercel.app)** · **[Descargar APK Android](https://antilia-delta.vercel.app/downloads/antilia.apk)** · **[Instalar en iPhone](distribucion/ios/README.md)** · **[Documentación](docs/README.md)**
 
@@ -27,14 +27,16 @@ El objetivo de este release es mejorar el producto con resultados de la validaci
 | Tareas físicas y digitales | Crear, editar, completar y archivar pendientes |
 | Tablero | Organizar tareas por estado y conservar los cambios |
 | Espacios | Crear espacios y asociarles tareas |
-| Mi escritorio | Guardar medidas y distribución, y recuperarlas al volver |
-| Medición con cámara | Estimar medidas usando una foto y una referencia de tamaño conocido |
+| Mi escritorio 3D | Elegir entre tres mesas, colocar tarjetas con nombres propios y guardar la distribución |
+| Medición con cámara | Estimar ancho y fondo corrigiendo la perspectiva con una referencia rectangular |
 | Agenda | Registrar turnos y evitar cruces de horario |
-| Progreso y Astra | Consultar estadísticas, racha y récord, con una mascota animada |
+| Progreso y Lumi | Consultar estadísticas, racha y récord, con una mascota animada |
 | Sesión de orden | Usar un temporizador de cinco minutos con pausa y recuperación al recargar |
 | Recordatorios | Guardar la configuración; el envío real requiere proveedor de correo y programador |
 
 El recorrido principal es: **crear cuenta → organizar una tarea → completarla → consultar la racha y el progreso**. El temporizador por sí solo no completa tareas ni concede una racha.
+
+La versión móvil 0.3.0 incorpora mesa recta, cajonera y mesa en L, hasta 24 tarjetas editables y medición de ancho y fondo. [Uso y límites de la cámara y del editor 3D](docs/ESCRITORIO_3D.md).
 
 ## Cambios candidatos a updates
 

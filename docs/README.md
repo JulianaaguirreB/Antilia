@@ -12,6 +12,8 @@
 
 ## Uso
 
+- [Escritorio 3D](ESCRITORIO_3D.md): tres modelos, tarjetas editables y medición de ancho y fondo.
+
 - [Medir con cámara](uso/medir-con-camara.md): referencia de tamaño, permisos y límites de la medición.
 
 ## Desarrollo y pruebas

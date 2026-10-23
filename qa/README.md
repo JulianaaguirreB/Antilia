@@ -28,8 +28,12 @@ Ejecuta los archivos desde la raíz del repositorio. El entorno de prueba del Re
 | `recorrido.mjs` | Recorrido original en tamaño de celular |
 | `recorrido-release2.mjs` | Integración de los módulos del Release 2 |
 | `instalacion.mjs` | Manifiesto, instalación web y recursos sin conexión |
-| `camara.mjs` | Medición con una foto de referencia y guardado |
-| `escritorio-mascota.mjs` | Guardado del escritorio y estados de la mascota |
+| `desk-math.cjs` | Corrección de perspectiva y límites del tablero en L |
+| `desk3d.cjs` | Tres mesas 3D, tarjetas, cámara y guardado real |
+| `desk-fallback.cjs` | Vista amplia y alternativa sin WebGL, con datos simulados |
+| `lumi.cjs` | Emociones, colores, racha y movimiento reducido de Lumi |
+| `camara.mjs` | Entrada compatible para el recorrido actualizado de cámara y escritorio |
+| `escritorio-mascota.mjs` | Recorridos actualizados del escritorio y de Lumi |
 | `sesion.mjs` | Temporizador, pausa, recarga y tarea completada |
 | `mailbox.mjs` | Bandeja simulada, lectura segura, categorías, desconexión y recuperación sin proveedor |
 
