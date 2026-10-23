@@ -1,0 +1,35 @@
+# Documentación de Antilia
+
+## Producto
+
+- [Diseño del universo de Lumi](producto/diseno-lumi.md): lenguaje visual, bienvenida y nombres de navegación.
+
+- [Diseño y alcance](producto/diseno-y-alcance.md): pantallas, recorrido principal y límites de las funciones.
+
+## Instalación
+
+- [Web instalable](instalacion/web-instalable.md): acceso desde el navegador y pantalla de inicio.
+- [iPhone con Sideloadly](instalacion/iphone-sideloadly.md): instalación del IPA.
+- [IPA disponible](../distribucion/ios/README.md): archivo, versión y comprobación de integridad.
+
+## Uso
+
+- [Escritorio 3D](ESCRITORIO_3D.md): tres modelos, tarjetas editables y medición de ancho y fondo.
+
+- [Medir con cámara](uso/medir-con-camara.md): referencia de tamaño, permisos y límites de la medición.
+
+## Desarrollo y pruebas
+
+- [Correo real y Gmail](desarrollo/correo-y-gmail.md): configuración del remitente, permisos de Google y límites de selección.
+
+- [Arquitectura](desarrollo/arquitectura.md): responsabilidades, dependencias y ubicación de cada función.
+
+- [Ejecución y despliegue](desarrollo/ejecucion-y-despliegue.md): requisitos, comandos, API y publicación.
+- [Backend](desarrollo/backend.md): servicios y funciones del Release 2.
+- [Pruebas de recorridos](../qa/README.md): preparación y comprobaciones de la app.
+
+## Entregas
+
+- [Seguimiento del Release 2](entregas/release2.md): estado registrado para esa entrega; no reemplaza las pruebas de la versión actual.
+
+[Volver al proyecto](../README.md)
