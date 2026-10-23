@@ -2,6 +2,8 @@
 
 ## Producto
 
+- [Diseño del universo de Lumi](producto/diseno-lumi.md): lenguaje visual, bienvenida y nombres de navegación.
+
 - [Diseño y alcance](producto/diseno-y-alcance.md): pantallas, recorrido principal y límites de las funciones.
 
 ## Instalación
