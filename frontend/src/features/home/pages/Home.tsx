@@ -1,3 +1,4 @@
+import { WelcomeEmailNotice } from '../../auth/pages/WelcomeEmailNotice';
 import { ActionIcon } from '../../../shared/components/ActionIcon';
 import { DeskEntry } from '../../desk/components/DeskEntry';
 import { DailyCompass } from '../components/DailyCompass';
@@ -205,7 +206,7 @@ export function Home({ navigate }: HomeProps) {
     <div className="min-h-dvh bg-bg-main pb-[calc(140px+env(safe-area-inset-bottom))]">
       <div className="home-shell max-w-[480px] mx-auto px-5 pt-6">
         <div className="flex items-center justify-between mb-6"><div className="flex items-center gap-2"><img src="/icons/icon-192.png" alt="" className="brand-mark !w-8 !h-8 !text-lg !rounded-xl"/><span className="font-bold text-lg">antilia.</span></div><span className="home-date">{new Intl.DateTimeFormat('es-CO', {weekday:'short',day:'numeric',month:'short',timeZone:'America/Bogota'}).format(new Date())}</span></div>
-        <header className="home-welcome mb-6 flex justify-between items-start gap-3">
+        <WelcomeEmailNotice/><header className="home-welcome mb-6 flex justify-between items-start gap-3">
           <div>
             <h1 className="text-2xl font-bold text-text-main">Hola, {firstName}</h1>
             <p className="text-text-secondary text-sm mt-1">¿Qué quieres ordenar hoy?</p>

@@ -5,7 +5,7 @@ import { Input, Button } from '../../../shared/components/ui';
 import { validateEmail, validatePassword, validateName } from '../../../shared/lib/validation';
 import { OrbitArtwork } from '../../../shared/components/OrbitArtwork';
 import { Icons } from '../../../shared/components/Icons';
-import { loginDestination } from '../../../app/routing';
+import { replaceRoute, loginDestination } from '../../../app/routing';
 
 interface AuthProps {
   isRegister: boolean;
@@ -65,6 +65,7 @@ export function Auth({ isRegister, navigate }: AuthProps) {
           body: JSON.stringify({ name: name.trim(), email: email.trim().toLowerCase(), password }),
         });
         login(res.token, res.user);
+        if (isRegister) sessionStorage.setItem('antilia_welcome_email', res.welcome_email || 'failed');
       } else {
         const res = await api('/auth/login', {
           method: 'POST',
@@ -72,9 +73,7 @@ export function Auth({ isRegister, navigate }: AuthProps) {
         });
         login(res.token, res.user);
       }
-      const meRes = await api<{ user: any }>('/auth/me');
-      login(localStorage.getItem('antilia_token') || '', meRes.user);
-      navigate(destination);
+      replaceRoute(destination);
     } catch (err) {
       if (err instanceof ApiError) {
         setGlobalError(err.message);

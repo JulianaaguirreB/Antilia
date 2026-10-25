@@ -1,3 +1,4 @@
+import { replaceRoute } from '../../../app/routing';
 import { ProfilePhoto } from '../components/ProfilePhoto';
 import { ActionIcon } from '../../../shared/components/ActionIcon';
 import { useState, useEffect } from 'react';
@@ -37,7 +38,7 @@ export function Account({ navigate }: AccountProps) {
 
   const handleLogout = () => {
     logout();
-    navigate('#/acceso');
+    replaceRoute('#/acceso');
   };
 
   if (!user) return null;
@@ -79,7 +80,7 @@ export function Account({ navigate }: AccountProps) {
         </Button>
       </div>
 
-      {confirmLogout && <div className="fixed inset-0 z-50 bg-[#17132c]/40 backdrop-blur-sm grid place-items-center p-5"><div role="alertdialog" aria-modal="true" aria-labelledby="logout-title" className="surface p-6 max-w-sm w-full"><h2 id="logout-title" className="text-xl font-bold mb-2">¿Cerrar tu sesión?</h2><p className="text-sm text-text-secondary mb-5">Tus tareas seguirán guardadas. Puedes volver cuando quieras.</p><div className="flex gap-3"><Button autoFocus variant="secondary" onClick={() => setConfirmLogout(false)}>Cancelar</Button><Button onClick={handleLogout}>Salir</Button></div></div></div>}
+      {confirmLogout && <div className="fixed inset-0 z-50 bg-[#17132c]/40 backdrop-blur-sm grid place-items-center p-5"><div role="alertdialog" aria-modal="true" aria-labelledby="logout-title" onKeyDown={event => { if(event.key === 'Escape') setConfirmLogout(false); }} className="surface p-6 max-w-sm w-full"><h2 id="logout-title" className="text-xl font-bold mb-2">¿Cerrar tu sesión?</h2><p className="text-sm text-text-secondary mb-5">Tus tareas seguirán guardadas. Puedes volver cuando quieras.</p><div className="flex gap-3"><Button autoFocus variant="secondary" onClick={() => setConfirmLogout(false)}>Cancelar</Button><Button onClick={handleLogout}>Salir</Button></div></div></div>}
       {editing && <Modal title="Editar mis datos" busy={saving} onClose={() => setEditing(false)}><form className="grid gap-4" onSubmit={async e => { e.preventDefault(); const validation = validateName(name) || validateEmail(email); setError(validation || ''); if (validation) return; setSaving(true); try { const result = await api<{ user: typeof user }>('/auth/me', { method: 'PATCH', body: JSON.stringify({ name, email, ...(email.trim().toLowerCase() !== user.email ? { current_password: password } : {}) }) }); login(localStorage.getItem('antilia_token') || '', result.user); setEditing(false); } catch (err) { setError((err as Error).message); } finally { setSaving(false); } }}><Input label="Nombre completo" value={name} maxLength={80} required onChange={e => setName(e.target.value)}/><Input label="Correo Electrónico" value={email} type="email" required onChange={e => setEmail(e.target.value)}/>{email.trim().toLowerCase() !== user.email && <><Input label="Contraseña actual" type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)}/><Notice>Al cambiar el correo, los recordatorios se pausarán hasta que verifiques el nuevo.</Notice></>}{error && <Notice error>{error}</Notice>}<Button loading={saving}>Guardar datos</Button></form></Modal>}
       <Navigation currentPath="#/perfil" navigate={navigate} />
     </div>

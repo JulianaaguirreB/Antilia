@@ -16,6 +16,7 @@ export function TaskSheet(props: Props) {
     document.body.style.overflow = 'hidden';
     props.titleRef.current?.focus();
     const keydown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { if (!props.creating) props.onClose(); return; }
       if (e.key !== 'Tab') return;
       const controls = dialog.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled)');
       if (!controls?.length) return;
@@ -25,8 +26,8 @@ export function TaskSheet(props: Props) {
     };
     document.addEventListener('keydown', keydown);
     return () => { document.body.style.overflow = overflow; document.removeEventListener('keydown', keydown); previous?.focus(); };
-  }, []);
-  return <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#17132c]/40 backdrop-blur-sm px-0 sm:px-4" onClick={props.onClose}>
+  }, [props.creating, props.onClose]);
+  return <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#17132c]/40 backdrop-blur-sm px-0 sm:px-4" onClick={() => { if (!props.creating) props.onClose(); }}>
     <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="task-sheet-title" className="w-full max-w-[480px] max-h-[90dvh] overflow-y-auto bg-white rounded-t-[28px] sm:rounded-[28px] p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]" onClick={e => e.stopPropagation()}>
       <div className="flex justify-between items-start mb-5"><div><p className="eyebrow mb-2">Un paso a la vez</p><h2 id="task-sheet-title" className="text-2xl font-bold">Nueva Tarea</h2></div><button type="button" onClick={props.onClose} disabled={props.creating} aria-label="Cerrar formulario" className="h-11 w-11 rounded-full bg-bg-main text-xl">×</button></div>
       <form onSubmit={props.onSubmit} noValidate className="flex flex-col gap-5">

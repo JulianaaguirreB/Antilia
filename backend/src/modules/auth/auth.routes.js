@@ -1,3 +1,4 @@
+const { welcomeEmail } = require('../../infrastructure/mail/welcome');
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -33,7 +34,8 @@ router.post("/register", async (req, res, next) => {
     const user = result.rows[0];
 
     const token = signToken(user.id);
-    res.status(201).json({ token, user });
+    const welcome_email = await welcomeEmail(user.id).catch(() => 'failed');
+    res.status(201).json({ token, user, welcome_email });
   } catch (err) {
     if (err.code === '23505') {
       return res.status(409).json({ error: "Ya existe una cuenta con ese correo." });
@@ -41,6 +43,11 @@ router.post("/register", async (req, res, next) => {
     next(err);
   }
 });
+
+router.post('/welcome-email', requireAuth, route(async (req, res) => {
+  if (!req.body || Array.isArray(req.body) || typeof req.body !== 'object' || Object.keys(req.body).length) throw problem(400, 'Esta acción no recibe campos.');
+  res.json({ welcome_email: await welcomeEmail(req.userId, true) });
+}));
 
 router.post("/login", async (req, res, next) => {
   try {

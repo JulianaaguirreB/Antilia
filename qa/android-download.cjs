@@ -11,7 +11,7 @@ const base = process.env.BASE_URL || 'http://localhost:3102';
     await page.goto(base + '/#/acceso');
     const apk = page.getByRole('link', { name: 'Descargar Antilia para Android (APK)', exact: true });
     await apk.waitFor();
-    assert.equal(await apk.getAttribute('href'), '/downloads/antilia.apk?v=5');
+    assert.equal(await apk.getAttribute('href'), '/downloads/antilia.apk?v=6');
     assert.equal(await apk.getAttribute('download'), 'Antilia-Android.apk');
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     const file = await page.request.get(base + '/downloads/antilia.apk');

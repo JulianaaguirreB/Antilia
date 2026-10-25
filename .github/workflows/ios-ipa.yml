@@ -48,7 +48,7 @@ jobs:
           (target / 'Contents.json').write_text(json.dumps({'images': [{'filename': 'AppIcon.png', 'idiom': 'universal', 'platform': 'ios', 'size': '1024x1024'}], 'info': {'author': 'xcode', 'version': 1}}))
           plist = Path('ios/App/App/Info.plist')
           settings = plistlib.loads(plist.read_bytes())
-          settings['CFBundleShortVersionString'] = '0.3.2'
+          settings['CFBundleShortVersionString'] = '0.3.4'
           settings['CFBundleVersion'] = os.environ['GITHUB_RUN_NUMBER']
           settings['NSCameraUsageDescription'] = 'Antilia usa la cámara cuando eliges tomar tu foto de perfil o medir un escritorio con una referencia que tú marcas.'
           settings['NSPhotoLibraryUsageDescription'] = 'Antilia permite elegir tu foto de perfil o una foto del escritorio para medir con una referencia.'
