@@ -2,7 +2,7 @@
 
 [Descargar Antilia para iPhone](https://github.com/JulianaaguirreB/Antilia/raw/refs/heads/developer/distribucion/ios/Antilia-iPhone.ipa)
 
-Este IPA sin firma es Antilia **0.3.2, compilación 17**, compilado desde cero con Xcode el 23 de octubre de 2026 a partir del código `8c80a41`. Incluye foto de perfil, vestidor de Lumi con gafas, landing pública y el diseño inspirado en Lumi, bienvenida animada con escoba y planeta, navegación Correos y archivos, tres mesas 3D, tarjetas con nombres y posiciones, medición fotográfica de ancho y fondo con corrección de perspectiva, tareas, sesiones de orden, Lumi, Gmail de solo lectura y recuperación por correo. Se conecta al servidor público y a los datos existentes de Antilia; requiere iOS 15 o posterior e internet. Es arm64 para un iPhone real, no para simulador.
+Este IPA sin firma es Antilia **0.3.4, compilación 22**, compilado desde cero con Xcode el 25 de octubre de 2026 a partir del código `baac3fe`. Incluye bienvenida por correo al registrarse, mejoras de navegación, foto de perfil, vestidor de Lumi con gafas, landing pública y el diseño inspirado en Lumi, bienvenida animada con escoba y planeta, navegación Correos y archivos, tres mesas 3D, tarjetas con nombres y posiciones, medición fotográfica de ancho y fondo con corrección de perspectiva, tareas, sesiones de orden, Lumi, Gmail de solo lectura y recuperación por correo. Se conecta al servidor público y a los datos existentes de Antilia; requiere iOS 15 o posterior e internet. Es arm64 para un iPhone real, no para simulador.
 
 1. Descarga el archivo `.ipa` en tu computador.
 2. Conecta y desbloquea tu iPhone. Abre Sideloadly y selecciona el dispositivo.

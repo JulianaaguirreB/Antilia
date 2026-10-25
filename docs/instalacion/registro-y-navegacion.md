@@ -13,3 +13,9 @@ En Android, Atrás cierra primero el diálogo visible, recorre las pantallas vis
 - Puente Android simulado: una sola suscripción, diálogos primero, historial, cancelación/confirmación de salida y reinicio de sesión. Permisos de cámara y galería conservados.
 
 La pulsación y el gesto Atrás en un teléfono Android físico siguen pendientes de comprobación. Estas pruebas técnicas no sustituyen la validación con usuarios del curso.
+
+## Publicación
+
+La web y el APK 0.3.4 están publicados. Producción confirmó email_configured=true y la ruta de reintento devuelve 401 sin sesión. La descarga pública entrega exactamente el SHA-256 del APK verificado. El IPA 0.3.4, compilación 22, proviene del workflow 40243236767 del commit baac3fe; sigue sin firma de Apple y su instalación física está pendiente.
+
+Producción tiene scheduler_configured=false: los recordatorios se pueden guardar como borradores, pero su activación automática requiere configurar un programador real. No se marca esa función como operativa ni se confunde la bienvenida del registro con un envío programado.
