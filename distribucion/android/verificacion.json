@@ -1,16 +1,17 @@
 {
-  "version": "0.3.3",
-  "versionCode": 5,
+  "version": "0.3.4",
+  "versionCode": 6,
   "package": "co.antilia.app",
   "android_minimo": 7,
   "sdk_minimo": 24,
-  "bytes": 10461813,
-  "sha256": "c39b34a4c74770ec9df84d73c8f120f2103689e811c794d8b5412b37a750f7d3",
+  "bytes": 10465991,
+  "sha256": "f7e29a724758a65598ab5c0f8f2ff4bf2ebd3d9e565a58646a9f85e5a7e399a7",
   "firma_verificada": true,
   "alineacion_16KB": true,
   "debuggable": false,
   "api": "https://antilia-delta.vercel.app/api",
   "plugins": [
+    "App",
     "Browser",
     "Camera"
   ],
@@ -19,5 +20,7 @@
     "INTERNET",
     "CAMERA"
   ],
-  "camara_opcional": true
+  "camara_opcional": true,
+  "source_commit": "baac3fe",
+  "navegacion_atras": "historial, diálogo y confirmación al salir; dispositivo físico pendiente"
 }
