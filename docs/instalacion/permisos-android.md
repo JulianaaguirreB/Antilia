@@ -21,3 +21,5 @@ La versión de navegador conserva su selector nativo del navegador. El sistema o
 `node qa/native-permissions.cjs`: primera solicitud limitada a Cámara, permiso ya concedido, nueva solicitud tras revocación, rechazo, cancelación y galería sin permiso amplio. También verifica el manifiesto. El APK debe actualizarse para recibir los cambios; desplegar la web no modifica un APK instalado.
 
 Referencias: [Solicitudes en contexto](https://developer.android.com/training/permissions/requesting), [minimizar permisos](https://developer.android.com/privacy-and-security/minimize-permission-requests), [API de cámara](https://capacitorjs.com/docs/apis/camera).
+
+La compilación de distribución, firma, permiso declarado, pruebas de lógica y descarga pública de 0.3.3 pasaron. Se intentó la prueba completa en el emulador Pixel 6a: no se completó porque Android mostró «System UI isn’t responding». No se presenta como una prueba aprobada del diálogo. Falta confirmar el aviso y la captura en un teléfono Android físico.
