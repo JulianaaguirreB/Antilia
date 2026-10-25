@@ -3,7 +3,7 @@ import { LandingMetrics } from '../features/landing/LandingMetrics';
 import { BootSplash, introWasSeen } from '../shared/components/BootSplash';
 import { Component, ErrorInfo, ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '../features/auth/context/AuthContext';
-import { useHashRoute, rememberLoginDestination, loginDestination, clearLoginDestination } from './routing';
+import { replaceRoute, useHashRoute, rememberLoginDestination, loginDestination, clearLoginDestination } from './routing';
 import { Auth } from '../features/auth/pages/Auth';
 import { Home } from '../features/home/pages/Home';
 import { Progress } from '../features/progress/pages/Progress';
@@ -37,12 +37,12 @@ export function AppContent() {
   
   if (!user && !isAuthRoute) {
     rememberLoginDestination(hash);
-    navigate('#/acceso');
+    replaceRoute('#/acceso');
     return null;
   }
 
   if (user && ['#/acceso', '#/registro', '#/bienvenida'].includes(hash)) {
-    navigate(loginDestination());
+    replaceRoute(loginDestination());
     return null;
   }
 
@@ -81,7 +81,7 @@ export function AppContent() {
       if (user) {
         navigate('#/inicio');
       } else {
-        navigate('#/acceso');
+        replaceRoute('#/acceso');
       }
       return null;
   }

@@ -77,7 +77,7 @@ after(async () => {
 
 test('migraciones repetibles y esquema con datos aislados', async () => {
   const result = await pool.query('SELECT name FROM schema_migrations ORDER BY name');
-  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql', '005_gmail.sql', '006_desk_models.sql']);
+  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql', '005_gmail.sql', '006_desk_models.sql', '007_personal_style.sql', '008_landing_metrics.sql', '009_welcome_email.sql']);
   assert.equal((await request('/spaces')).status, 401);
   assert.equal((await request('/shifts')).status, 401);
   assert.equal((await request('/reminders')).status, 401);
@@ -417,3 +417,27 @@ test('SMTP entrega al transporte y oculta errores del proveedor', async () => {
   await assert.rejects(service.sendEmail({to:'recipient@example.com',subject:'Test',text:'Test'}),error=>error.status===503&&!error.message.includes('secret'));
  } finally {nodemailer.createTransport=original;for(const k of keys){if(previous[k]===undefined)delete process.env[k];else process.env[k]=previous[k];}}
 });
+
+ test('registro envía bienvenida una vez y tolera fallo del proveedor', async () => {
+   const count = emails.length;
+   const user = await register('bienvenida');
+   assert.equal(user.welcome_email, 'sent');
+   assert.equal(emails.length, count + 1);
+   assert.match(emails.at(-1).subject, /Bienvenido a Antilia/);
+   assert.deepEqual(emails.at(-1).to, [user.user.email]);
+   assert.equal((await request('/auth/welcome-email', {method:'POST',token:user.token,body:{}})).data.welcome_email,'sent');
+   assert.equal(emails.length,count+1);
+   assert.equal((await request('/auth/welcome-email',{method:'POST',body:{}})).status,401);
+   assert.equal((await request('/auth/welcome-email',{method:'POST',token:user.token,body:{to:'otra@example.com'}})).status,400);
+   const saved = global.fetch;
+   try {
+     global.fetch = async () => new Response('{}',{status:503});
+     const failed = await register('correo-fallido');
+     assert.equal(failed.welcome_email,'failed');
+     assert.equal((await request('/auth/me',{token:failed.token})).status,200);
+     assert.equal((await request('/auth/welcome-email',{method:'POST',token:failed.token,body:{}})).status,429);
+     await pool.query("UPDATE users SET welcome_email_attempted_at=now()-interval '2 minutes' WHERE id=$1",[failed.user.id]);
+     global.fetch=saved;
+     assert.equal((await request('/auth/welcome-email',{method:'POST',token:failed.token,body:{}})).data.welcome_email,'sent');
+   } finally { global.fetch=saved; }
+ });

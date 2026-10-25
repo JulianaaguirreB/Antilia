@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const vm=require('node:vm');const {createRequire}=require('node:module');const path=require('node:path');
+const req=createRequire(path.resolve('frontend/package.json'));const ts=req('typescript');
+const source=ts.transpileModule(fs.readFileSync('frontend/src/app/routing.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
+let effect,listener,subscriptions=0,exits=0,backs=0,dialog=null,confirmed=false;
+const events={};const state={hash:'#/inicio',href:'http://localhost/#/inicio'};const history={state:null,replaceState(value,unused,url){this.state=value;if(url) state.hash=url;},back(){backs++;}};
+const window={location:state,history,scrollTo(){},confirm(){return confirmed;},dispatchEvent(event){events[event.type]?.();},addEventListener(type,handler){events[type]=handler;},removeEventListener(){}};
+const exportsObject={};vm.runInNewContext(source,{exports:exportsObject,require:name=>name==='@capacitor/app'?{App:{addListener:async(type,fn)=>{subscriptions++;listener=fn;return {remove:async()=>{}};},exitApp:()=>{exits++;}}}:name==='@capacitor/core'?{Capacitor:{getPlatform:()=> 'android',isNativePlatform:()=>true}}:{useState:()=>[state.hash,()=>{}],useEffect:fn=>{effect=fn;}},window,document:{querySelectorAll:()=>dialog?[dialog]:[]},HashChangeEvent:class{constructor(type){this.type=type;}},KeyboardEvent:class{constructor(type,props){this.type=type;Object.assign(this,props);}},sessionStorage:{getItem(){return null;}}});
+(async()=>{exportsObject.useHashRoute();const cleanup=effect();exportsObject.useHashRoute();const secondCleanup=effect();await Promise.resolve();assert.equal(subscriptions,1);
+ listener();assert.equal(exits,0);confirmed=true;listener();assert.equal(exits,1);
+ let escapes=0;dialog={dispatchEvent(event){assert.equal(event.key,'Escape');escapes++;}};listener();assert.equal(escapes,1);assert.equal(exits,1);dialog=null;
+ state.hash='#/espacios';history.state=null;events.hashchange();listener();assert.equal(backs,1);assert.equal(exits,1);
+ exportsObject.replaceRoute('#/inicio');confirmed=false;listener();assert.equal(backs,1);assert.equal(exits,1);
+ exportsObject.replaceRoute('#/perfil');listener();assert.equal(state.hash,'#/inicio');assert.equal(exits,1);
+ cleanup();secondCleanup();console.log('Atrás Android: historial, diálogo primero, cancelar salida, confirmar salida y sesión reiniciada comprobados con puente simulado.');
+})().catch(error=>{console.error(error);process.exitCode=1});

@@ -1,7 +1,8 @@
 import { ActionIcon } from '../../../shared/components/ActionIcon';
 import {useEffect,useRef,useState} from 'react';
 import {Capacitor} from '@capacitor/core';
-import {Camera,CameraResultType,CameraSource} from '@capacitor/camera';
+import {CameraSource} from '@capacitor/camera';
+import {pickNativePhoto} from '../../../shared/lib/nativePhoto';
 import {Button,Input} from '../../../shared/components/ui';
 import {Notice} from '../../../shared/components/ReleaseLayout';
 import {measureRectangle,type Point} from '../lib/photoCalibration';
@@ -24,15 +25,15 @@ export function CameraMeasure({onUse,onDimensions}:{onUse:(cm:number)=>void;onDi
  const setImage=(url:string)=>{if(blob.current){URL.revokeObjectURL(blob.current);blob.current='';}setPhoto(url);setPoints([]);setAccepted(false);setError('');};
  async function capture(source:CameraSource){
   if(!Capacitor.isNativePlatform()){(source===CameraSource.Camera?captureFile:gallery).current?.click();return;}
-  setBusy(true);setError('');try{const image=await Camera.getPhoto({quality:95,width:2400,correctOrientation:true,saveToGallery:false,resultType:CameraResultType.Uri,source});if(image.webPath)setImage(image.webPath);}
-  catch{setError('No se abrió la imagen. Puedes volver a intentar o revisar el permiso de Cámara y Fotos en Ajustes.');}finally{setBusy(false);}
+  setBusy(true);setError('');try{const path=await pickNativePhoto(source===CameraSource.Camera?'camera':'gallery','measurement');if(path)setImage(path);}
+  catch(e){setError((e as Error).message);}finally{setBusy(false);}
  }
  const fileChanged=(file:File|undefined)=>{if(!file)return;if(file.size>20*1024*1024){setError('Elige una foto de menos de 20 MB.');return;}const url=URL.createObjectURL(file);setImage(url);blob.current=url;};
  const estimate=measureRectangle(points,Number(referenceWidth),Number(referenceDepth));
  const useDimensions=(width:number,depth:number)=>{setError('');if(onDimensions){if(onDimensions(width,depth)===false)return;}else onUse(width);setAccepted(true);};
  const chooseReference=(value:string)=>{setReference(value);if(value==='a4'){setReferenceWidth('21');setReferenceDepth('29.7');}else if(value==='tarjeta'){setReferenceWidth('8.56');setReferenceDepth('5.398');}setPoints([]);setAccepted(false);};
  return <section className="surface p-5 mb-5 camera-measure"><p className="eyebrow mb-2">Cámara y medidas</p><h2 className="font-bold text-lg mb-2">Dale medidas a tu mesa</h2><p className="text-sm text-text-secondary mb-4">Coloca una hoja A4 plana sobre el tablero y fotografía la mesa completa, con las cuatro esquinas visibles. Cuanto más de frente a la superficie y mejor iluminada esté, mejor.</p>
- <div className="measurement-steps"><span>1 · Toma la foto</span><span>2 · Marca las esquinas</span><span>3 · Revisa las medidas</span></div>
+ <p className="text-xs text-text-secondary mb-4">La cámara se usa solo si la autorizas. En la galería eliges una sola foto. La imagen de tu mesa se procesa en el dispositivo y no se sube al servidor; también puedes introducir medidas sin usar fotos.</p><div className="measurement-steps"><span>1 · Toma la foto</span><span>2 · Marca las esquinas</span><span>3 · Revisa las medidas</span></div>
  <div className="grid gap-2 mt-4"><Button type="button" loading={busy} onClick={()=>capture(CameraSource.Camera)}>Tomar foto de la mesa</Button><button type="button" className="min-h-11 text-primary" disabled={busy} onClick={()=>capture(CameraSource.Photos)}>Elegir una foto</button></div>
  <input ref={captureFile} type="file" capture="environment" accept="image/*" aria-label="Tomar foto del escritorio" className="sr-only" onChange={e=>{fileChanged(e.target.files?.[0]);e.target.value='';}}/>
  <input ref={gallery} type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" aria-label="Foto del escritorio" className="sr-only" onChange={e=>{fileChanged(e.target.files?.[0]);e.target.value='';}}/>

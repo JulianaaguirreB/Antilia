@@ -1,3 +1,4 @@
+import { replaceRoute } from '../../../app/routing';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api, setUnauthorizedHandler } from '../../../shared/api/client';
 
@@ -30,10 +31,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         localStorage.removeItem('antilia_token');
         sessionStorage.setItem('session_expired', 'true');
+        sessionStorage.removeItem('antilia_welcome_email');
       } catch (e) {}
       setUser(null);
       if (window.location.hash !== '#/acceso' && window.location.hash !== '#/registro') {
-        window.location.hash = '#/acceso';
+        replaceRoute('#/acceso');
       }
     });
 
@@ -65,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    sessionStorage.removeItem('antilia_welcome_email');
     try {
       localStorage.removeItem('antilia_token');
     } catch (e) {}

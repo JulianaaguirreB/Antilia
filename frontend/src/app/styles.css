@@ -177,3 +177,6 @@ button:focus-visible,a:focus-visible { outline:3px solid #b48730; outline-offset
 .desk-entry svg { width:100px; flex-shrink:0; }
 .desk-entry:focus-visible { outline:3px solid #ba8e36; outline-offset:4px; }
 @media(max-width:360px) { .desk-entry {padding:16px;} .desk-entry svg {width:72px;} }
+
+/* Keep every header action above the decorative constellation. */
+.cosmic-heading button, .cosmic-heading a { position: relative; z-index: 2; touch-action: manipulation; }

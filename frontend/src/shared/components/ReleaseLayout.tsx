@@ -1,3 +1,4 @@
+import { goBack } from '../../app/routing';
 import { ActionIcon } from './ActionIcon';
 import { OrbitArtwork } from './OrbitArtwork';
 import { useEffect, useRef, useState } from 'react';
@@ -8,7 +9,7 @@ import { api } from '../api/client';
 export type Navigate = (path: string) => void;
 
 export function ReleasePage({ title, subtitle, children, navigate, active = '#/inicio', back }: { title: string; subtitle?: string; children: ReactNode; navigate: Navigate; active?: string; back?: string }) {
-  return <div className="min-h-dvh bg-bg-main"><main className="page-content"><header className="page-heading cosmic-heading mb-6"><div className="flex items-center justify-between mb-5"><button aria-label="Ir a inicio" onClick={() => navigate('#/inicio')} className="brand-bar flex items-center gap-2 font-bold"><img src="/icons/icon-192.png" alt="" className="brand-mark !w-8 !h-8 !text-lg"/>antilia.</button>{back && <button className="text-sm text-primary min-h-11" onClick={() => navigate(back)}><ActionIcon action="Volver"/><span>Volver</span></button>}</div><OrbitArtwork className="masthead-art"/><p className="masthead-motto">the space is yours</p><h1 className="text-3xl font-bold">{title}</h1>{subtitle && <p className="text-sm text-text-secondary mt-2 leading-relaxed">{subtitle}</p>}</header>{children}</main><Navigation currentPath={active} navigate={navigate}/></div>;
+  return <div className="min-h-dvh bg-bg-main"><main className="page-content"><header className="page-heading cosmic-heading mb-6"><div className="flex items-center justify-between mb-5"><button aria-label="Ir a inicio" onClick={() => navigate('#/inicio')} className="brand-bar flex items-center gap-2 font-bold"><img src="/icons/icon-192.png" alt="" className="brand-mark !w-8 !h-8 !text-lg"/>antilia.</button>{back && <button className="text-sm text-primary min-h-11" onClick={() => goBack(back)}><ActionIcon action="Volver"/><span>Volver</span></button>}</div><OrbitArtwork className="masthead-art"/><p className="masthead-motto">the space is yours</p><h1 className="text-3xl font-bold">{title}</h1>{subtitle && <p className="text-sm text-text-secondary mt-2 leading-relaxed">{subtitle}</p>}</header>{children}</main><Navigation currentPath={active} navigate={navigate}/></div>;
 }
 
 export function Notice({ children, error = false }: { children: ReactNode; error?: boolean }) {
@@ -27,7 +28,7 @@ export function Modal({ title, children, onClose, busy = false, className = '' }
     document.body.style.overflow = 'hidden';
     ref.current?.querySelector<HTMLElement>('input,button,select,textarea')?.focus();
     const listener = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !busyRef.current) closeRef.current();
+      if (e.key === 'Escape' && ref.current === document.querySelectorAll('[aria-modal="true"]')[document.querySelectorAll('[aria-modal="true"]').length - 1]) { e.stopImmediatePropagation(); if (!busyRef.current) closeRef.current(); }
       if (e.key !== 'Tab') return;
       const elements = ref.current?.querySelectorAll<HTMLElement>('input:not(:disabled),button:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href]');
       if (!elements?.length) return;
