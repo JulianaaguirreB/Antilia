@@ -2,7 +2,7 @@
 
 [Descargar APK](https://antilia-delta.vercel.app/downloads/antilia.apk) · [Huella SHA-256](https://antilia-delta.vercel.app/downloads/antilia.sha256)
 
-Versión 0.3.2, compilación 4. Requiere Android 7 o posterior e internet. Conserva la firma anterior para actualizar sin desinstalar. Incluye foto de perfil, vestidor de Lumi con gafas, landing pública y la interfaz inspirada en Lumi, bienvenida animada y navegación Correos y archivos, además de tres mesas 3D, tarjetas personalizables, medición de ancho y fondo con corrección de perspectiva y Lumi. Se conecta a la API pública de Antilia y a los datos existentes de cada cuenta: tareas, recuperación por correo y acceso a Gmail para los usuarios autorizados del piloto.
+Versión 0.3.3, compilación 5. Requiere Android 7 o posterior e internet. Conserva la firma anterior para actualizar sin desinstalar. Incluye foto de perfil, vestidor de Lumi con gafas, landing pública y la interfaz inspirada en Lumi, bienvenida animada y navegación Correos y archivos, además de tres mesas 3D, tarjetas personalizables, medición de ancho y fondo con corrección de perspectiva y Lumi. Se conecta a la API pública de Antilia y a los datos existentes de cada cuenta: tareas, recuperación por correo y acceso a Gmail para los usuarios autorizados del piloto.
 
 1. Abre la web de Antilia desde el teléfono Android y pulsa **Descargar Antilia para Android (APK)**.
 2. Abre el archivo descargado. Si Android lo solicita, permite que ese navegador instale el archivo y confirma la instalación.
@@ -21,3 +21,5 @@ Vercel ejecuta `frontend/scripts/copy-downloads.cjs` después de construir la we
 ## Verificación
 
 Comprueba la firma con `apksigner verify --verbose --print-certs`, la alineación con `zipalign -c -P 16 4` y los metadatos con `aapt dump badging`. La prueba `qa/android-download.cjs` verifica el botón en Android, su ausencia en iPhone y la descarga de un archivo APK real. La instalación y los permisos deben comprobarse también en un teléfono Android físico.
+
+La cámara se solicita únicamente al tomar una foto de perfil o medir la mesa. La galería abre el selector del sistema sin permiso general de almacenamiento. Rechazar o cancelar no bloquea las tareas; se puede usar una foto elegida o introducir medidas manuales. [Permisos de Android](../../docs/instalacion/permisos-android.md).

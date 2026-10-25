@@ -11,3 +11,5 @@ qa/evidencias/
 .signing/
 *.jks
 *.keystore
+
+.kotlin/
