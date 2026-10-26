@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Antilia</string>
+    <string name="title_activity_main">Antilia</string>
+    <string name="package_name">co.antilia.app</string>
+    <string name="custom_url_scheme">co.antilia.app</string>
+</resources>
