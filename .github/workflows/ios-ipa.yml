@@ -1,0 +1,79 @@
+name: Crear IPA de Antilia
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [developer]
+    paths:
+      - '.github/workflows/ios-ipa.yml'
+      - 'frontend/**'
+
+permissions:
+  contents: read
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Seleccionar Xcode
+        run: |
+          XCODE_PATH=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' | sort -V | tail -n 1)
+          if [ -z "$XCODE_PATH" ]; then
+            echo 'Se necesita Xcode 26 o posterior para Capacitor 8.'
+            ls /Applications | grep Xcode
+            exit 1
+          fi
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          xcodebuild -version
+      - name: Construir pantallas y proyecto iOS
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          npx cap add ios --packagemanager SPM
+          npx cap sync ios
+          python3 - <<'PY'
+          import json, shutil, plistlib, os
+          from pathlib import Path
+          target = Path('ios/App/App/Assets.xcassets/AppIcon.appiconset')
+          target.mkdir(parents=True, exist_ok=True)
+          shutil.copyfile('public/icons/ios-icon-1024.png', target / 'AppIcon.png')
+          (target / 'Contents.json').write_text(json.dumps({'images': [{'filename': 'AppIcon.png', 'idiom': 'universal', 'platform': 'ios', 'size': '1024x1024'}], 'info': {'author': 'xcode', 'version': 1}}))
+          plist = Path('ios/App/App/Info.plist')
+          settings = plistlib.loads(plist.read_bytes())
+          settings['CFBundleShortVersionString'] = '0.3.4'
+          settings['CFBundleVersion'] = os.environ['GITHUB_RUN_NUMBER']
+          settings['NSCameraUsageDescription'] = 'Antilia usa la cámara cuando eliges tomar tu foto de perfil o medir un escritorio con una referencia que tú marcas.'
+          settings['NSPhotoLibraryUsageDescription'] = 'Antilia permite elegir tu foto de perfil o una foto del escritorio para medir con una referencia.'
+          settings['NSPhotoLibraryAddUsageDescription'] = 'Antilia solo guarda fotos en tu biblioteca si tú lo solicitas.'
+          plist.write_bytes(plistlib.dumps(settings))
+          PY
+      - name: Compilar para un iPhone real sin firma
+        working-directory: frontend
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' build
+      - name: Empaquetar IPA para Sideloadly
+        working-directory: frontend
+        run: |
+          mkdir -p build/package/Payload
+          cp -R build/ios/Build/Products/Release-iphoneos/App.app build/package/Payload/Antilia.app
+          test -f build/package/Payload/Antilia.app/App
+          file build/package/Payload/Antilia.app/App
+          cd build/package
+          zip -qr Antilia-sin-firma.ipa Payload
+          shasum -a 256 Antilia-sin-firma.ipa > Antilia-sin-firma.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Antilia-iPhone-Sideloadly
+          path: |
+            frontend/build/package/Antilia-sin-firma.ipa
+            frontend/build/package/Antilia-sin-firma.sha256
+          retention-days: 14
+          if-no-files-found: error
