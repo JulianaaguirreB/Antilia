@@ -9,6 +9,7 @@ import { Navigation } from '../../../shared/components/Navigation';
 import { Button, Input } from '../../../shared/components/ui';
 import { Modal, Notice } from '../../../shared/components/ReleaseLayout';
 import { validateEmail, validateName } from '../../../shared/lib/validation';
+import { reopenStartGuide } from '../../home/components/FirstSteps';
 
 interface AccountProps {
   navigate: (path: string) => void;
@@ -70,6 +71,7 @@ export function Account({ navigate }: AccountProps) {
 
         <div className="surface p-4 grid gap-2 mb-5"><h2 className="font-bold">Configuración</h2><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/recordatorios')}><ActionIcon action="Recordatorios y alertas"/><span>Recordatorios y alertas</span></button><button className="text-primary min-h-11 text-left" onClick={()=>navigate('#/privacidad')}><ActionIcon action="Privacidad y datos"/><span>Privacidad y datos</span></button></div>
         {analyticsAllowed&&<button className="surface p-4 text-left w-full mb-5 text-sm text-primary" onClick={()=>navigate('#/visitas')}><ActionIcon action="Estadísticas"/>Visitas a la landing</button>}
+        <button className="surface p-4 text-left w-full mb-5 text-sm text-primary" onClick={() => { reopenStartGuide(user.id); navigate('#/inicio'); }}><ActionIcon action="Empezar"/>Ver la guía de inicio</button>
         <section className="surface p-5 mb-6"><p className="eyebrow mb-3">Cómo funciona tu racha</p><p className="text-sm text-text-secondary leading-relaxed">Completa una tarea cada día para mantenerla. Varias tareas en el mismo día cuentan como un solo día. Tu récord se conserva.</p><p className="mt-4 text-xs text-text-secondary">Tus tareas se guardan en tu cuenta y solo tú puedes consultarlas.</p></section>
         <Button 
           variant="secondary" 
