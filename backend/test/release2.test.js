@@ -77,7 +77,7 @@ after(async () => {
 
 test('migraciones repetibles y esquema con datos aislados', async () => {
   const result = await pool.query('SELECT name FROM schema_migrations ORDER BY name');
-  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql', '005_gmail.sql', '006_desk_models.sql', '007_personal_style.sql', '008_landing_metrics.sql', '009_welcome_email.sql', '010_product_analytics.sql']);
+  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql', '005_gmail.sql', '006_desk_models.sql', '007_personal_style.sql', '008_landing_metrics.sql', '009_welcome_email.sql', '010_product_analytics.sql', '011_validation_comparison.sql']);
   assert.equal((await request('/spaces')).status, 401);
   assert.equal((await request('/shifts')).status, 401);
   assert.equal((await request('/reminders')).status, 401);
@@ -542,4 +542,56 @@ test('Release 3 instrumentación automática y embudo sin datos inventados', asy
    assert.equal((await request('/analytics/exclusions',{method:'POST',token:first.token,body:{email:separate.user.email,reason:'remove'}})).status,403);
   });
  } finally {if(previous===undefined)delete process.env.LANDING_ANALYTICS_ADMINS;else process.env.LANDING_ANALYTICS_ADMINS=previous;}
+});
+
+
+test('Release 3 comparación de validaciones R1 y R2',async t=>{
+ const model=require('../src/modules/validation/comparison');
+ const owner=await register('comparacion-admin');await verify(owner);const previous=process.env.LANDING_ANALYTICS_ADMINS;process.env.LANDING_ANALYTICS_ADMINS=owner.user.email;
+ let protocol;const records={};
+ const maxSus=[5,1,5,1,5,1,5,1,5,1],minSus=[1,5,1,5,1,5,1,5,1,5];
+ const protocolBody={title:'Protocolo de prueba aislada',prepared_on:'2026-10-01',evidence_ref:'E-PROT-TEST',tasks:[{label:'Crear espacio',criterion:'Guarda y encuentra el espacio'},{label:'Guardar tarea',criterion:'La tarea persiste'},{label:'Completar tarea',criterion:'Aparece como completada'}]};
+ const sample=(release,n)=>({release,participant_code:'P0'+n,session_on:release==='R1'?'2026-10-10':'2026-10-23',evidence_ref:'E-'+release+'-P0'+n,segment_confirmed:true,independent:true,unassisted:true,consent:true,results:protocol.tasks.map((task,i)=>({task_id:task.id,success:i===0?(release==='R2'||n<=3):i===2,seconds:release==='R1'?n*10+i*5:20+i*5})),sus:release==='R1'?Array(10).fill(3):maxSus});
+ const details=()=>request('/validation/protocols/'+protocol.id,{token:owner.token});
+ try{
+  await t.test('SUS usa las diez respuestas, puntuación de 0 a 100 y polaridad correcta',()=>{
+   assert.equal(model.score(maxSus),100);assert.equal(model.score(minSus),0);assert.equal(model.score(Array(10).fill(3)),50);
+   assert.throws(()=>model.score(Array(10).fill(0)));assert.throws(()=>model.score(Array(9).fill(3)));assert.throws(()=>model.score(Array(10).fill('3')));
+  });
+  await t.test('acceso privado, protocolo de 3 a 5 tareas y comparación vacía sin ceros ficticios',async()=>{
+   assert.equal((await request('/validation/protocols')).status,401);const outsider=await register('comparacion-externo');assert.equal((await request('/validation/protocols',{token:outsider.token})).status,403);
+   for(const bad of [{...protocolBody,tasks:protocolBody.tasks.slice(0,2)},{...protocolBody,prepared_on:'2099-01-01'},{...protocolBody,evidence_ref:'https://ejemplo.com/privado'},{...protocolBody,tasks:[protocolBody.tasks[0],protocolBody.tasks[0],protocolBody.tasks[2]]}])assert.equal((await request('/validation/protocols',{method:'POST',token:owner.token,body:bad})).status,400);
+   const created=await request('/validation/protocols',{method:'POST',token:owner.token,body:protocolBody});assert.equal(created.status,201);protocol=created.data.protocol;
+   const result=await details();assert.equal(result.status,200);assert.equal(result.data.comparison.R1.participants,0);assert.equal(result.data.comparison.R1.sus_mean,null);assert.equal(result.data.comparison.R1.tasks[0].success_rate,null);assert.equal(result.data.comparison.R1.tasks[0].mean_seconds,null);assert.equal(result.data.comparison.ready,false);
+   assert.equal((await request('/validation/protocols/'+crypto.randomUUID(),{token:owner.token})).status,404);
+  });
+  await t.test('valida códigos, fechas, permiso, respuestas completas y correspondencia de tareas',async()=>{
+   const good=sample('R1',1);
+   const bad=[{...good,participant_code:'Juliana'},{...good,session_on:'2026-09-30'},{...good,consent:false},{...good,sus:Array(9).fill(3)},{...good,results:[good.results[0],good.results[0],good.results[2]]},{...good,results:good.results.map((r,i)=>i===0?{...r,seconds:-1}:r)},{...good,eligible:true}];
+   for(const body of bad)assert.equal((await request('/validation/protocols/'+protocol.id+'/sessions',{method:'POST',token:owner.token,body})).status,400);
+   assert.equal((await details()).data.sessions.length,0);
+  });
+  await t.test('compara éxito y tiempos lado a lado y reconoce participantes repetidos',async()=>{
+   for(const release of ['R1','R2'])for(let n=1;n<=5;n++){const r=await request('/validation/protocols/'+protocol.id+'/sessions',{method:'POST',token:owner.token,body:sample(release,n)});assert.equal(r.status,201);records[release+n]=r.data.session.id;}
+   const c=(await details()).data.comparison;assert.equal(c.ready,true);assert.equal(c.R1.participants,5);assert.equal(c.R2.participants,5);assert.equal(c.returning_participants,5);assert.equal(c.R1.sus_mean,50);assert.equal(c.R2.sus_mean,100);assert.equal(c.sus_delta,50);
+   assert.equal(c.R1.tasks[0].success_rate,.6);assert.equal(c.R2.tasks[0].success_rate,1);assert.equal(c.R1.tasks[0].mean_seconds,30);assert.equal(c.R2.tasks[0].mean_seconds,20);assert.equal(c.tasks[0].time_delta,-10);assert.equal(c.R1.tasks[1].mean_seconds,35);assert.equal(c.R1.tasks[1].success_mean_seconds,null);
+   assert.equal((await request('/validation/protocols/'+protocol.id+'/sessions',{method:'POST',token:owner.token,body:sample('R1',1)})).status,409);
+  });
+  await t.test('correcciones conservan historial y muestran retrocesos reales',async()=>{
+   const corrected=sample('R2',1);corrected.sus=minSus;corrected.results[0].seconds=99;
+   const result=await request('/validation/sessions/'+records.R21,{method:'PATCH',token:owner.token,body:corrected});assert.equal(result.status,200);
+   const c=(await details()).data.comparison;assert.equal(c.R2.sus_mean,80);assert.equal(c.R2.tasks[0].mean_seconds,35.8);assert.ok(c.tasks[0].time_delta>0);
+   const history=await pool.query('SELECT previous_data FROM validation_session_revisions WHERE session_id=$1',[records.R21]);assert.equal(history.rows.length,1);assert.equal(Number(history.rows[0].previous_data.sus_score),100);
+   assert.equal((await request('/validation/sessions/'+records.R21,{method:'PATCH',token:owner.token,body:{...corrected,release:'R1'}})).status,400);
+  });
+  await t.test('excluir y restaurar conservan evidencia y no cuentan sesiones no elegibles',async()=>{
+   assert.equal((await request('/validation/sessions/'+records.R21+'/exclusion',{method:'POST',token:owner.token,body:{exclude:true,reason:'Sesión de prueba excluida'}})).status,200);
+   let data=(await details()).data;assert.equal(data.comparison.R2.participants,4);assert.equal(data.comparison.R2.excluded,1);assert.equal(data.comparison.ready,false);assert.equal(data.sessions.length,10);
+   assert.equal((await request('/validation/sessions/'+records.R21+'/exclusion',{method:'POST',token:owner.token,body:{exclude:false,reason:'Revisión de evidencia completada'}})).status,200);
+   assert.equal((await details()).data.comparison.ready,true);
+   const assisted=sample('R2',2);assisted.unassisted=false;assert.equal((await request('/validation/sessions/'+records.R22,{method:'PATCH',token:owner.token,body:assisted})).status,200);
+   data=(await details()).data;assert.equal(data.comparison.R2.participants,4);assert.equal(data.comparison.returning_participants,4);assert.equal(data.sessions.find(s=>s.id===records.R22).eligible,false);
+   assert.equal((await pool.query('SELECT count(*)::int AS n FROM validation_session_revisions WHERE session_id=$1',[records.R21])).rows[0].n,3);
+  });
+ }finally{if(previous===undefined)delete process.env.LANDING_ANALYTICS_ADMINS;else process.env.LANDING_ANALYTICS_ADMINS=previous;}
 });

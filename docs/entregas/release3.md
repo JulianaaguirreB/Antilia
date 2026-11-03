@@ -1,6 +1,6 @@
 # Release 3 en preparación
 
-Fecha de revisión: 3 de noviembre de 2026. Entrega: 8 de noviembre a las 23:59 de Bogotá; demo: 12 de noviembre. El primer bloque técnico está publicado en Vercel y en developer. La validación académica y los cuatro updates restantes siguen pendientes; no se creó el tag v0.3.
+Fecha de revisión: 3 de noviembre de 2026. Entrega: 8 de noviembre a las 23:59 de Bogotá; demo: 12 de noviembre. El primer bloque técnico está publicado en Vercel y en developer. La validación académica y los cambios basados en hallazgos siguen pendientes; no se creó el tag v0.3.
 
 ## Primer update de instrumentación
 
@@ -35,7 +35,7 @@ Las cuentas administradoras y las marcadas por el equipo se separan del público
 
 ## Comprobaciones
 
-- npm run test:release3 --prefix backend: 31 pruebas del servidor, incluidas deduplicación, concurrencia, privacidad, correo verificado, autorización, primer origen y rollback si falla una conversión. Se fuerza un error controlado en una prueba para verificar que no queda una tarea completada sin su evento; ese error esperado no indica un fallo de la suite.
+- npm run test:release3 --prefix backend: 38 pruebas del servidor, incluidas deduplicación, concurrencia, privacidad, correo verificado, autorización, primer origen y rollback si falla una conversión. Se fuerza un error controlado en una prueba para verificar que no queda una tarea completada sin su evento; ese error esperado no indica un fallo de la suite.
 - node qa/analytics-context.cjs: sesión estable, origen permitido, modo prueba, DNT, GPC y preferencia local.
 - qa/release3-analytics.cjs: recorrido real local por la interfaz, sin respuestas de API simuladas; visita, registro, activación, CSV sin datos personales, actualización automática, filtros, navegación y exclusión de medición. Anchuras 320, 390 y 768.
 - npm run build --prefix frontend: compilación del cliente.
@@ -57,6 +57,19 @@ También faltan el video narrado sobre la URL pública, el protocolo final con u
 - SHA-256 del APK: ba31f5974b1aa0040919cd5c1c40da6e6b6edd69c952644be7a40a5f2155ee0a.
 - Firma y alineación verificadas; conserva la firma de distribución anterior. La comprobación en teléfono Android físico sigue pendiente.
 - La descarga real en la URL pública coincide con esa huella y las cabeceras de APK. El evento de comprobación quedó marcado como test, fuera del grupo del público. No se crearon cuentas sintéticas en producción ni se enviaron mensajes de prueba.
-- Las rutas del panel y de actividad devuelven 401 sin sesión. Las 31 pruebas del servidor y los recorridos de interfaz se realizaron en entornos locales aislados.
+- Las rutas del panel y de actividad devuelven 401 sin sesión. Las 38 pruebas del servidor y los recorridos de interfaz se realizaron en entornos locales aislados.
 
 Este bloque es un update de instrumentación. La entrega completa y el tag v0.3 siguen pendientes de los otros cuatro updates y de las evidencias reales de validación.
+
+
+## Comparación de validaciones
+
+Segundo avance técnico: sección privada `#/comparacion`, accesible desde el embudo. Permite registrar el protocolo original de tres a cinco tareas, con criterios y fecha; transcribir sesiones R1/R2 mediante códigos de participante y referencias de evidencia; calcular SUS con las diez respuestas originales y comparar éxito y tiempo promedio por tarea. Cuenta como candidato a un segundo update verificable, con origen en el requisito de comparación de la Junta; no se atribuye a un hallazgo inexistente.
+
+Los participantes repetidos se identifican mediante el mismo código en ambos ciclos. Se exige permiso para guardar la sesión; los registros fuera del segmento, relacionados con el equipo o asistidos se conservan fuera de las métricas. La comparación avisa si no hay cinco participantes elegibles por ciclo y dos repetidos. El SUS se expresa en puntos, nunca como porcentaje. Los promedios de tiempo incluyen éxitos y fallos; las diferencias pueden mostrar retrocesos.
+
+La exportación CSV incluye el resumen, códigos, referencias y respuestas SUS, sin nombres ni correos. Las correcciones y exclusiones conservan una revisión de los datos anteriores en la base. El protocolo queda inmutable para no cambiar las tareas retrospectivamente; si hay otra versión debe registrarse aparte. Estos registros manuales no se mezclan con el embudo automático.
+
+Verificación local: las 38 pruebas del servidor pasaron. `qa/release3-comparison.cjs` comprobó el recorrido de protocolo, sesiones, SUS, repetidos, corrección, exclusión y restauración, exportación protegida de fórmulas y ausencia de desbordes en 320, 390 y 768 píxeles. Solo se usaron ejemplos claramente marcados en la base local con correo desactivado. La herramienta no acredita por sí sola que la validación se haya ejecutado.
+
+Quedan por definir y construir al menos tres updates desde hallazgos reales de R2. No se creó el tag v0.3.
