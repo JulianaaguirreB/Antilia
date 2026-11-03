@@ -44,7 +44,7 @@ Todo usa bases PostgreSQL locales aisladas y correo desactivado o transporte sim
 
 ## Para completar la entrega
 
-Se necesitan los resultados reales de validación de R2 y las tareas de R1 para definir al menos tres updates basados en hallazgos identificables. Faltan cuatro updates por seleccionar y comprobar; no se cuentan partes del panel como varios cambios. La comparación debe incluir éxitos por tarea, tiempos promedio, SUS de ambos ciclos, dos participantes que repitan y las mejoras y retrocesos observados.
+Se necesitan los resultados reales de validación de R2 y las tareas de R1 para definir al menos tres updates basados en hallazgos identificables. Con instrumentación y comparación implementadas, faltan al menos tres updates por seleccionar desde hallazgos reales y comprobar; no se cuentan partes del panel como varios cambios. La comparación debe incluir éxitos por tarea, tiempos promedio, SUS de ambos ciclos, dos participantes que repitan y las mejoras y retrocesos observados.
 
 También faltan el video narrado sobre la URL pública, el protocolo final con usuarios agendados, costos reales del periodo, comprobación externa de acceso y participación auténtica de todos los integrantes. La instrumentación no sustituye esas evidencias. El tag v0.3 se prepara cuando se apruebe el alcance final y estén listos los cinco updates.
 
@@ -59,7 +59,7 @@ También faltan el video narrado sobre la URL pública, el protocolo final con u
 - La descarga real en la URL pública coincide con esa huella y las cabeceras de APK. El evento de comprobación quedó marcado como test, fuera del grupo del público. No se crearon cuentas sintéticas en producción ni se enviaron mensajes de prueba.
 - Las rutas del panel y de actividad devuelven 401 sin sesión. Las 38 pruebas del servidor y los recorridos de interfaz se realizaron en entornos locales aislados.
 
-Este bloque es un update de instrumentación. La entrega completa y el tag v0.3 siguen pendientes de los otros cuatro updates y de las evidencias reales de validación.
+La instrumentación cuenta como un update y la comparación se registra como otro candidato. La entrega completa y el tag v0.3 siguen pendientes de al menos tres cambios desde hallazgos y de las evidencias reales de validación.
 
 
 ## Comparación de validaciones

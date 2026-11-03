@@ -1,11 +1,11 @@
 {
-  "version": "0.3.5",
-  "versionCode": 7,
+  "version": "0.3.6",
+  "versionCode": 8,
   "package": "co.antilia.app",
   "android_minimo": 7,
   "sdk_minimo": 24,
-  "bytes": 10470087,
-  "sha256": "ba31f5974b1aa0040919cd5c1c40da6e6b6edd69c952644be7a40a5f2155ee0a",
+  "bytes": 10474183,
+  "sha256": "f18f5767686d695af80f5a9c8c82247455782f2e36c30190f3996b83a22421ad",
   "firma_verificada": true,
   "alineacion_16KB": true,
   "debuggable": false,
@@ -21,7 +21,8 @@
     "CAMERA"
   ],
   "camara_opcional": true,
-  "source_commit": "0ac5550",
+  "source_commit": "9ab0bc9",
   "navegacion_atras": "historial, diálogo y confirmación al salir; dispositivo físico pendiente",
-  "instrumentacion": "Registro, activación, regreso y panel privado; respeta preferencia de no medición."
+  "instrumentacion": "Registro, activación, regreso y panel privado; respeta preferencia de no medición.",
+  "comparacion": "Protocolo compartido, sesiones R1/R2, SUS, éxito y tiempos, CSV e historial; acceso privado."
 }
