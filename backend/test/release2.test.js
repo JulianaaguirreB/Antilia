@@ -16,9 +16,9 @@ let pool;
 let base;
 let users;
 
-async function request(path, { method = 'GET', token, body } = {}) {
-  const result = await realFetch(base + path, { method, headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) }, body: body === undefined ? undefined : JSON.stringify(body) });
-  return { status: result.status, data: await result.json() };
+async function request(path, { method = 'GET', token, body, headers = {} } = {}) {
+  const result = await realFetch(base + path, { method, headers: { ...headers, ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) }, body: body === undefined ? undefined : JSON.stringify(body) });
+  return { status: result.status, data: result.status===204 ? null : await result.json() };
 }
 
 async function register(name) {
@@ -77,7 +77,7 @@ after(async () => {
 
 test('migraciones repetibles y esquema con datos aislados', async () => {
   const result = await pool.query('SELECT name FROM schema_migrations ORDER BY name');
-  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql', '005_gmail.sql', '006_desk_models.sql', '007_personal_style.sql', '008_landing_metrics.sql', '009_welcome_email.sql']);
+  assert.deepEqual(result.rows.map(row => row.name), ['001_init.sql', '002_release2.sql', '003_measurements.sql', '004_desks.sql', '005_gmail.sql', '006_desk_models.sql', '007_personal_style.sql', '008_landing_metrics.sql', '009_welcome_email.sql', '010_product_analytics.sql']);
   assert.equal((await request('/spaces')).status, 401);
   assert.equal((await request('/shifts')).status, 401);
   assert.equal((await request('/reminders')).status, 401);
@@ -441,3 +441,105 @@ test('SMTP entrega al transporte y oculta errores del proveedor', async () => {
      assert.equal((await request('/auth/welcome-email',{method:'POST',token:failed.token,body:{}})).data.welcome_email,'sent');
    } finally { global.fetch=saved; }
  });
+
+
+test('Release 3 instrumentación automática y embudo sin datos inventados', async t => {
+ const previous=process.env.LANDING_ANALYTICS_ADMINS;
+ const owner=await register('analitica-admin');
+ process.env.LANDING_ANALYTICS_ADMINS=owner.user.email;
+ assert.equal((await request('/analytics/funnel',{token:owner.token})).status,403);
+ await verify(owner);
+ const headers=(sid,extra={})=>({'X-Antilia-Session':sid,'X-Antilia-Source':'qr','X-Antilia-Device':'android','X-Antilia-Audience':'test',...extra});
+ const create=async(sid,name='analitica',extra={})=>{
+  const response=await request('/auth/register',{method:'POST',headers:headers(sid,extra),body:{name,email:name+'-'+crypto.randomBytes(6).toString('hex')+'@example.com',password:'PruebaR32026'}});
+  assert.equal(response.status,201);return response.data;
+ };
+ const count=async(user,event)=>(await pool.query('SELECT count(*)::int AS total FROM analytics_events WHERE user_id=$1 AND event=$2',[user.user.id,event])).rows[0].total;
+ const space=async user=>request('/spaces',{method:'POST',token:user.token,body:{name:'Mesa de prueba R3',type:'fisica'}});
+ const complete=async user=>{
+  const task=await request('/tasks',{method:'POST',token:user.token,body:{title:'Ordenar una libreta',type:'fisica'}});
+  return request('/tasks/'+task.data.task.id+'/complete',{method:'PATCH',token:user.token});
+ };
+ try {
+  await t.test('panel privado, entradas validadas y eventos públicos sin identidad inventada',async()=>{
+   assert.equal((await request('/analytics/funnel')).status,401);
+   const outsider=await register('analitica-externo');
+   assert.equal((await request('/analytics/funnel',{token:outsider.token})).status,403);
+   assert.equal((await request('/analytics/funnel?from=2026-02-30',{token:owner.token})).status,400);
+   assert.equal((await request('/analytics/funnel?from=2026-01-01&to=2026-11-30',{token:owner.token})).status,400);
+   assert.equal((await request('/analytics/funnel?audience=invalid',{token:owner.token})).status,400);
+   assert.equal((await request('/analytics/visit',{method:'POST',body:{event:'registration'}})).status,400);
+   assert.equal((await request('/analytics/activity',{method:'POST',token:outsider.token,body:{user_id:owner.user.id}})).status,400);
+  });
+  await t.test('recargas y solicitudes concurrentes no multiplican visitas',async()=>{
+   const sid=crypto.randomUUID();
+   const results=await Promise.all(Array.from({length:5},()=>request('/analytics/visit',{method:'POST',headers:headers(sid),body:{}})));
+   assert.ok(results.every(r=>r.status===204));
+   assert.equal((await pool.query("SELECT count(*)::int AS n FROM analytics_events WHERE session_id=$1 AND event='landing_visit'",[sid])).rows[0].n,1);
+  });
+  await t.test('registro real, activación en ambos órdenes y una sola conversión',async()=>{
+   const sid=crypto.randomUUID();await request('/analytics/visit',{method:'POST',headers:headers(sid),body:{}});
+   const user=await create(sid);
+   assert.equal(await count(user,'registration'),1);assert.equal(await count(user,'activation'),0);
+   assert.equal((await complete(user)).status,200);assert.equal(await count(user,'activation'),0);
+   assert.equal((await space(user)).status,201);assert.equal(await count(user,'activation'),1);
+   await Promise.all([space(user),complete(user)]);assert.equal(await count(user,'activation'),1);
+   const other=await create(crypto.randomUUID(),'otro-orden');await space(other);assert.equal(await count(other,'activation'),0);await complete(other);assert.equal(await count(other,'activation'),1);
+   const before=await count(other,'registration');
+   assert.equal((await request('/auth/register',{method:'POST',body:{name:'Duplicado',email:other.user.email,password:'PruebaR32026'}})).status,409);
+   assert.equal(await count(other,'registration'),before);
+  });
+  await t.test('origen inicial, pruebas con cuenta iniciada y rollback de activación',async()=>{
+   const sid=crypto.randomUUID();await request('/analytics/visit',{method:'POST',headers:headers(sid),body:{}});
+   const user=await create(sid,'origen-inicial',{'X-Antilia-Source':'instagram'});
+   assert.equal((await pool.query("SELECT source FROM analytics_events WHERE event='registration' AND user_id=$1",[user.user.id])).rows[0].source,'qr');
+   const teamSession=crypto.randomUUID();await request('/analytics/visit',{method:'POST',token:owner.token,headers:{'X-Antilia-Session':teamSession},body:{}});
+   assert.equal((await pool.query('SELECT audience FROM analytics_events WHERE session_id=$1',[teamSession])).rows[0].audience,'test');
+   await space(user);
+   await pool.query("CREATE FUNCTION analytics_test_failure() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'Fallo aislado de prueba'; END $$");
+   await pool.query("CREATE TRIGGER analytics_test_failure BEFORE INSERT ON analytics_events FOR EACH ROW WHEN (NEW.event='activation') EXECUTE FUNCTION analytics_test_failure()");
+   try {
+    assert.equal((await complete(user)).status,500);
+    assert.equal((await pool.query("SELECT count(*)::int AS n FROM tasks WHERE user_id=$1 AND status='completada'",[user.user.id])).rows[0].n,0);
+    assert.equal(await count(user,'activation'),0);
+   } finally {await pool.query('DROP TRIGGER analytics_test_failure ON analytics_events');await pool.query('DROP FUNCTION analytics_test_failure()');}
+  });
+  await t.test('regreso usa día del servidor y se deduplica bajo concurrencia',async()=>{
+   const user=await create(crypto.randomUUID(),'regreso');
+   await request('/analytics/activity',{method:'POST',token:user.token,body:{}});assert.equal(await count(user,'return'),0);
+   await pool.query("UPDATE analytics_user_state SET last_seen_day=(now() AT TIME ZONE 'America/Bogota')::date-1 WHERE user_id=$1",[user.user.id]);
+   const responses=await Promise.all(Array.from({length:6},()=>request('/analytics/activity',{method:'POST',token:user.token,body:{}})));
+   assert.ok(responses.every(r=>r.status===204));assert.equal(await count(user,'return'),1);
+   await request('/analytics/activity',{method:'POST',token:user.token,body:{}});assert.equal(await count(user,'return'),1);
+  });
+  await t.test('cuentas antiguas y preferencia de no medición no crean registros históricos',async()=>{
+   const old=await create(crypto.randomUUID(),'anterior');
+   await pool.query('DELETE FROM analytics_events WHERE user_id=$1',[old.user.id]);await pool.query('DELETE FROM analytics_user_state WHERE user_id=$1',[old.user.id]);
+   await request('/analytics/activity',{method:'POST',token:old.token,body:{}});await space(old);await complete(old);
+   assert.equal(await count(old,'registration'),0);assert.equal(await count(old,'activation'),0);assert.equal(await count(old,'return'),0);
+   const hidden=await create(crypto.randomUUID(),'sin-medicion',{'X-Antilia-Analytics':'off'});
+   await request('/spaces',{method:'POST',token:hidden.token,headers:{'X-Antilia-Analytics':'off'},body:{name:'Mesa privada',type:'fisica'}});
+   await request('/analytics/activity',{method:'POST',token:hidden.token,headers:{'Sec-GPC':'1'},body:{}});
+   assert.equal((await pool.query('SELECT count(*)::int AS n FROM analytics_events WHERE user_id=$1',[hidden.user.id])).rows[0].n,0);
+   assert.equal((await request('/auth/me',{token:hidden.token})).status,200);
+   const sid=crypto.randomUUID();await request('/analytics/visit',{method:'POST',headers:headers(sid,{'DNT':'1'}),body:{}});
+   assert.equal((await pool.query('SELECT count(*)::int AS n FROM analytics_events WHERE session_id=$1',[sid])).rows[0].n,0);
+  });
+  await t.test('embudo mantiene unidades comparables y separa pruebas después del registro',async()=>{
+   const before=(await request('/analytics/funnel?audience=test',{token:owner.token})).data;
+   const sid=crypto.randomUUID();await request('/analytics/visit',{method:'POST',headers:headers(sid),body:{}});
+   const first=await create(sid,'primera');const second=await create(sid,'segunda');await space(first);await complete(first);await space(second);await complete(second);
+   const after=(await request('/analytics/funnel?audience=test',{token:owner.token})).data;
+   assert.equal(after.steps[0].total-before.steps[0].total,1);assert.equal(after.steps[1].total-before.steps[1].total,1);assert.equal(after.steps[2].total-before.steps[2].total,1);
+   assert.equal(after.accounts.registered-before.accounts.registered,2);assert.equal(after.accounts.activated-before.accounts.activated,2);
+   assert.ok(after.steps.every((step,i)=>!i||step.total<=after.steps[i-1].total));
+   assert.ok(after.recent.every(row=>!('user_id' in row)&&!('session_id' in row)&&!('email' in row)));
+   const separate=await register('separar-equipo');
+   const publicBefore=(await request('/analytics/funnel',{token:owner.token})).data.accounts.registered;
+   assert.equal((await request('/analytics/exclusions',{method:'POST',token:owner.token,body:{email:separate.user.email,reason:'team'}})).status,200);
+   const publicAfter=(await request('/analytics/funnel',{token:owner.token})).data.accounts.registered;
+   assert.equal(publicBefore-publicAfter,1);
+   assert.equal((await request('/analytics/exclusions',{method:'POST',token:first.token,body:{email:separate.user.email,reason:'remove'}})).status,403);
+  });
+ } finally {if(previous===undefined)delete process.env.LANDING_ANALYTICS_ADMINS;else process.env.LANDING_ANALYTICS_ADMINS=previous;}
+});

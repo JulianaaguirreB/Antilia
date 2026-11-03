@@ -11,6 +11,7 @@
     "smoke": "node scripts/smoke.js",
     "smoke:streak": "node scripts/smoke-streak.js",
     "test:release2": "node --test --test-concurrency=1 test/release2.test.js",
+    "test:release3": "node --test --test-concurrency=1 test/release2.test.js",
     "reminders:dispatch": "node scripts/dispatch-reminders.js",
     "preview:release2": "node scripts/preview-local.js"
   },
