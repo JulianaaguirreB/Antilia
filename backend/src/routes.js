@@ -19,4 +19,6 @@ router.use('/landing', require('./modules/landing/landing.routes'));
 
 router.use('/analytics', require('./modules/analytics/analytics.routes'));
 
+router.use('/validation', require('./modules/validation/validation.routes'));
+
 module.exports = router;
