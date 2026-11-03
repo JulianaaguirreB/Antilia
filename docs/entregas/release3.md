@@ -73,3 +73,10 @@ La exportación CSV incluye el resumen, códigos, referencias y respuestas SUS, 
 Verificación local: las 38 pruebas del servidor pasaron. `qa/release3-comparison.cjs` comprobó el recorrido de protocolo, sesiones, SUS, repetidos, corrección, exclusión y restauración, exportación protegida de fórmulas y ausencia de desbordes en 320, 390 y 768 píxeles. Solo se usaron ejemplos claramente marcados en la base local con correo desactivado. La herramienta no acredita por sí sola que la validación se haya ejecutado.
 
 Quedan por definir y construir al menos tres updates desde hallazgos reales de R2. No se creó el tag v0.3.
+
+
+## Publicación de la comparación comprobada
+
+El 3 de noviembre se publicó el código de `6271f2f` en el despliegue `dpl_8Tdj4SphAT43x24CCgQYhYzesw9f`, con alias https://antilia-delta.vercel.app. Los logs confirman la migración 011 completada y la compilación correcta. La landing responde 200 y `/api/validation/protocols` responde 401 sin sesión. No se cargaron sesiones ficticias en producción.
+
+La comparación está en https://antilia-delta.vercel.app/#/comparacion para cuentas autorizadas. El APK 0.3.6, compilación 8, se descarga desde https://antilia-delta.vercel.app/downloads/antilia.apk?v=8. Tamaño: 10474183 bytes. SHA-256: f18f5767686d695af80f5a9c8c82247455782f2e36c30190f3996b83a22421ad. La descarga pública coincide con esa huella; se comprobaron cabeceras de archivo Android, firma previa, alineación de 16 KB y recursos compilados. La instalación física sigue pendiente. El IPA no se modificó en este bloque.
