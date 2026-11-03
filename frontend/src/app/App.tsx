@@ -1,3 +1,5 @@
+import {ProductAnalytics} from '../features/analytics/ProductAnalytics';
+import {useProductActivity} from '../features/analytics/useProductActivity';
 import { Landing } from '../features/landing/Landing';
 import { LandingMetrics } from '../features/landing/LandingMetrics';
 import { BootSplash, introWasSeen } from '../shared/components/BootSplash';
@@ -22,6 +24,7 @@ export function AppContent() {
   const { user, loading } = useAuth();
   const { hash: fullHash, navigate } = useHashRoute();
   const hash = fullHash.split('?')[0];
+  useProductActivity(user?.id,hash);
   useEffect(()=>{if(user&&!loading&&!['#/acceso','#/registro','#/bienvenida','#/recuperar'].includes(hash))clearLoginDestination();},[user,loading,hash]);
 
   if (hash==='#/'||hash==='#/landing') return <Landing navigate={navigate}/>;
@@ -47,6 +50,7 @@ export function AppContent() {
   }
 
   switch (hash) {
+    case '#/analitica': return <ProductAnalytics navigate={navigate}/>;
     case '#/visitas': return <LandingMetrics navigate={navigate}/>;
     case '#/sesion': return <FocusSession navigate={navigate}/>;
     case '#/mi-escritorio': return <Desk navigate={navigate}/>;
