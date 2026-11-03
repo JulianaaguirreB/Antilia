@@ -1,3 +1,4 @@
+import {ReleaseComparison} from '../features/validation/ReleaseComparison';
 import {ProductAnalytics} from '../features/analytics/ProductAnalytics';
 import {useProductActivity} from '../features/analytics/useProductActivity';
 import { Landing } from '../features/landing/Landing';
@@ -50,6 +51,7 @@ export function AppContent() {
   }
 
   switch (hash) {
+    case '#/comparacion': return <ReleaseComparison navigate={navigate}/>;
     case '#/analitica': return <ProductAnalytics navigate={navigate}/>;
     case '#/visitas': return <LandingMetrics navigate={navigate}/>;
     case '#/sesion': return <FocusSession navigate={navigate}/>;
