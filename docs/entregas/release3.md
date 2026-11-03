@@ -1,6 +1,6 @@
 # Release 3 en preparación
 
-Fecha de revisión: 3 de noviembre de 2026. Entrega: 8 de noviembre a las 23:59 de Bogotá; demo: 12 de noviembre. El primer bloque técnico está aprobado para publicación. La validación académica y los cuatro updates restantes siguen pendientes; no se creó el tag v0.3.
+Fecha de revisión: 3 de noviembre de 2026. Entrega: 8 de noviembre a las 23:59 de Bogotá; demo: 12 de noviembre. El primer bloque técnico está publicado en Vercel y en developer. La validación académica y los cuatro updates restantes siguen pendientes; no se creó el tag v0.3.
 
 ## Primer update de instrumentación
 
@@ -8,7 +8,7 @@ Instrumentación de registro, activación y regreso con panel privado y embudo. 
 
 Criterio de terminado técnico: una visita medida, una cuenta creada y las dos acciones de activación aparecen en el panel sin duplicarse con recargas o solicitudes concurrentes; el regreso se cuenta al abrir la app con sesión iniciada en otro día de Bogotá. El panel actualiza cada 15 segundos si está visible y permite exportar evidencia CSV.
 
-La condición de eventos en producción se comprueba al finalizar la publicación; el inicio real de medición lo fija la migración de la base publicada. Los números de la vista local son datos de demostración; no se presentan como participantes del segmento ni resultados de producción.
+La ruta de eventos en producción aceptó una visita clasificada como prueba. El inicio real de medición lo fija la migración de la base publicada; registro, activación y regreso se guardan con la actividad nueva, sin reconstruir historial. Los números de la vista local son datos de demostración; no se presentan como participantes del segmento ni resultados de producción.
 
 ## Qué se mide
 
@@ -47,3 +47,16 @@ Todo usa bases PostgreSQL locales aisladas y correo desactivado o transporte sim
 Se necesitan los resultados reales de validación de R2 y las tareas de R1 para definir al menos tres updates basados en hallazgos identificables. Faltan cuatro updates por seleccionar y comprobar; no se cuentan partes del panel como varios cambios. La comparación debe incluir éxitos por tarea, tiempos promedio, SUS de ambos ciclos, dos participantes que repitan y las mejoras y retrocesos observados.
 
 También faltan el video narrado sobre la URL pública, el protocolo final con usuarios agendados, costos reales del periodo, comprobación externa de acceso y participación auténtica de todos los integrantes. La instrumentación no sustituye esas evidencias. El tag v0.3 se prepara cuando se apruebe el alcance final y estén listos los cinco updates.
+
+## Publicación comprobada el 3 de noviembre
+
+- URL pública: https://antilia-delta.vercel.app/
+- Panel privado: https://antilia-delta.vercel.app/#/analitica. Requiere cuenta autorizada con correo verificado.
+- Despliegue: dpl_BFkihEE2rHhWxMc6bUqawiZ14GGo, con el código de a6ebde2.
+- APK: https://antilia-delta.vercel.app/downloads/antilia.apk?v=7, versión 0.3.5, compilación 7, 10470087 bytes.
+- SHA-256 del APK: ba31f5974b1aa0040919cd5c1c40da6e6b6edd69c952644be7a40a5f2155ee0a.
+- Firma y alineación verificadas; conserva la firma de distribución anterior. La comprobación en teléfono Android físico sigue pendiente.
+- La descarga real en la URL pública coincide con esa huella y las cabeceras de APK. El evento de comprobación quedó marcado como test, fuera del grupo del público. No se crearon cuentas sintéticas en producción ni se enviaron mensajes de prueba.
+- Las rutas del panel y de actividad devuelven 401 sin sesión. Las 31 pruebas del servidor y los recorridos de interfaz se realizaron en entornos locales aislados.
+
+Este bloque es un update de instrumentación. La entrega completa y el tag v0.3 siguen pendientes de los otros cuatro updates y de las evidencias reales de validación.
