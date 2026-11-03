@@ -595,3 +595,26 @@ test('Release 3 comparación de validaciones R1 y R2',async t=>{
   });
  }finally{if(previous===undefined)delete process.env.LANDING_ANALYTICS_ADMINS;else process.env.LANDING_ANALYTICS_ADMINS=previous;}
 });
+
+
+test('espacios muestran contadores propios y restauran sin perder tareas', async () => {
+ const owner=await register('espaciosr3'),other=await register('espaciosajenosr3');
+ const made=await request('/spaces',{method:'POST',token:owner.token,body:{name:'Archivo R3',type:'fisica'}});
+ const id=made.data.space.id;
+ const add=async title=>(await request('/tasks',{method:'POST',token:owner.token,body:{title,type:'fisica',space_id:id}})).data.task;
+ const pending=await add('Guardar carpeta'),complete=await add('Ordenar libreta');
+ await request('/tasks/'+complete.id+'/complete',{method:'PATCH',token:owner.token});
+ let spaces=(await request('/spaces',{token:owner.token})).data.spaces;
+ assert.equal(spaces[0].pending_count,1);assert.equal(spaces[0].completed_count,1);
+ assert.equal((await request('/spaces',{token:other.token})).data.spaces.length,0);
+ assert.equal((await request('/spaces/'+id+'/archive',{method:'POST',token:owner.token})).status,409);
+ await request('/tasks/'+pending.id+'/archive',{method:'POST',token:owner.token});
+ assert.equal((await request('/spaces/'+id+'/archive',{method:'POST',token:owner.token})).status,200);
+ assert.equal((await request('/spaces/'+id+'/restore',{method:'POST',token:other.token})).status,404);
+ assert.equal((await request('/spaces/'+id+'/restore',{method:'POST'})).status,401);
+ assert.equal((await request('/spaces/'+id+'/restore',{method:'POST',token:owner.token})).status,200);
+ spaces=(await request('/spaces',{token:owner.token})).data.spaces;
+ assert.equal(spaces.length,1);assert.equal(spaces[0].completed_count,1);assert.equal(spaces[0].pending_count,0);
+ assert.equal((await request('/tasks?status=archivada&space_id='+id,{token:owner.token})).data.tasks[0].id,pending.id);
+ assert.equal((await request('/tasks?status=all&space_id='+id,{token:owner.token})).data.tasks[0].id,complete.id);
+});

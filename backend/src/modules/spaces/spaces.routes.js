@@ -11,7 +11,7 @@ router.use(requireAuth);
 
 router.get('/', route(async (req, res) => {
   const archived = queryBoolean(req.query.archived, 'archived');
-  const result = await pool.query('SELECT * FROM spaces WHERE user_id = $1 AND (archived_at IS NOT NULL) = $2 ORDER BY created_at, id', [req.userId, archived]);
+  const result = await pool.query("SELECT s.*, (SELECT count(*)::int FROM tasks t WHERE t.space_id=s.id AND t.user_id=$1 AND t.status IN ('pendiente','en_progreso')) AS pending_count, (SELECT count(*)::int FROM tasks t WHERE t.space_id=s.id AND t.user_id=$1 AND t.status='completada') AS completed_count FROM spaces s WHERE s.user_id = $1 AND (s.archived_at IS NOT NULL) = $2 ORDER BY s.created_at, s.id", [req.userId, archived]);
   res.json({ spaces: result.rows });
 }));
 
@@ -56,6 +56,13 @@ router.post('/:id/archive', route(async (req, res) => {
     return result.rows[0];
   });
   res.json({ space });
+}));
+
+router.post('/:id/restore', route(async (req, res) => {
+  const id = uuid(req.params.id, 'Espacio');
+  const result = await pool.query('UPDATE spaces SET archived_at=NULL, updated_at=now() WHERE id=$1 AND user_id=$2 RETURNING *', [id,req.userId]);
+  if (!result.rows.length) throw problem(404, 'Espacio no encontrado.');
+  res.json({space:result.rows[0]});
 }));
 
 module.exports = router;
