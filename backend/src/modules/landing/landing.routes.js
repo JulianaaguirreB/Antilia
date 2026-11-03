@@ -4,12 +4,7 @@ const { requireAuth } = require('../../shared/middleware/auth');
 const { route, problem } = require('../../shared/http');
 const { body } = require('../../shared/release2-validation');
 const events = ['visit','try_app','download_options','download_android','iphone_web','download_ipa'];
-async function canRead(userId) {
- const allowed = (process.env.LANDING_ANALYTICS_ADMINS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
- if (!allowed.length) return false;
- const result = await pool.query('SELECT email FROM users WHERE id = $1', [userId]);
- return allowed.includes(result.rows[0]?.email.toLowerCase());
-}
+const {canRead} = require('../analytics/tracking');
 router.post('/events', route(async (req,res) => {
  const input = body(req.body, ['event','device','source']);
  if (!events.includes(input.event) || !['desktop','android','iphone'].includes(input.device) || !['directo','whatsapp','instagram','qr','otro'].includes(input.source)) throw problem(400, 'Evento inválido.');

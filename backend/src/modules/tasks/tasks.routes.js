@@ -1,3 +1,4 @@
+const {recordAction,context} = require('../analytics/tracking');
 const express = require("express");
 const { pool } = require("../../infrastructure/database/pool");
 const { requireAuth } = require("../../shared/middleware/auth");
@@ -135,6 +136,7 @@ router.patch("/:id/complete", async (req, res, next) => {
     }
 
     const streak = await updateStreakOnCompletion(client, req.userId);
+    await recordAction(client,req.userId,'complete',context(req));
 
     await client.query("COMMIT");
     res.json({ task: taskResult.rows[0], streak });

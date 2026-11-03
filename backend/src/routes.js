@@ -17,4 +17,6 @@ router.use('/mailbox', require('./modules/mailbox/mailbox.routes'));
 
 router.use('/landing', require('./modules/landing/landing.routes'));
 
+router.use('/analytics', require('./modules/analytics/analytics.routes'));
+
 module.exports = router;
