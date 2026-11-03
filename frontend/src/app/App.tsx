@@ -1,3 +1,5 @@
+import {GuidedStart} from '../features/home/components/GuidedStart';
+import {PendingHub} from '../features/tasks/pages/PendingHub';
 import {ReleaseComparison} from '../features/validation/ReleaseComparison';
 import {ProductAnalytics} from '../features/analytics/ProductAnalytics';
 import {useProductActivity} from '../features/analytics/useProductActivity';
@@ -51,6 +53,8 @@ export function AppContent() {
   }
 
   switch (hash) {
+    case '#/primeros-pasos': return <GuidedStart navigate={navigate}/>;
+    case '#/pendientes': return <PendingHub navigate={navigate}/>;
     case '#/comparacion': return <ReleaseComparison navigate={navigate}/>;
     case '#/analitica': return <ProductAnalytics navigate={navigate}/>;
     case '#/visitas': return <LandingMetrics navigate={navigate}/>;

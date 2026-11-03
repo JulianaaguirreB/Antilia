@@ -2,7 +2,7 @@ import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { useState, useEffect } from 'react';
 
-const returnPaths=new Set(['#/comparacion','#/analitica','#/inicio','#/mi-escritorio','#/medir-espacio','#/espacios','#/escritorio','#/progreso','#/digital','#/sesion','#/metricas','#/estado','#/perfil','#/turnos','#/recordatorios','#/correos','#/archivos','#/kanban','#/archivadas','#/privacidad']);
+const returnPaths=new Set(['#/primeros-pasos','#/pendientes','#/comparacion','#/analitica','#/inicio','#/mi-escritorio','#/medir-espacio','#/espacios','#/escritorio','#/progreso','#/digital','#/sesion','#/metricas','#/estado','#/perfil','#/turnos','#/recordatorios','#/correos','#/archivos','#/kanban','#/archivadas','#/privacidad']);
 function allowedReturn(path:string) { return returnPaths.has(path)||/^#\/espacio\/[0-9a-f-]{36}$/i.test(path); }
 export function rememberLoginDestination(path:string) {
   try{if(allowedReturn(path))sessionStorage.setItem('antilia_login_destination',path);}catch{}

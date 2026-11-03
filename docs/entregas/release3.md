@@ -1,6 +1,6 @@
 # Release 3 en preparación
 
-Fecha de revisión: 3 de noviembre de 2026. Entrega: 8 de noviembre a las 23:59 de Bogotá; demo: 12 de noviembre. El primer bloque técnico está publicado en Vercel y en developer. La validación académica y los cambios basados en hallazgos siguen pendientes; no se creó el tag v0.3.
+Estado técnico actualizado: 3 de noviembre de 2026. Los apartados de publicación conservan el historial de cada avance. Entrega: 8 de noviembre a las 23:59 de Bogotá; demo: 12 de noviembre. El primer bloque técnico está publicado en Vercel y en developer. La validación académica y los cambios basados en hallazgos siguen pendientes; no se creó el tag v0.3.
 
 ## Primer update de instrumentación
 
@@ -80,3 +80,24 @@ Quedan por definir y construir al menos tres updates desde hallazgos reales de R
 El 3 de noviembre se publicó el código de `6271f2f` en el despliegue `dpl_8Tdj4SphAT43x24CCgQYhYzesw9f`, con alias https://antilia-delta.vercel.app. Los logs confirman la migración 011 completada y la compilación correcta. La landing responde 200 y `/api/validation/protocols` responde 401 sin sesión. No se cargaron sesiones ficticias en producción.
 
 La comparación está en https://antilia-delta.vercel.app/#/comparacion para cuentas autorizadas. El APK 0.3.6, compilación 8, se descarga desde https://antilia-delta.vercel.app/downloads/antilia.apk?v=8. Tamaño: 10474183 bytes. SHA-256: f18f5767686d695af80f5a9c8c82247455782f2e36c30190f3996b83a22421ad. La descarga pública coincide con esa huella; se comprobaron cabeceras de archivo Android, firma previa, alineación de 16 KB y recursos compilados. La instalación física sigue pendiente. El IPA no se modificó en este bloque.
+
+
+## Alcance técnico para la entrega
+
+Se completaron cinco cambios verificables. La validación R2 no se ha realizado, según confirmó el equipo; por eso no se declara cumplido el requisito de tres cambios nacidos de esa validación. El material recibido tiene las cinco respuestas del 25 de octubre identificadas como validación R1 en el reporte, SUS promedio 77,5. No contiene tiempos medidos ni tasas observadas de éxito. No se importaron opiniones de facilidad como éxitos o tiempos en el panel.
+
+| # | Cambio | Origen real | Criterio verificable |
+| --- | --- | --- | --- |
+| 01 | Instrumentación y embudo privado | Requisito de la Junta R3 | Visita, registro, activación y regreso se guardan con acciones nuevas; panel y CSV separan pruebas del público. |
+| 02 | Comparación R1/R2 | Requisito de la Junta R3 | Con un mismo protocolo y sesiones reales calcula SUS, éxito, tiempo y repetidos; vacío muestra Sin datos; correcciones y exclusiones conservan historial. |
+| 03 | Recorrido guiado accionable y acceso destacado en Inicio | H1/H2 de R1 como antecedente, decisión de producto pendiente de revalidar | Desde Inicio se crea espacio, se agrega una tarea asociada y se completa sin salir del recorrido; tres pasos se reconstruyen desde la cuenta al recargar. |
+| 04 | Espacios localizables y recuperables | H3 de R1: una respuesta neutral sobre crear/encontrar espacios | Busca por nombre/descripción sin tildes, filtra por tipo, ordena, muestra pendientes y completadas; restaura un archivado sin perder historial ni exponer cuentas ajenas. |
+| 05 | Bandeja unificada de pendientes | H1/H2 de R1 como antecedente, decisión de producto pendiente de revalidar | Reúne pendientes físicos y digitales; busca por tarea/espacio y filtra estado, fecha de Bogotá y espacio; permite crear, editar y completar desde la lista. |
+
+No se cuentan subcomponentes de instrumentación como updates separados. Los cambios 03–05 usan antecedentes conocidos o decisiones de producto, no hallazgos de R2. Tener cinco cambios técnicos no demuestra el cumplimiento académico completo.
+
+Rutas para la demo: `#/primeros-pasos`, `#/espacios`, `#/pendientes`, `#/analitica` y `#/comparacion`. La guía también se abre desde Perfil. Las tarjetas nuevas no modifican el cuadro de racha ni el vestidor de Lumi. La guía mantiene su avance por datos guardados en la cuenta, no por marcas ficticias en el navegador.
+
+Comprobaciones: 39 pruebas backend aprobadas, incluidos aislamiento y restauración de espacios con tareas; `qa/release3-experience.cjs` ejecuta el recorrido por la interfaz contra base local aislada con correo desactivado, filtros vacíos, búsqueda sin tildes, recarga, racha y restauración. Anchos 320/390/768 sin desbordes. La navegación Android se comprobó con puente simulado (`qa/android-back.cjs`); el teléfono físico sigue pendiente.
+
+La URL de producción y el APK contienen el código de la entrega. Quedan fuera del alcance de código la ejecución real de las validaciones, al menos dos participantes repetidos, las evidencias y tiempos originales, el video narrado, el plan final con usuarios agendados, costos reales y los commits auténticos de cada integrante. El equipo debe resolver además la diferencia entre las tareas del protocolo R1 y las nuevas tareas propuestas para R2 antes de afirmar que las métricas son comparables. No se completan esos datos automáticamente.
