@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", service: "antilia-backend", release: "v0.2-dev" });
+  res.json({ status: "ok", service: "antilia-backend", release: "v0.3" });
 });
 
 app.get('/api/capabilities', (req, res) => {

@@ -101,3 +101,8 @@ Rutas para la demo: `#/primeros-pasos`, `#/espacios`, `#/pendientes`, `#/analiti
 Comprobaciones: 39 pruebas backend aprobadas, incluidos aislamiento y restauración de espacios con tareas; `qa/release3-experience.cjs` ejecuta el recorrido por la interfaz contra base local aislada con correo desactivado, filtros vacíos, búsqueda sin tildes, recarga, racha y restauración. Anchos 320/390/768 sin desbordes. La navegación Android se comprobó con puente simulado (`qa/android-back.cjs`); el teléfono físico sigue pendiente.
 
 La URL de producción y el APK contienen el código de la entrega. Quedan fuera del alcance de código la ejecución real de las validaciones, al menos dos participantes repetidos, las evidencias y tiempos originales, el video narrado, el plan final con usuarios agendados, costos reales y los commits auténticos de cada integrante. El equipo debe resolver además la diferencia entre las tareas del protocolo R1 y las nuevas tareas propuestas para R2 antes de afirmar que las métricas son comparables. No se completan esos datos automáticamente.
+
+
+## Paquete técnico v0.3
+
+APK 0.3.7, compilación 9: 10478279 bytes; SHA-256 401ca0b5ff5c76a3dbafc24acd9f2522f1b2c08b7ae3f2ce08d1e6d736a00fe1. Mantiene firma anterior y alineación de 16 KB. La etiqueta v0.3 identifica el código y los cinco cambios técnicos enumerados; no acredita validaciones, video ni los tres orígenes de R2 pendientes. El IPA distribuido no se actualiza con este bloque.

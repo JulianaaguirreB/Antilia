@@ -2,7 +2,7 @@
 
 [Descargar APK](https://antilia-delta.vercel.app/downloads/antilia.apk) · [Huella SHA-256](https://antilia-delta.vercel.app/downloads/antilia.sha256)
 
-Versión 0.3.6, compilación 8. Requiere Android 7 o posterior e internet. Conserva la firma anterior para actualizar sin desinstalar. Incluye bienvenida por correo al registrarse, navegación Atrás entre pantallas con confirmación al salir, accesos superiores a Inicio, foto de perfil, vestidor de Lumi con gafas, landing pública y la interfaz inspirada en Lumi, bienvenida animada y navegación Correos y archivos, además de tres mesas 3D, tarjetas personalizables, medición de ancho y fondo con corrección de perspectiva y Lumi. Se conecta a la API pública de Antilia y a los datos existentes de cada cuenta: tareas, recuperación por correo y acceso a Gmail para los usuarios autorizados del piloto.
+Versión 0.3.7, compilación 9. Requiere Android 7 o posterior e internet. Conserva la firma anterior para actualizar sin desinstalar. Incluye bienvenida por correo al registrarse, navegación Atrás entre pantallas con confirmación al salir, accesos superiores a Inicio, foto de perfil, vestidor de Lumi con gafas, landing pública y la interfaz inspirada en Lumi, bienvenida animada y navegación Correos y archivos, además de tres mesas 3D, tarjetas personalizables, medición de ancho y fondo con corrección de perspectiva y Lumi. Se conecta a la API pública de Antilia y a los datos existentes de cada cuenta: tareas, recuperación por correo y acceso a Gmail para los usuarios autorizados del piloto.
 
 1. Abre la web de Antilia desde el teléfono Android y pulsa **Descargar Antilia para Android (APK)**.
 2. Abre el archivo descargado. Si Android lo solicita, permite que ese navegador instale el archivo y confirma la instalación.
@@ -24,6 +24,8 @@ Comprueba la firma con `apksigner verify --verbose --print-certs`, la alineació
 
 La cámara se solicita únicamente al tomar una foto de perfil o medir la mesa. La galería abre el selector del sistema sin permiso general de almacenamiento. Rechazar o cancelar no bloquea las tareas; se puede usar una foto elegida o introducir medidas manuales. [Permisos de Android](../../docs/instalacion/permisos-android.md).
 
-La versión 0.3.6 registra el uso de registro, activación y regreso según la preferencia de medición de cada dispositivo. El equipo autorizado con correo verificado puede consultar el embudo y exportar su evidencia; las cuentas del equipo y de prueba se separan del público. Las cifras anteriores no se reconstruyen ni se presentan como nuevos eventos.
+La versión 0.3.7 registra el uso de registro, activación y regreso según la preferencia de medición de cada dispositivo. El equipo autorizado con correo verificado puede consultar el embudo y exportar su evidencia; las cuentas del equipo y de prueba se separan del público. Las cifras anteriores no se reconstruyen ni se presentan como nuevos eventos.
 
 El equipo autorizado también puede registrar las sesiones de validación R1/R2 y comparar SUS, éxito y tiempos. Los ejemplos locales no se publican como resultados reales.
+
+La compilación 9 añade el recorrido guiado desde Inicio y Perfil, espacios con búsqueda, filtros, contadores y restauración, y una bandeja con todos los pendientes físicos y digitales ordenados por fecha límite.

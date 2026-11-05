@@ -1,11 +1,11 @@
 {
-  "version": "0.3.6",
-  "versionCode": 8,
+  "version": "0.3.7",
+  "versionCode": 9,
   "package": "co.antilia.app",
   "android_minimo": 7,
   "sdk_minimo": 24,
-  "bytes": 10474183,
-  "sha256": "f18f5767686d695af80f5a9c8c82247455782f2e36c30190f3996b83a22421ad",
+  "bytes": 10478279,
+  "sha256": "401ca0b5ff5c76a3dbafc24acd9f2522f1b2c08b7ae3f2ce08d1e6d736a00fe1",
   "firma_verificada": true,
   "alineacion_16KB": true,
   "debuggable": false,
@@ -21,8 +21,11 @@
     "CAMERA"
   ],
   "camara_opcional": true,
-  "source_commit": "9ab0bc9",
+  "source_commit": "27034b9",
   "navegacion_atras": "historial, diálogo y confirmación al salir; dispositivo físico pendiente",
   "instrumentacion": "Registro, activación, regreso y panel privado; respeta preferencia de no medición.",
-  "comparacion": "Protocolo compartido, sesiones R1/R2, SUS, éxito y tiempos, CSV e historial; acceso privado."
+  "comparacion": "Protocolo compartido, sesiones R1/R2, SUS, éxito y tiempos, CSV e historial; acceso privado.",
+  "recorrido": "Crear espacio, tarea asociada y completar con avance real de la cuenta.",
+  "espacios": "Búsqueda sin tildes, filtros, contadores y restauración con aislamiento.",
+  "pendientes": "Lista física y digital con búsqueda por tarea/espacio y filtros por estado, fecha y espacio."
 }
