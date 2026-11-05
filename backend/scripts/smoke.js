@@ -23,13 +23,10 @@ function assertMatch(actual, regex, msg) {
 
 async function run() {
   try {
-    // 1. health
     let res = await fetch(`${BASE_URL}/api/health`);
     assertEqual(res.status, 200, "Health check status 200");
     let json = await res.json();
     assertEqual(json.service, "antilia-backend", "Health check service name");
-
-    // 2. registro
     const email = `test${Date.now()}@example.com`;
     const pwd = "Password123";
     res = await fetch(`${BASE_URL}/api/auth/register`, {
@@ -46,16 +43,12 @@ async function run() {
       console.log("PASS: Register response no password_hash");
     }
     const token = json.token;
-
-    // 3. correo duplicado
     res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Test User", email, password: pwd })
     });
     assertEqual(res.status, 409, "Register duplicate email 409");
-
-    // 4. login
     res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -69,8 +62,6 @@ async function run() {
       body: JSON.stringify({ email, password: "WrongPassword1" })
     });
     assertEqual(res.status, 401, "Login invalid 401");
-
-    // (a) registro con contraseña " Prueba1234 " y login con esa misma clave → 200
     const emailUntrimmedPwd = `test_untrimmed_${Date.now()}@example.com`;
     const pwdUntrimmed = " Prueba1234 ";
     res = await fetch(`${BASE_URL}/api/auth/register`, {
@@ -86,8 +77,6 @@ async function run() {
       body: JSON.stringify({ email: emailUntrimmedPwd, password: pwdUntrimmed })
     });
     assertEqual(res.status, 200, "Login with untrimmed password 200");
-
-    // (b) login con 80 bytes → 400 con el mensaje del punto 2
     const longBytesPwd = "a".repeat(80);
     res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
@@ -97,8 +86,6 @@ async function run() {
     assertEqual(res.status, 400, "Login with 80 bytes password 400");
     let jsonErr = await res.json();
     assertEqual(jsonErr.message || jsonErr.error, "La contraseña es demasiado larga (máximo 72 bytes).", "Login with 80 bytes password message");
-
-    // 5. /me y protegido sin token
     res = await fetch(`${BASE_URL}/api/auth/me`, {
       headers: { "Authorization": `Bearer ${token}` }
     });
@@ -106,8 +93,6 @@ async function run() {
     
     res = await fetch(`${BASE_URL}/api/auth/me`);
     assertEqual(res.status, 401, "Get /me no token 401");
-
-    // 6. crear tarea
     res = await fetch(`${BASE_URL}/api/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
@@ -123,8 +108,6 @@ async function run() {
       body: JSON.stringify({ title: "Digital 1", type: "digital" })
     });
     assertEqual(res.status, 201, "Create task digital 201");
-
-    // invalid type, title no-string, title >120, email no-string
     res = await fetch(`${BASE_URL}/api/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
@@ -152,8 +135,6 @@ async function run() {
       body: JSON.stringify({ name: "1", email: 123, password: pwd })
     });
     assertEqual(res.status, 400, "Register email invalid type 400");
-
-    // listados
     res = await fetch(`${BASE_URL}/api/tasks?status=pendiente`, { headers: { "Authorization": `Bearer ${token}` }});
     json = await res.json();
     assertEqual(json.tasks.length, 2, "List pending tasks 2");
@@ -195,8 +176,6 @@ async function run() {
       headers: { "Authorization": `Bearer ${token}` }
     });
     assertEqual(res.status, 404, "Complete invalid UUID 404");
-
-    // json malformado
     res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -205,8 +184,6 @@ async function run() {
     assertEqual(res.status, 400, "Malformed JSON 400");
     json = await res.json();
     assertEqual(json.error, "JSON inválido.", "Malformed JSON message");
-
-    // /api/inexistente
     res = await fetch(`${BASE_URL}/api/inexistente`);
     assertEqual(res.status, 404, "API not found 404");
     json = await res.json();
