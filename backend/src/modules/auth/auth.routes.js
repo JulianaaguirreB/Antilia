@@ -1,3 +1,4 @@
+const {recordAction,context} = require('../analytics/tracking');
 const { welcomeEmail } = require('../../infrastructure/mail/welcome');
 const express = require("express");
 const bcrypt = require("bcryptjs");
@@ -22,7 +23,8 @@ router.post("/register", async (req, res, next) => {
     const password = validatePassword(req.body.password);
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const result = await pool.query(
+    const user = await transaction(async client => {
+    const result = await client.query(
       `WITH new_user AS (
         INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, created_at
       ), new_streak AS (
@@ -31,7 +33,10 @@ router.post("/register", async (req, res, next) => {
       SELECT id, name, email, created_at FROM new_user`,
       [name, email, passwordHash]
     );
-    const user = result.rows[0];
+    const created = result.rows[0];
+    await recordAction(client,created.id,'registration',context(req));
+    return created;
+    });
 
     const token = signToken(user.id);
     const welcome_email = await welcomeEmail(user.id).catch(() => 'failed');

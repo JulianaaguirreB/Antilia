@@ -63,5 +63,5 @@ export function ResourceState({ loading, error, retry }: { loading: boolean; err
 }
 
 export function FieldSelect({ label, value, onChange, children }: { label: string; value: string; onChange: (v: string) => void; children: ReactNode }) {
-  return <label className="flex flex-col gap-2 text-sm font-medium">{label}<select value={value} onChange={e => onChange(e.target.value)} className="rounded-xl border border-border-main bg-white p-3 min-h-13 text-base">{children}</select></label>;
+  return <label className="flex flex-col gap-2 text-sm font-medium">{label}<select aria-label={label} value={value} onChange={e => onChange(e.target.value)} className="rounded-xl border border-border-main bg-white p-3 min-h-13 text-base">{children}</select></label>;
 }

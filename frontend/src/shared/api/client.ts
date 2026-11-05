@@ -1,3 +1,4 @@
+import {measurementHeaders} from '../../features/analytics/context';
 import { Capacitor } from '@capacitor/core';
 
 export class ApiError extends Error {
@@ -27,6 +28,7 @@ export async function api<T = any>(
   } catch (e) {}
   
   const headers = new Headers(options.headers || {});
+  measurementHeaders(headers);
   
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);

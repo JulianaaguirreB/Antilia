@@ -1,3 +1,5 @@
+import {api} from '../../shared/api/client';
+import {analyticsAllowed} from '../analytics/context';
 export type LandingEvent='visit'|'try_app'|'download_options'|'download_android'|'iphone_web'|'download_ipa';
 export function visitorDevice(): 'desktop'|'android'|'iphone' {
  if(/Android/i.test(navigator.userAgent))return 'android';
@@ -5,7 +7,8 @@ export function visitorDevice(): 'desktop'|'android'|'iphone' {
  return 'desktop';
 }
 export function trackLanding(event:LandingEvent, device=visitorDevice()) {
- if(navigator.doNotTrack==='1'||(navigator as Navigator&{globalPrivacyControl?:boolean}).globalPrivacyControl)return;
+ if(!analyticsAllowed())return;
+ if(event==='visit')void api('/analytics/visit',{method:'POST',body:'{}'}).catch(()=>{});
  const sourceValue=new URLSearchParams(location.search).get('utm_source')?.toLowerCase();
  const source=!sourceValue?'directo':['whatsapp','instagram','qr'].includes(sourceValue)?sourceValue:'otro';
  const key=`antilia_landing_${event}_${device}_${source}`;

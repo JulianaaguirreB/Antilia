@@ -1,3 +1,4 @@
+const {recordAction,context} = require('../analytics/tracking');
 const express = require('express');
 const { pool } = require('../../infrastructure/database/pool');
 const { requireAuth } = require('../../shared/middleware/auth');
@@ -10,14 +11,18 @@ router.use(requireAuth);
 
 router.get('/', route(async (req, res) => {
   const archived = queryBoolean(req.query.archived, 'archived');
-  const result = await pool.query('SELECT * FROM spaces WHERE user_id = $1 AND (archived_at IS NOT NULL) = $2 ORDER BY created_at, id', [req.userId, archived]);
+  const result = await pool.query("SELECT s.*, (SELECT count(*)::int FROM tasks t WHERE t.space_id=s.id AND t.user_id=$1 AND t.status IN ('pendiente','en_progreso')) AS pending_count, (SELECT count(*)::int FROM tasks t WHERE t.space_id=s.id AND t.user_id=$1 AND t.status='completada') AS completed_count FROM spaces s WHERE s.user_id = $1 AND (s.archived_at IS NOT NULL) = $2 ORDER BY s.created_at, s.id", [req.userId, archived]);
   res.json({ spaces: result.rows });
 }));
 
 router.post('/', route(async (req, res) => {
   const input = body(req.body, ['name', 'type', 'description']);
-  const result = await pool.query('INSERT INTO spaces (user_id, name, type, description) VALUES ($1, $2, $3, $4) RETURNING *', [req.userId, validateString(input.name, 'name', 1, 100), validateType(input.type), validateString(input.description ?? '', 'description', 0, 1000)]);
-  res.status(201).json({ space: result.rows[0] });
+  const space=await transaction(async client=>{
+  const result = await client.query('INSERT INTO spaces (user_id, name, type, description) VALUES ($1, $2, $3, $4) RETURNING *', [req.userId, validateString(input.name, 'name', 1, 100), validateType(input.type), validateString(input.description ?? '', 'description', 0, 1000)]);
+  await recordAction(client,req.userId,'space',context(req));
+  return result.rows[0];
+  });
+  res.status(201).json({ space });
 }));
 
 router.get('/:id', route(async (req, res) => {
@@ -51,6 +56,13 @@ router.post('/:id/archive', route(async (req, res) => {
     return result.rows[0];
   });
   res.json({ space });
+}));
+
+router.post('/:id/restore', route(async (req, res) => {
+  const id = uuid(req.params.id, 'Espacio');
+  const result = await pool.query('UPDATE spaces SET archived_at=NULL, updated_at=now() WHERE id=$1 AND user_id=$2 RETURNING *', [id,req.userId]);
+  if (!result.rows.length) throw problem(404, 'Espacio no encontrado.');
+  res.json({space:result.rows[0]});
 }));
 
 module.exports = router;
