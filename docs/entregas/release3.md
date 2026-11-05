@@ -106,3 +106,12 @@ La URL de producción y el APK contienen el código de la entrega. Quedan fuera 
 ## Paquete técnico v0.3
 
 APK 0.3.7, compilación 9: 10478279 bytes; SHA-256 401ca0b5ff5c76a3dbafc24acd9f2522f1b2c08b7ae3f2ce08d1e6d736a00fe1. Mantiene firma anterior y alineación de 16 KB. La etiqueta v0.3 identifica el código y los cinco cambios técnicos enumerados; no acredita validaciones, video ni los tres orígenes de R2 pendientes. El IPA distribuido no se actualiza con este bloque.
+
+
+## Publicación final del código — 5 de noviembre de 2026
+
+Rama developer publicada; etiqueta v0.3 en 894b56f. Despliegue de producción dpl_BJQxbXezqp3r42p371cG6b3zqy32, alias https://antilia-delta.vercel.app. La API health informa v0.3. La landing carga (200), el paquete público contiene primeros-pasos, pendientes, comparación y analítica, y las rutas de datos privados devuelven 401 sin sesión.
+
+La descarga pública https://antilia-delta.vercel.app/downloads/antilia.apk?v=9 coincide con el APK firmado 0.3.7, compilación 9, y su SHA-256 registrado. La prueba de descarga confirmó botón Android, cabeceras de APK y ausencia del instalador incompatible en iPhone. No se crearon cuentas de prueba ni registros de validación ficticios en producción. Las pruebas con acciones de usuarios se realizaron solo en local.
+
+El código técnico está publicado; la instalación física Android y las condiciones académicas pendientes se mantienen declaradas. La etiqueta no sustituye la validación R2 ni sus hallazgos.
