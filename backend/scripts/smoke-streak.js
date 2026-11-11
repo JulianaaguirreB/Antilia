@@ -36,8 +36,6 @@ async function run() {
   let client;
   try {
     client = await pool.connect();
-
-    // 1. registro
     const email = `streak${Date.now()}@test.com`;
     let res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
@@ -47,8 +45,6 @@ async function run() {
     let json = await res.json();
     const token = json.token;
     const userId = json.user.id;
-
-    // Fija last_active_date en ayer
     await client.query("UPDATE streaks SET current_streak = 5, best_streak = 5, last_active_date = (now() AT TIME ZONE 'America/Bogota')::date - 1 WHERE user_id = $1", [userId]);
 
     res = await fetch(`${BASE_URL}/api/tasks`, {
@@ -66,8 +62,6 @@ async function run() {
     json = await res.json();
     assertEqual(json.streak.current_streak, 6, "Subió racha desde ayer (5 -> 6)");
     assertEqual(json.streak.best_streak, 6, "Subió best_streak (5 -> 6)");
-
-    // Fija last_active_date en hace 3 días
     await client.query("UPDATE streaks SET current_streak = 6, best_streak = 6, last_active_date = (now() AT TIME ZONE 'America/Bogota')::date - 3 WHERE user_id = $1", [userId]);
 
     res = await fetch(`${BASE_URL}/api/streak`, { headers: { "Authorization": `Bearer ${token}` }});
