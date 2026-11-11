@@ -5,3 +5,11 @@ node_modules/
 *.log
 _referencia_figma/
 dist/
+.vercel/
+qa/evidencias/
+*.tsbuildinfo
+.signing/
+*.jks
+*.keystore
+
+.kotlin/
