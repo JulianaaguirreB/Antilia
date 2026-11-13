@@ -59,3 +59,14 @@ Faltan la muestra objetivo, cronometraje y éxito por tarea, el CSV actualizado 
 
 La viabilidad revisada recibida usa una hipótesis de suscripción por usuario de 15.000 COP/mes, 37 pagadores de equilibrio operativo y 101 con adquisición. El pitch conserva 34 y 93. Adoptar la revisión como referencia de la hipótesis comercial vigente y mantener el cobro B2B por oficina como experimento posterior. La demanda empresarial y la recuperación de inversión requieren sus propias evidencias.
 
+
+
+## Publicación del candidato comprobada
+
+Tag v1.0-rc en a2a224a141a84853d20e7899876886ef97da671a, publicado el 13 de noviembre. El código de aplicación coincide con main 48f75fa. Despliegue dpl_DoQrvnPM87YbGyk65WrwkDwKpjpX en estado Ready. La URL https://antilia-delta.vercel.app/ responde 200, la API health responde ok y las rutas privadas de analítica y comparación responden 401 sin sesión. Health conserva v0.3 porque no se modificó el código congelado.
+
+Vercel protege el enlace de despliegue antilia-44qkqsne1-antilia1.vercel.app y el alias antilia-v10-rc.vercel.app con autenticación de la cuenta. Las sesiones externas usan la URL pública de producción mientras se mantiene el congelamiento. Registrar commit, versión y fecha junto con cada evidencia.
+
+El reporte actualizado Antilia_Release3.pdf, aportado después del pitch, confirma siete respuestas R3 el 8 de noviembre con SUS 95,36. Solo una corresponde a empresa mediana; el segmento continúa limitado a empresas medianas por confirmación del equipo. Las cinco primeras mejoras planeadas son hipótesis a contrastar con el segmento. La precisión táctil 3D tiene dos dificultades declaradas, correos una y la unificación recibe 4,29/5. Los datos todavía no incluyen tiempos observados por tarea.
+
+Los documentos de validación final preparados conservan estas limitaciones. No se publicó una encuesta ficticia ni se cambiaron funcionalidades durante esta preparación.
