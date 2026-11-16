@@ -1,0 +1,58 @@
+import {lazy,Suspense,useEffect,useRef,useState} from 'react';
+import {api} from '../../../shared/api/client';
+import {Button,Input} from '../../../shared/components/ui';
+import {FieldSelect,Notice,ReleasePage,ResourceState,useResource} from '../../../shared/components/ReleaseLayout';
+import type {Navigate} from '../../../shared/components/ReleaseLayout';
+import {CameraMeasure} from '../../measurements/components/CameraMeasure';
+import {type DeskData,type DeskItem,models,labels,itemSize,normalizeDesk,placeItem,fits} from '../lib/layout';
+const DeskScene=lazy(()=>import('../components/DeskScene'));
+const initial:DeskData={name:'Mi escritorio',model:'recta',width_cm:120,depth_cm:70,height_cm:75,layout:[{id:'monitor',kind:'monitor',x:50,y:22},{id:'teclado',kind:'teclado',x:50,y:65}]};
+export function Desk({navigate}:{navigate:Navigate}){
+ const result=useResource<{desk:DeskData|null}>('/desk');
+ const [desk,setDesk]=useState<DeskData>(initial);
+ const deskRef=useRef(desk);deskRef.current=desk;
+ const [selected,setSelected]=useState('monitor');
+ const [newLabel,setNewLabel]=useState('');
+ const [mode,setMode]=useState<'move'|'orbit'>('move');
+ const [view,setView]=useState<'3d'|'top'|'plan'>('3d');
+ const [measuring,setMeasuring]=useState(false);
+ const [busy,setBusy]=useState(false);
+ const [dirty,setDirty]=useState(false);
+ const [error,setError]=useState('');
+ const [saved,setSaved]=useState(false);
+ useEffect(()=>{if(result.data?.desk){const value=normalizeDesk(result.data.desk);setDesk(value);setSelected(value.layout[0]?.id||'');}},[result.data]);
+ useEffect(()=>{if(!dirty)return;const warn=(event:BeforeUnloadEvent)=>{event.preventDefault();};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn);},[dirty]);
+ const change=(value:DeskData)=>{deskRef.current=value;setDesk(value);setDirty(true);setSaved(false);setError('');};
+ const item=desk.layout.find(i=>i.id===selected);
+ const validSize=desk.width_cm>=20&&desk.width_cm<=1000&&desk.depth_cm>=20&&desk.depth_cm<=1000&&(desk.height_cm??75)>=30&&(desk.height_cm??75)<=130;
+ const outside=validSize?desk.layout.filter(i=>!fits(desk,i)):[];
+ const move=(id:string,x:number,y:number)=>{const value=deskRef.current;change({...value,layout:value.layout.map(i=>i.id===id?placeItem(value,i,x,y):i)});};
+ const edit=(patch:Partial<DeskItem>)=>{if(!item)return;change({...desk,layout:desk.layout.map(i=>i.id===selected?placeItem(desk,{...i,...patch}):i)});};
+ const dimensions=(width:number,depth:number)=>{const next={...deskRef.current,width_cm:width,depth_cm:depth};change({...next,layout:next.layout.map(i=>placeItem(next,i))});};
+ return <ReleasePage title="Mi escritorio 3D" subtitle="Prueba tu distribución antes de mover las cosas de verdad." navigate={navigate} active="#/espacios" back="#/espacios">
+ <ResourceState {...result} retry={result.reload}/>{!result.loading&&!result.error&&<>
+ <form onSubmit={async event=>{event.preventDefault();if(outside.length){setError('Ajusta los objetos que quedan fuera del tablero antes de guardar.');return;}setBusy(true);setError('');setSaved(false);try{const response=await api<{desk:DeskData}>('/desk',{method:'PUT',body:JSON.stringify({name:desk.name,model:desk.model,height_cm:desk.height_cm,width_cm:desk.width_cm,depth_cm:desk.depth_cm,layout:desk.layout})});setDesk(normalizeDesk(response.desk));setDirty(false);setSaved(true);}catch(err){setError((err as Error).message);}finally{setBusy(false);}}}>
+ <fieldset disabled={busy} className="grid gap-5">
+ <section><p className="eyebrow mb-3">01 · Elige tu mesa</p><div className="desk-models">{models.map(model=><button type="button" className={`desk-model ${desk.model===model.id?'is-selected':''}`} aria-pressed={desk.model===model.id} key={model.id} onClick={()=>{const next={...desk,model:model.id,width_cm:model.width,depth_cm:model.depth};change({...next,layout:next.layout.map(i=>placeItem(next,i))});}}><svg viewBox="0 0 100 70" aria-hidden="true"><path d={model.id==='esquina'?'M8 25 52 7 93 24 71 34 52 27 30 37 30 52 8 42Z':'M9 25 58 7 94 24 45 45Z'} fill={desk.model===model.id?'#e8bd6d':'#c7daeb'} stroke="#193d62" strokeWidth="2"/><path d="M9 26v26 M45 45v18 M94 25v24" stroke="#193d62" strokeWidth="4"/>{model.id==='cajonera'&&<path d="M68 37v21l20-8V29 M70 44l15-6 M70 51l15-6" fill="#b5cbe0" stroke="#193d62" strokeWidth="2"/>}</svg><strong>{model.name}</strong><span>{model.description}</span></button>)}</div></section>
+ <Input label="Nombre del escritorio" maxLength={80} required value={desk.name} onChange={e=>change({...desk,name:e.target.value})}/>
+ <div className="grid grid-cols-2 gap-3"><Input label="Ancho en cm" type="number" step={0.1} min={20} max={1000} required value={desk.width_cm||''} onChange={e=>change({...desk,width_cm:Number(e.target.value)})}/><Input label="Fondo en cm" type="number" step={0.1} min={20} max={1000} required value={desk.depth_cm||''} onChange={e=>change({...desk,depth_cm:Number(e.target.value)})}/></div>
+ <Input label="Altura en cm" type="number" step={0.1} min={30} max={130} required value={desk.height_cm||''} onChange={e=>change({...desk,height_cm:Number(e.target.value)})}/>
+ <button type="button" className="desk-camera-button" aria-expanded={measuring} onClick={()=>setMeasuring(!measuring)}>▧ {measuring?'Ocultar medición':'Medir ancho y fondo con cámara'}</button>
+ {measuring&&<CameraMeasure onUse={cm=>dimensions(cm,desk.depth_cm)} onDimensions={(width,depth)=>{if(width<20||width>1000||depth<20||depth>1000){setError('La mesa debe medir entre 20 y 1000 cm en cada lado.');return false;}dimensions(width,depth);return true;}}/>}
+ <section className="desk-studio"><div className="p-4"><p className="eyebrow mb-2">02 · Organiza tu espacio</p><h2 className="font-bold text-lg">Una mesa, tus ideas</h2><p className="text-sm text-text-secondary mt-1">{desk.width_cm} × {desk.depth_cm} cm · {desk.model==='esquina'?'La esquina vacía no forma parte del tablero.':'Las tarjetas muestran la ubicación de tus objetos.'}</p></div>
+ <div className="desk-view-tabs">{(['3d','top','plan'] as const).map(value=><button type="button" key={value} aria-pressed={view===value} onClick={()=>setView(value)}>{value==='3d'?'Vista 3D':value==='top'?'Desde arriba':'Plano'}</button>)}</div>
+ {validSize?(view==='plan'?<svg viewBox={`0 0 ${desk.width_cm} ${desk.depth_cm}`} role="img" aria-label="Plano del escritorio" className="desk-flat" onPointerDown={e=>{if(!selected)return;const rect=e.currentTarget.getBoundingClientRect();move(selected,(e.clientX-rect.left)/rect.width*100,(e.clientY-rect.top)/rect.height*100);}}><path d={desk.model==='esquina'?`M0 0H${desk.width_cm}V${desk.depth_cm*.44}H${desk.width_cm*.44}V${desk.depth_cm}H0Z`:`M0 0H${desk.width_cm}V${desk.depth_cm}H0Z`} fill="#dec29e"/>{desk.layout.map(i=>{const size=itemSize(i);return <g key={i.id} transform={`translate(${i.x*desk.width_cm/100},${i.y*desk.depth_cm/100}) rotate(${i.rotation??0})`} onPointerDown={e=>{e.stopPropagation();setSelected(i.id);}}><rect x={-size.width/2} y={-size.depth/2} width={size.width} height={size.depth} rx="1" stroke={i.id===selected?'#123b67':'#b58c34'} strokeWidth={i.id===selected?1.3:.4} fill={i.color??'#fff2bf'}/><text textAnchor="middle" dominantBaseline="middle" fontSize={Math.min(size.width/6,size.depth/3,5)} fill="#163658">{(i.label||labels[i.kind]).slice(0,22)}</text></g>;})}</svg>:<Suspense fallback={<p className="p-8 text-center" role="status">Preparando tu mesa 3D…</p>}><DeskScene desk={desk} selected={selected} mode={mode} top={view==='top'} onSelect={setSelected} onMove={move}/></Suspense>):<p className="p-6 text-sm">Introduce dimensiones válidas para ver la mesa.</p>}
+ {view!=='plan'&&<div className="desk-view-tabs"><button type="button" aria-pressed={mode==='move'} onClick={()=>setMode('move')}>Mover tarjetas</button><button type="button" aria-pressed={mode==='orbit'} onClick={()=>setMode('orbit')}>Girar y acercar</button></div>}
+ <p className="text-xs text-text-secondary p-4">{view==='plan'?'Selecciona una tarjeta y toca su nueva posición.':mode==='move'?'Arrastra una tarjeta o toca el tablero para mover la seleccionada.':'Desliza para girar. Usa dos dedos o la rueda para acercar.'} También puedes usar los controles de posición.</p></section>
+ {outside.length>0&&<Notice error>{outside.length} objeto(s) no caben en el tablero. Reduce su tamaño o ajusta su posición.</Notice>}
+ <section className="surface p-5 grid gap-4"><p className="eyebrow">03 · Tus objetos</p><Input label="Nombre de la nueva tarjeta" placeholder="Portátil, despertador, libreta…" maxLength={40} value={newLabel} onChange={e=>setNewLabel(e.target.value)}/><button type="button" className="desk-add" disabled={!newLabel.trim()||desk.layout.length>=24||!validSize} onClick={()=>{const id=crypto.randomUUID();const added=placeItem(desk,{id,kind:'personalizado',label:newLabel.trim(),x:50,y:25,width_cm:Math.min(28,desk.width_cm*.3),depth_cm:Math.min(20,desk.depth_cm*.3),rotation:0,color:'#fff2bf'});change({...desk,layout:[...desk.layout,added]});setSelected(id);setNewLabel('');}}>＋ Agregar tarjeta ({desk.layout.length}/24)</button>
+ <FieldSelect label="Objeto seleccionado" value={selected} onChange={setSelected}><option value="">Selecciona un objeto</option>{desk.layout.map(i=><option value={i.id} key={i.id}>{i.label||labels[i.kind]}</option>)}</FieldSelect>
+ {item&&<><Input label="Nombre del objeto" maxLength={40} required value={item.label??labels[item.kind]} onChange={e=>edit({label:e.target.value})}/><div className="grid grid-cols-2 gap-3"><Input label="Ancho del objeto (cm)" type="number" min={1} max={300} step={0.1} required value={itemSize(item).width||''} onChange={e=>edit({width_cm:Number(e.target.value)})}/><Input label="Fondo del objeto (cm)" type="number" min={1} max={300} step={0.1} required value={itemSize(item).depth||''} onChange={e=>edit({depth_cm:Number(e.target.value)})}/></div>
+ <label className="text-sm">Posición horizontal: {Math.round(item.x)} %<input className="block w-full mt-3 accent-primary" type="range" min="5" max="95" value={item.x} onChange={e=>move(item.id,Number(e.target.value),item.y)}/></label><label className="text-sm">Posición de fondo: {Math.round(item.y)} %<input className="block w-full mt-3 accent-primary" type="range" min="5" max="95" value={item.y} onChange={e=>move(item.id,item.x,Number(e.target.value))}/></label>
+ <FieldSelect label="Color de la tarjeta" value={item.color??'#fff2bf'} onChange={color=>edit({color})}><option value="#fff2bf">Dorado suave</option><option value="#d8edff">Azul cielo</option><option value="#dcf4e5">Verde suave</option><option value="#f5dded">Rosa suave</option></FieldSelect>
+ <div className="flex flex-wrap gap-3"><button type="button" className="desk-add" onClick={()=>edit({rotation:((item.rotation??0)+90)%360})}>Girar tarjeta 90°</button><button type="button" className="text-red-700 min-h-11" onClick={()=>{change({...desk,layout:desk.layout.filter(i=>i.id!==selected)});setSelected(desk.layout.find(i=>i.id!==selected)?.id??'');}}>Quitar tarjeta</button></div></>}
+ <p className="text-xs text-text-secondary">Las tarjetas son marcadores planos con medidas que tú introduces. Puedes superponerlas; la app no detecta automáticamente el tamaño de tus pertenencias.</p></section>
+ {error&&<Notice error>{error}</Notice>}{saved&&<Notice>Escritorio guardado en tu cuenta. Conservamos el modelo, las medidas y tus tarjetas para cuando vuelvas.</Notice>}{dirty&&<p className="text-xs text-text-secondary" role="status">Tienes cambios por guardar.</p>}<Button loading={busy} disabled={outside.length>0}>Guardar escritorio</Button>
+ </fieldset></form></>}
+ </ReleasePage>;
+}

@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict');const fs=require('node:fs');const vm=require('node:vm');const {createRequire}=require('node:module');const path=require('node:path');
+const req=createRequire(path.resolve('frontend/package.json'));const ts=req('typescript');const code=ts.transpileModule(fs.readFileSync('frontend/src/shared/lib/nativePhoto.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;const exported={};vm.runInNewContext(code,{exports:exported,require:req,Error});const {pickNativePhoto,PhotoPermissionError}=exported;
+(async()=>{let requests=[],captures=0,gallery=0;let status='prompt';const camera={checkPermissions:async()=>({camera:status,photos:'granted'}),requestPermissions:async opts=>{requests.push(opts);status='granted';return {camera:status}},takePhoto:async opts=>{captures++;assert.equal(opts.saveToGallery,false);assert.equal(opts.includeMetadata,false);return {webPath:'capacitor://photo'}},chooseFromGallery:async opts=>{gallery++;assert.equal(opts.allowMultipleSelection,false);return {results:[{webPath:'capacitor://selected'}]}}};
+ assert.equal(await pickNativePhoto('camera','profile',camera),'capacitor://photo');assert.deepEqual([...requests[0].permissions],['camera']);assert.equal(captures,1);
+ await pickNativePhoto('camera','measurement',camera);assert.equal(requests.length,1);
+ status='prompt-with-rationale';await pickNativePhoto('camera','measurement',camera);assert.equal(requests.length,2);
+ status='denied';await assert.rejects(pickNativePhoto('camera','profile',camera),PhotoPermissionError);assert.equal(captures,3);assert.equal(requests.length,2);
+ assert.equal(await pickNativePhoto('gallery','profile',camera),'capacitor://selected');assert.equal(gallery,1);assert.equal(requests.length,2);
+ camera.chooseFromGallery=async()=>{throw {code:'OS-PLUG-CAMR-0020'}};assert.equal(await pickNativePhoto('gallery','profile',camera),null);
+ status='prompt';camera.requestPermissions=async()=>({camera:'denied'});await assert.rejects(pickNativePhoto('camera','profile',camera),PhotoPermissionError);assert.equal(captures,3);
+ const manifest=fs.readFileSync('frontend/android/app/src/main/AndroidManifest.xml','utf8');assert.match(manifest,/android.permission.CAMERA/);for(const forbidden of ['READ_MEDIA_IMAGES','READ_EXTERNAL_STORAGE','WRITE_EXTERNAL_STORAGE','RECORD_AUDIO','ACCESS_FINE_LOCATION','READ_CONTACTS','POST_NOTIFICATIONS'])assert.ok(!manifest.includes(forbidden));
+ console.log('Permisos: primera solicitud solo cámara, reutilización, revocación, rechazo, galería sin acceso amplio y cancelación sin error. Manifest mínimo.');
+})().catch(e=>{console.error(e);process.exitCode=1});

@@ -1,0 +1,37 @@
+import {chromium,devices} from 'playwright';
+import assert from 'node:assert/strict';
+import {mkdirSync} from 'node:fs';
+const base=process.env.BASE_URL||'http://localhost:3102';
+if(!['localhost','127.0.0.1'].includes(new URL(base).hostname))throw new Error('Solo vista local.');
+const browser=await chromium.launch();
+try{
+ const context=await browser.newContext({...devices['iPhone 13']});
+ const reg=await context.request.post(base+'/api/auth/register',{data:{name:'Sesión prueba',email:`sesion-${Date.now()}@example.com`,password:'PruebaSesion2026'}});
+ const {token}=await reg.json();
+ const headers={Authorization:'Bearer '+token};
+ const task=await context.request.post(base+'/api/tasks',{headers,data:{title:'Despejar el centro del escritorio',type:'fisica'}});assert.equal(task.status(),201);
+ const {task:created}=await task.json();
+ await context.addInitScript(value=>localStorage.setItem('antilia_token',value),token);
+ const page=await context.newPage();
+ await page.clock.install();
+ await page.goto(base+'/#/sesion');
+ await page.getByLabel('Tarea para esta sesión').selectOption(created.id);
+ await page.getByRole('button',{name:'Empezar cinco minutos',exact:true}).click();
+ await page.getByRole('timer').getByText('05:00',{exact:true}).waitFor();
+ await page.clock.fastForward(2000);
+ await page.getByRole('button',{name:'Pausar sesión',exact:true}).click();
+ const paused=await page.getByRole('timer').innerText();
+ await page.reload();
+ await page.getByRole('button',{name:'Continuar sesión',exact:true}).waitFor();
+ assert.equal(await page.getByRole('timer').innerText(),paused);
+ await page.getByRole('button',{name:'Continuar sesión',exact:true}).click();
+ await page.clock.fastForward(301000);
+ await page.getByRole('timer').getByText('00:00',{exact:true}).waitFor();
+ const before=await(await context.request.get(base+'/api/streak',{headers})).json();assert.equal(before.streak.current_streak,0);
+ await page.getByRole('button',{name:'Ya completé mi tarea',exact:true}).click();
+ await page.getByText('Tarea completada. Tu progreso y tu racha están actualizados en tu cuenta.',{exact:true}).waitFor();
+ const after=await(await context.request.get(base+'/api/streak',{headers})).json();assert.equal(after.streak.current_streak,1);
+ mkdirSync('qa/evidencias/sesion',{recursive:true});
+ await page.screenshot({path:'qa/evidencias/sesion/terminada.png',fullPage:true});
+ console.log('PASA: inicio, pausa, recuperación, fin del tiempo sin recompensa y completado real con racha.');
+}finally{await browser.close();}

@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),{createRequire}=require('node:module'),path=require('node:path');
+const req=createRequire(path.resolve('frontend/package.json'));const ts=req('typescript');
+const code=ts.transpileModule(fs.readFileSync('frontend/src/features/analytics/context.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
+const memory=()=>{const map=new Map();return{getItem:k=>map.get(k)||null,setItem:(k,v)=>map.set(k,v),removeItem:k=>map.delete(k)}};
+const session=memory(),local=memory(),navigator={doNotTrack:'0',userAgent:'Android',platform:'',maxTouchPoints:0},location={search:'?utm_source=qr'};const output={};let ids=0;
+vm.runInNewContext(code,{exports:output,navigator,location,localStorage:local,sessionStorage:session,crypto:{randomUUID:()=>{ids++;return'123e4567-e89b-42d3-a456-426614174000'}},URLSearchParams,window:{dispatchEvent(){}},Event:class{}});
+const one=output.analyticsContext();const two=output.analyticsContext();assert.equal(one.session,two.session);assert.equal(ids,1);assert.equal(one.device,'android');assert.equal(one.source,'qr');location.search='';assert.equal(output.analyticsContext().source,'qr');
+location.search='?utm_source=secret@example.com';assert.equal(output.analyticsContext().source,'otro');assert.equal(session.getItem('antilia_measurement_source'),'otro');
+location.search='?analytics_test=1';assert.equal(output.analyticsContext().audience,'test');
+navigator.doNotTrack='1';assert.equal(output.analyticsContext(),null);const headers=new Headers();output.measurementHeaders(headers);assert.equal(headers.get('X-Antilia-Analytics'),'off');assert.equal(headers.get('X-Antilia-Session'),null);
+navigator.doNotTrack='0';navigator.globalPrivacyControl=true;assert.equal(output.analyticsContext(),null);navigator.globalPrivacyControl=false;output.setMeasurementAllowed(false);assert.equal(output.analyticsContext(),null);output.setMeasurementAllowed(true);assert.ok(output.analyticsContext());
+console.log('Contexto analítico: sesión estable, origen permitido, modo prueba, no rastrear, GPC y preferencia local; sin guardar datos del query libre.');
