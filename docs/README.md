@@ -34,6 +34,9 @@
 - [Registro del Release 1](validacion/registro-release1.xlsx): resultados por tarea, SUS calculado, hallazgos y resumen.
 - [Plan de validación del Release 2](validacion/plan-release2.md): participantes, tareas, criterios, responsables y fechas del 26 de octubre al 8 de noviembre.
 - [Registro del Release 2](validacion/registro-release2.xlsx): misma estructura con las tareas del Release 2.
+- [Protocolo de la validación final](validacion/protocolo-final-release3.md): tareas T1-F a T4-F, criterios y ejecución real del 8 de noviembre.
+- [Registro de la validación final](validacion/registro-final.xlsx): participantes, éxito y tiempo por tarea, SUS, hallazgos, uso real y comparación entre ciclos.
+- [Validación final y candidato v1.0-rc](entregas/validacion-final-rc.md): congelamiento, errores conocidos y plan del MVP final.
 
 ## Entregas
 

@@ -4,6 +4,8 @@ Responsable del protocolo: Samuel Montealegre Quintero (QA).
 
 Ventana de ejecución: del lunes 9 al domingo 15 de noviembre de 2026. Los resultados alimentan la entrega de la validación final (15 de noviembre) y el MVP final (22 de noviembre).
 
+> **Ejecución real (registrado el 16 de noviembre de 2026).** Las sesiones se hicieron el 8 de noviembre de 2026 con siete personas, sobre v0.3. Ese código de aplicación es el mismo del tag `v1.0-rc`: desde el 9 de noviembre solo cambiaron documentos. Se aplicó el bloque B (T1-F a T4-F), no el bloque A, para cumplir el límite de 3 a 5 tareas de la Junta [CONFIRMAR]. Cinco participantes trabajan en microempresas, uno en una empresa pequeña y uno en una mediana: es una desviación del perfil del punto 3 y se declara en el reporte. Los resultados se registran en [registro-final.xlsx](registro-final.xlsx).
+
 ## 1. Objetivo
 
 Comprobar con personas reales del segmento:
@@ -78,18 +80,19 @@ La sesión puede ser presencial o por videollamada con pantalla compartida y dur
 
 ## 7. Registro
 
-Los resultados se diligencian en `registro-final.xlsx`, con la misma estructura de `registro-release2.xlsx` (hojas Guion, Participantes, Tareas, SUS, Hallazgos y Resumen).
+Los resultados se diligencian en [registro-final.xlsx](registro-final.xlsx), con la misma estructura de `registro-release2.xlsx` (hojas Guion, Participantes, Tareas, SUS, Hallazgos y Resumen).
 
 ## 8. Agenda de participantes
 
-| Código | Perfil y empresa | Participación previa | Fecha y hora | Modalidad | Estado |
+| Código | Perfil y empresa | Participación previa | Fecha y hora | Dispositivo | Estado |
 |---|---|---|---|---|---|
-| PF-1 | | | | | Por confirmar |
-| PF-2 | | | | | Por confirmar |
-| PF-3 | | | | | Por confirmar |
-| PF-4 | | | | | Por confirmar |
-| PF-5 | | | | | Por confirmar |
-| Reserva | | | | | Por confirmar |
+| VF-1 | Contadora · microempresa | Usó R1 | 08/11/2026 16:53 | Android web | Completada |
+| VF-2 | Secretaria · microempresa | Usó R1 | 08/11/2026 16:58 | Android web | Completada |
+| VF-3 | Asesor de ventas · empresa pequeña | Nueva | 08/11/2026 17:00 | Android web | Completada |
+| VF-4 | Administradora · microempresa | Nueva | 08/11/2026 17:20 | Computador | Completada |
+| VF-5 | Administradora · microempresa | Nueva | 08/11/2026 17:24 | Computador | Completada |
+| VF-6 | Gerente técnico · empresa mediana | Usó R1 | 08/11/2026 17:25 | Android web | Completada |
+| VF-7 | Gerente · microempresa | Nueva | 08/11/2026 17:28 | Computador | Completada |
 
 La tabla se actualiza cuando cada participante confirma su fecha. Solo se marca «Confirmado» con una respuesta escrita del participante.
 
